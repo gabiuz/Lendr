@@ -5,7 +5,7 @@
   --color-red-02: #990000;
   --color-gray: #2a2a2a;
   --color-dark-gray: #150e0e;
-  --color-light-gray:   #d9d9d9;
+  --color-light-gray: #d9d9d9;
 }
 
 :root {
@@ -49,4 +49,12 @@ a {
   html {
     color-scheme: light;
   }
+}
+
+.red-line {
+  width: 183px;
+  height: 15px;
+  border: 1px solid red;
+  background-color: red;
+  border-radius: 50px;
 }
