@@ -8,25 +8,25 @@ import Button from "../components/Button";
 export default function Register() {
   return (
     <>
-      <div className="relative h-screen">
+      <div className="relative min-h-screen">
         <div className="absolute inset-0 bg-[url('/bg-image-login.jpg')] bg-cover bg-center opacity-55"></div>
-        <div className="z-10 absolute top-4 left-4 sm:top-6 sm:left-6 lg:top-8 lg:left-8">
+        <div className="image z-10">
           <Image
             src="/lendr-logo.png"
             alt="Lendr Logo"
             width={142}
             height={54}
-            className="w-24 sm:w-32 lg:w-36"
+            className="w-24 sm:w-32 lg:w-36 ml-1.5!"
           />
         </div>
-        <div className="z-10 absolute bottom-0 right-0">
+        <div className="z-10 relative flex justify-end align-bottom sm:justify-center sm:align-bottom">
           <Form className="login">
-            <div className="bg-white px-24! mt-36! py-[113px]! mr-[150px]!">
+            <div className="bg-white sm:px-1.5 md:px-16 lg:px-20 xl:px-24 sm:mt-20 md:mt-28 lg:mt-32 xl:mt-36 sm:py-3 md:py-16 lg:py-24 xl:py-[113px] md:mr-10 lg:mr-16 xl:mr-[150px]">
               <div className="red-line mx-auto! mb-[72px]!"></div>
-              <h1 className="text-[64px]! font-bold text-black mt-0! mb-3 w-fit">
+              <h1 className=" sm:text-1xl md:text-3xl lg:text-5xl xl:text-[64px] font-bold text-black mt-0! md:mb-1.5 lg:mb-3 w-fit">
                 Create an Account<span className="m-0 p-0 text-red">.</span>
               </h1>
-              <p className="text-base text-black mb-11!">
+              <p className="md:text-sm lg:text-base text-black mb-11!">
                 Already have an Account?
                 <Link href="/login" className="font-bold">
                   <span> Log in</span>
