@@ -8,20 +8,19 @@ import Button from "../components/Button";
 export default function Register() {
   return (
     <>
-      <div className="relative h-screen overflow-hidden">
+      <div className="relative min-h-screen">
         <div className="absolute inset-0 bg-[url('/bg-image-login.jpg')] bg-cover bg-center opacity-55"></div>
-        <div className="image z-10">
+        <div className="absolute z-10 lg:left-[150px] lg:top-[89px]">
           <Image
             src="/lendr-logo.png"
             alt="Lendr Logo"
             width={142}
             height={54}
-            className="lg:ml-28 lg:pt-20 xl:ml-36 xl:pt-20"
           />
         </div>
-        <div className="z-10 relative flex xl:justify-end xl:align-end min-h-0">
+        <div className="z-10 relative flex justify-end items-end min-h-screen">
           <Form className="login">
-            <div className="bg-white sm:px-1.5 md:px-16 lg:px-20 xl:px-24 sm:mt-20 md:mt-28 lg:mt-32 xl:mt-0 m:py-3 md:py-16 lg:py-24 xl:py-[113px] md:mr-10 lg:mr-16 xl:mr-[150px]">
+            <div className="bg-white xl:px-24 xl:py-[113px] mr-[150px]">
               <div className="red-line mx-auto! mb-[72px]!"></div>
               <h1 className=" sm:text-1xl md:text-3xl lg:text-5xl xl:text-[64px] font-bold text-black mt-0! md:mb-1.5 lg:mb-3 w-fit">
                 Create an Account<span className="m-0 p-0 text-red">.</span>
