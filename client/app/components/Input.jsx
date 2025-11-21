@@ -12,10 +12,10 @@ export default function Input({
 }) {
   return (
     <div
-      className={`${containerClassName} flex flex-col border border-lightgray rounded-xl px-[25px]! py-3!`}
+      className={`${containerClassName} flex flex-col border border-lightgray rounded-xl px-6 py-2 xl:px-[25px] xl:py-3`}
     >
       {label && (
-        <label htmlFor={id} className="text-black mb-2! text-sm!">
+        <label htmlFor={id} className="text-black xl:mb-2 xl:text-sm!">
           {label} {required && <span className="text-red">*</span>}
         </label>
       )}
