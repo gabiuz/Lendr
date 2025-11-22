@@ -4,6 +4,7 @@ import Link from "next/link";
 import RadioButtons from "../components/RadioButtons";
 import Input from "../components/Input";
 import Button from "../components/Button";
+import Checkbox from "../components/Checkbox";
 
 export default function Login() {
   const formFields = [
@@ -61,12 +62,11 @@ export default function Login() {
                 ))}
               </div>
               <div className="remember-me-forgot-container flex justify-between items-center mb-[45px]">
-                <RadioButtons
-                  id="remember-pass"
-                  name="remember-pass"
-                  value="remember-pass"
+                <Checkbox
+                  id="remember-me"
+                  name="remember-me"
                   label="Remember Me"
-                ></RadioButtons>
+                ></Checkbox>
                 <Link href="/">
                   <span className="text-light-gray">Forgot Password</span>
                 </Link>
