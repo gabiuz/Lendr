@@ -6,6 +6,12 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 
 export default function Register() {
+  const formFields = [
+    { label: "First Name", name: "FirstName", placeholder: "First Name" },
+    { label: "Middle Name", name: "MiddleName", placeholder: "Middle Name" },
+    { label: "Last Name", name: "LastName", placeholder: "Last Name" },
+  ];
+
   return (
     <>
       <div className="relative min-h-screen">
@@ -34,33 +40,18 @@ export default function Register() {
                 </p>
               </div>
               <div className="Name-container flex flex-col gap-4 mb-4 lg:flex-row xl:flex-row xl:mb-[30px]">
-                <Input
-                  label="First Name"
-                  type="text"
-                  placeholder="First Name"
-                  name="FirstName"
-                  id="FirstName"
-                  required={true}
-                  containerClassName="w-full lg:w-3xs"
-                ></Input>
-                <Input
-                  label="Middle Name"
-                  type="text"
-                  placeholder="Middle Name"
-                  name="MiddleName"
-                  id="MiddleName"
-                  required={true}
-                  containerClassName="w-full lg:w-3xs"
-                ></Input>
-                <Input
-                  label="Last Name"
-                  type="text"
-                  placeholder="Last Name"
-                  name="LastName"
-                  id="LastName"
-                  required={true}
-                  containerClassName="w-full lg:w-3xs"
-                ></Input>
+                {formFields.map((field) => (
+                  <Input
+                    key={field.name}
+                    label={field.label}
+                    type="text"
+                    placeholder={field.placeholder}
+                    name={field.name}
+                    id={field.name}
+                    required={true}
+                    containerClassName="w-full lg:w-3xs"
+                  ></Input>
+                ))}
               </div>
               <div className="bday-radio-container flex flex-col gap-4 mb-4 lg:flex-row xl:flex-row xl:gap-[58px] xl:justify-between xl:mb-[30px]">
                 <div className="radio-container w-full pr-13">

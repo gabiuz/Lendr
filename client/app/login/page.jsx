@@ -6,6 +6,20 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 
 export default function Login() {
+  const formFields = [
+    {
+      label: "Email",
+      name: "email",
+      placeholder: "Abcde@gmail.com",
+      type: "email",
+    },
+    {
+      label: "Password",
+      name: "password",
+      placeholder: "********",
+      type: "password",
+    },
+  ];
   return (
     <>
       <div className="relative min-h-screen bg-[url('/bg-login.jpg')] bg-cover bg-center">
@@ -27,34 +41,26 @@ export default function Login() {
                 </h1>
                 <p className="text-sm text-black mb-6 lg:text-base xl:text-base">
                   Don&apos;t have an account?
-                  <Link href="/login" className="font-bold">
+                  <Link href="/register" className="font-bold">
                     <span> Sign Up</span>
                   </Link>
                 </p>
               </div>
               <div className="email-password flex flex-col gap-4 mb-4 lg:flex-col xl:justify-between xl:flex-row xl:mb-11 xl:gap-[45px]">
-                <Input
-                  label="Email"
-                  htmlFor="email"
-                  type="email"
-                  name="email"
-                  id="email"
-                  required={true}
-                  placeholder="Abcde@gmail.com"
-                  containerClassName="w-full! mb-6! password-container"
-                ></Input>
-                <Input
-                  label="Password"
-                  htmlFor="password"
-                  type="password"
-                  name="password"
-                  id="password"
-                  required={true}
-                  placeholder="********"
-                  containerClassName="w-full! mb-6! password-container"
-                ></Input>
+                {formFields.map((field) => (
+                  <Input
+                    key={field.name}
+                    label={field.label}
+                    type={field.type}
+                    name={field.name}
+                    id={field.name}
+                    required={true}
+                    placeholder={field.placeholder}
+                    containerClassName="w-full! mb-6! password-container"
+                  ></Input>
+                ))}
               </div>
-              <div className="remember-me-forgot-container flex justify-between mb-[45px]">
+              <div className="remember-me-forgot-container flex justify-between items-center mb-[45px]">
                 <RadioButtons
                   id="remember-pass"
                   name="remember-pass"
