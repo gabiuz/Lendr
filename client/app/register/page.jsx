@@ -9,7 +9,7 @@ export default function Register() {
   return (
     <>
       <div className="relative min-h-screen">
-        <div className="absolute inset-0 bg-[url('/bg-image-login.jpg')] bg-cover bg-center opacity-55"></div>
+        <div className="absolute inset-0 bg-[url('/bg-register-login.jpg')] bg-cover bg-center opacity-55"></div>
         <div className="absolute z-10 flex justify-center w-full top-6 md:w-full md:justify-center lg:w-full lg:justify-center xl:w-auto xl:justify-start xl:left-[150px] xl:top-[89px]">
           <Image
             src="/lendr-logo.png"
