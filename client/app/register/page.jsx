@@ -6,11 +6,18 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 
 export default function Register() {
-  const formFields = [
-    { label: "First Name", name: "FirstName", placeholder: "First Name" },
-    { label: "Middle Name", name: "MiddleName", placeholder: "Middle Name" },
-    { label: "Last Name", name: "LastName", placeholder: "Last Name" },
-  ];
+  const formFields = {
+    name: [
+      { label: "First Name", id: "FirstName", placeholder: "First Name" },
+      { label: "Middle Name", id: "MiddleName", placeholder: "Middle Name" },
+      { label: "Last Name", id: "LastName", placeholder: "Last Name" },
+    ],
+    sex: [
+      { label: "Male", id: "male", value: "male" },
+      { label: "Female", id: "female", value: "female" },
+      { label: "Prefer Not to Say", id: "other", value: "other" },
+    ],
+  };
 
   return (
     <>
@@ -25,8 +32,8 @@ export default function Register() {
           />
         </div>
         <div className="z-10 relative flex justify-center items-end lg:justify-end xl:justify-end min-h-screen">
-          <Form className="login w-full lg:w-auto xl:w-auto">
-            <div className="bg-white px-6 py-10 lg:w-4xl lg:px-22 lg:py-20 lg:mr-28 xl:px-24 xl:py-[113px] xl:mr-[150px]">
+          <Form className="register w-full lg:w-5xl xl:w-auto">
+            <div className="bg-white px-6 py-10 lg:px-22 lg:py-20 lg:mr-28 xl:px-24 xl:py-[113px] xl:mr-[150px]">
               <div className="red-line mx-auto mb-8 xl:mb-[72px]"></div>
               <div className="flex flex-col justify-center items-center lg:mb-8 lg:items-start xl:items-start xl:mb-11">
                 <h1 className="text-2xl font-bold text-black mt-0 mb-1 w-fit text-center lg:text-5xl xl:text-[64px]">
@@ -40,43 +47,34 @@ export default function Register() {
                 </p>
               </div>
               <div className="Name-container flex flex-col gap-4 mb-4 lg:flex-row xl:flex-row xl:mb-[30px]">
-                {formFields.map((field) => (
+                {formFields.name.map((field) => (
                   <Input
-                    key={field.name}
+                    key={field.id}
                     label={field.label}
                     type="text"
                     placeholder={field.placeholder}
-                    name={field.name}
-                    id={field.name}
+                    name={field.id}
+                    id={field.id}
                     required={true}
-                    containerClassName="w-full lg:w-3xs"
+                    containerClassName="w-full lg:w-[235px]"
                   ></Input>
                 ))}
               </div>
               <div className="bday-radio-container flex flex-col gap-4 mb-4 lg:flex-row xl:flex-row xl:gap-[58px] xl:justify-between xl:mb-[30px]">
-                <div className="radio-container w-full pr-13">
+                <div className="radio-container w-full mr-8">
                   <label className="text-black mb-1.5 block">
                     Sex<span className="text-red">*</span>
                   </label>
                   <div className="flex w-full gap-3 justify-between lg:w-fit xl:align-center xl:gap-[21px]">
-                    <RadioButtons
-                      id="Male"
-                      name="Sex"
-                      value="Male"
-                      label="Male"
-                    ></RadioButtons>
-                    <RadioButtons
-                      id="Female"
-                      name="Sex"
-                      value="Female"
-                      label="Female"
-                    ></RadioButtons>
-                    <RadioButtons
-                      id="Other"
-                      name="Sex"
-                      value="Other"
-                      label="Prefer Not to Say"
-                    ></RadioButtons>
+                    {formFields.sex.map((field) => (
+                      <RadioButtons
+                        key={field.id}
+                        id={field.id}
+                        name={field.id}
+                        value={field.value}
+                        label={field.label}
+                      ></RadioButtons>
+                    ))}
                   </div>
                 </div>
                 <Input
