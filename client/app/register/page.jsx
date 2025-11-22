@@ -20,10 +20,10 @@ export default function Register() {
         </div>
         <div className="z-10 relative flex justify-center items-end lg:justify-end xl:justify-end min-h-screen">
           <Form className="login w-full lg:w-auto xl:w-auto">
-            <div className="bg-white px-6 py-10 lg:px-22 lg:py-20 lg:mr-28 xl:px-24 xl:py-[113px] xl:mr-[150px]">
+            <div className="bg-white px-6 py-10 lg:w-4xl lg:px-22 lg:py-20 lg:mr-28 xl:px-24 xl:py-[113px] xl:mr-[150px]">
               <div className="red-line mx-auto mb-8 xl:mb-[72px]"></div>
               <div className="flex flex-col justify-center items-center lg:mb-8 lg:items-start xl:items-start xl:mb-11">
-                <h1 className="text-2xl font-bold text-black mt-0 mb-1 w-fit text-center lg:text-4xl xl:text-[64px]">
+                <h1 className="text-2xl font-bold text-black mt-0 mb-1 w-fit text-center lg:text-5xl xl:text-[64px]">
                   Create an Account<span className="m-0 p-0 text-red">.</span>
                 </h1>
                 <p className="text-sm text-black mb-6 lg:text-base xl:text-base">
@@ -63,7 +63,7 @@ export default function Register() {
                 ></Input>
               </div>
               <div className="bday-radio-container flex flex-col gap-4 mb-4 lg:flex-row xl:flex-row xl:gap-[58px] xl:justify-between xl:mb-[30px]">
-                <div className="radio-container w-full">
+                <div className="radio-container w-full pr-13">
                   <label className="text-black mb-1.5 block">
                     Sex<span className="text-red">*</span>
                   </label>
