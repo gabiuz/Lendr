@@ -30,12 +30,12 @@ export default function Homepage() {
             </ul>
           </div>
           <div className="text-black flex lg:gap-4">
-            <button>
-              <Link href="/register">Be a rental Owner</Link>
-            </button>
-            <button>
-              <Link href="/">Profile</Link>
-            </button>
+            <Link href="/register">
+              <button>Be a Rental Owner</button>
+            </Link>
+            <Link href="/register">
+              <button>Register</button>
+            </Link>
           </div>
         </nav>
       </div>
