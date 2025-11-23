@@ -61,7 +61,7 @@ export default function Register() {
                 ))}
               </div>
               <div className="bday-radio-container flex flex-col gap-4 mb-4 lg:flex-row xl:flex-row xl:gap-[58px] xl:justify-between xl:mb-[30px]">
-                <div className="radio-container w-full mr-8">
+                <div className="radio-container w-full lg:mr-8 xl:mr-0">
                   <label className="text-black mb-1.5 block">
                     Sex<span className="text-red">*</span>
                   </label>
