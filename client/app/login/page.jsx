@@ -24,7 +24,7 @@ export default function Login() {
   return (
     <>
       <div className="relative min-h-screen bg-[url('/bg-login.jpg')] bg-cover bg-center">
-        <div className="absolute z-10 flex justify-center w-full top-6 md:w-full md:justify-center lg:w-auto lg:justify-end lg:right-24 lg:top-16 xl:w-auto xl:justify-start xl:left-[150px] xl:top-[89px]">
+        <div className="absolute z-10 flex justify-center w-full top-6 md:w-full md:justify-center lg:w-auto lg:justify-end lg:right-24 lg:top-16 xl:w-auto xl:justify-end xl:left-[150px] xl:top-[89px]">
           <Image
             src="/lendr-logo.png"
             alt="Lendr Logo"
