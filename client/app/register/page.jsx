@@ -17,13 +17,21 @@ export default function Register() {
       { label: "Female", id: "female", value: "female" },
       { label: "Prefer Not to Say", id: "other", value: "other" },
     ],
+    emailAndPass: [
+      {label: "Email", id: "email" , placeholder:"Abcde@gmail.com"},
+      {label: "Password", id: "password" , placeholder:"*********"},
+    ],
+    addressAndPhone: [
+      {label: "Address", id: "address" , placeholder:"123 st. Metro Manila"},
+      {label: "Contact Number", id: "contactNo" , placeholder:"+63"},
+    ]
   };
 
   return (
     <>
       <div className="relative min-h-screen">
         <div className="absolute inset-0 bg-[url('/bg-image-register.jpg')] bg-cover bg-center opacity-55"></div>
-        <div className="absolute z-10 flex justify-center w-full top-6 md:w-full md:justify-center lg:w-auto lg:justify-start lg:left-24 lg:top-16 xl:w-auto xl:justify-start xl:left-[150px] xl:top-[89px]">
+        <div className="absolute z-10 flex justify-center w-full top-6 md:w-full md:justify-center lg:w-auto lg:justify-start lg:left-24 lg:top-16">
           <Image
             src="/lendr-logo.png"
             alt="Lendr Logo"
@@ -31,22 +39,22 @@ export default function Register() {
             height={54}
           />
         </div>
-        <div className="z-10 relative flex justify-center items-end lg:justify-end xl:justify-end min-h-screen">
-          <Form className="register w-full lg:w-5xl xl:w-auto">
-            <div className="bg-white px-6 py-10 lg:px-22 lg:py-20 lg:mr-28 xl:px-24 xl:py-[113px] xl:mr-[150px]">
-              <div className="red-line mx-auto mb-8 xl:mb-[72px]"></div>
-              <div className="flex flex-col justify-center items-center lg:mb-8 lg:items-start xl:items-start xl:mb-11">
-                <h1 className="text-2xl font-bold text-black mt-0 mb-1 w-fit text-center lg:text-5xl xl:text-[64px]">
+        <div className="z-10 relative flex justify-center items-end lg:justify-end min-h-screen">
+          <Form className="register w-full lg:w-5xl">
+            <div className="bg-white px-6 py-10 lg:px-22 lg:py-20 lg:mr-28">
+              <div className="red-line mx-auto mb-8"></div>
+              <div className="flex flex-col justify-center items-center lg:mb-8 lg:items-start">
+                <h1 className="text-2xl font-bold text-black mt-0 mb-1 w-fit text-center lg:text-5xl">
                   Create an Account<span className="m-0 p-0 text-red">.</span>
                 </h1>
-                <p className="text-sm text-black mb-6 lg:text-base xl:text-base">
+                <p className="text-sm text-black mb-6 lg:text-base">
                   Already have an Account?
                   <Link href="/login" className="font-bold">
                     <span> Log in</span>
                   </Link>
                 </p>
               </div>
-              <div className="Name-container flex flex-col gap-4 mb-4 lg:flex-row xl:flex-row xl:mb-[30px]">
+              <div className="Name-container flex flex-col gap-4 mb-4 lg:flex-row">
                 {formFields.name.map((field) => (
                   <Input
                     key={field.id}
@@ -60,12 +68,12 @@ export default function Register() {
                   ></Input>
                 ))}
               </div>
-              <div className="bday-radio-container flex flex-col gap-4 mb-4 lg:flex-row xl:flex-row xl:gap-[58px] xl:justify-between xl:mb-[30px]">
-                <div className="radio-container w-full lg:mr-8 xl:mr-0">
+              <div className="bday-radio-container flex flex-col gap-4 mb-4 lg:flex-row">
+                <div className="radio-container w-full lg:mr-8">
                   <label className="text-black mb-1.5 block">
                     Sex<span className="text-red">*</span>
                   </label>
-                  <div className="flex w-full gap-3 justify-between lg:w-fit xl:align-center xl:gap-[21px]">
+                  <div className="flex w-full gap-3 justify-between lg:w-fit">
                     {formFields.sex.map((field) => (
                       <RadioButtons
                         key={field.id}
@@ -88,46 +96,44 @@ export default function Register() {
                   required={true}
                 ></Input>
               </div>
-              <div className="email-phone flex flex-col  gap-4 mb-4 lg:flex-row xl:justify-between xl:flex-row xl:mb-11 xl:gap-[29px]">
+              <div className="email-password flex flex-col  gap-4 mb-4 lg:flex-row">
+                {formFields.emailAndPass.map((field) => (
                 <Input
-                  label="Email"
-                  htmlFor="email"
-                  type="email"
-                  name="email"
-                  id="email"
+                  key={field.id}
+                  label={field.label}
+                  htmlFor={field.id}
+                  type={field.id}
+                  name={field.id}
+                  id={field.id}
                   required={true}
-                  placeholder="Abcde@gmail.com"
+                  placeholder={field.placeholder}
                   containerClassName="w-full"
                 ></Input>
-                <Input
-                  label="Phone Number"
-                  htmlFor="phone"
-                  type="tel"
-                  name="phone"
-                  id="phone"
-                  required={true}
-                  placeholder="+63"
-                  containerClassName="w-full"
-                ></Input>
+                ))}
               </div>
-              <Input
-                label="Address"
-                htmlFor="address"
-                type="text"
-                name="address"
-                id="address"
-                required={true}
-                placeholder="123 St. Metro Manila"
-                containerClassName="w-full! mb-6! address-container"
-              ></Input>
-              <div className="button-container flex flex-row justify-between gap-3 lg:justify-end xl:justify-end">
+              <div className="address-phone flex flex-col  gap-4 mb-4 lg:flex-row">
+                {formFields.addressAndPhone.map((field) => (
+                <Input
+                  key={field.id}
+                  label={field.label}
+                  htmlFor={field.id}
+                  type={field.id}
+                  name={field.id}
+                  id={field.id}
+                  required={true}
+                  placeholder={field.placeholder}
+                  containerClassName="w-full"
+                ></Input>
+                ))}
+              </div>
+              <div className="button-container flex flex-row justify-between gap-3 lg:justify-end">
                 <Button
                   label="Cancel"
-                  className="text-light-gray flex-1 lg:flex-0 xl:flex-0 hover:text-red hover:border-red"
+                  className="text-light-gray flex-1 lg:flex-0 hover:text-red hover:border-red" 
                 ></Button>
                 <Button
                   label="Submit"
-                  className="text-white bg-light-gray flex-1 lg:flex-0 xl:flex-0 hover:bg-red"
+                  className="text-white bg-light-gray flex-1 lg:flex-0 hover:bg-red hover:border-red"
                 ></Button>
               </div>
             </div>
