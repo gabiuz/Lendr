@@ -74,7 +74,7 @@ export default function Login() {
               <div className="button-container flex flex-row justify-between gap-3 lg:justify-end xl:justify-end">
                 <Button
                   label="Log in"
-                  className="text-white bg-light-gray flex-1 lg:flex-1 xl:flex-1"
+                  className="text-white bg-light-gray flex-1 lg:flex-1 xl:flex-1 hover:bg-red"
                 ></Button>
               </div>
             </div>
