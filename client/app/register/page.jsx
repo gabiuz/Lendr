@@ -123,11 +123,11 @@ export default function Register() {
               <div className="button-container flex flex-row justify-between gap-3 lg:justify-end xl:justify-end">
                 <Button
                   label="Cancel"
-                  className="text-light-gray flex-1 lg:flex-0 xl:flex-0"
+                  className="text-light-gray flex-1 lg:flex-0 xl:flex-0 hover:text-red hover:border-red"
                 ></Button>
                 <Button
                   label="Submit"
-                  className="text-white bg-light-gray flex-1 lg:flex-0 xl:flex-0"
+                  className="text-white bg-light-gray flex-1 lg:flex-0 xl:flex-0 hover:bg-red"
                 ></Button>
               </div>
             </div>
