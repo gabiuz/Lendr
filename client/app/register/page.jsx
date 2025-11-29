@@ -18,12 +18,12 @@ export default function Register() {
       { label: "Prefer Not to Say", id: "other", value: "other" },
     ],
     emailAndPass: [
-      {label: "Email", id: "email" , placeholder:"Abcde@gmail.com"},
-      {label: "Password", id: "password" , placeholder:"*********"},
+      {label: "Email", id: "email", type: "email", placeholder:"Abcde@gmail.com"},
+      {label: "Password", id: "password", type: "password", placeholder:"*********"},
     ],
     addressAndPhone: [
-      {label: "Address", id: "address" , placeholder:"123 st. Metro Manila"},
-      {label: "Contact Number", id: "contactNo" , placeholder:"+63"},
+      {label: "Address", id: "address", type: "text", placeholder:"123 st. Metro Manila"},
+      {label: "Contact Number", id: "contactNo", type: "tel", placeholder:"+63"},
     ]
   };
 
@@ -102,7 +102,7 @@ export default function Register() {
                   key={field.id}
                   label={field.label}
                   htmlFor={field.id}
-                  type={field.id}
+                  type={field.type}
                   name={field.id}
                   id={field.id}
                   required={true}
@@ -117,7 +117,7 @@ export default function Register() {
                   key={field.id}
                   label={field.label}
                   htmlFor={field.id}
-                  type={field.id}
+                  type={field.type}
                   name={field.id}
                   id={field.id}
                   required={true}
