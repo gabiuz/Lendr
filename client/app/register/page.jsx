@@ -18,12 +18,12 @@ export default function Register() {
       { label: "Prefer Not to Say", id: "other", value: "other" },
     ],
     emailAndPass: [
-      {label: "Email", id: "email", type: "email", placeholder:"Abcde@gmail.com"},
-      {label: "Password", id: "password", type: "password", placeholder:"*********"},
+      { label: "Email", id: "email", type: "email", placeholder: "Abcde@gmail.com" },
+      { label: "Password", id: "password", type: "password", placeholder: "*********" },
     ],
     addressAndPhone: [
-      {label: "Address", id: "address", type: "text", placeholder:"123 st. Metro Manila"},
-      {label: "Contact Number", id: "contactNo", type: "tel", placeholder:"+63"},
+      { label: "Address", id: "address", type: "text", placeholder: "123 st. Metro Manila" },
+      { label: "Contact Number", id: "contactNo", type: "tel", placeholder: "+63" },
     ]
   };
 
@@ -54,7 +54,7 @@ export default function Register() {
                   </Link>
                 </p>
               </div>
-              <div className="Name-container flex flex-col gap-4 mb-4 lg:flex-row">
+              <div className="Name-container flex flex-col gap-4 mb-4 lg:flex-row ">
                 {formFields.name.map((field) => (
                   <Input
                     key={field.id}
@@ -98,38 +98,38 @@ export default function Register() {
               </div>
               <div className="email-password flex flex-col  gap-4 mb-4 lg:flex-row">
                 {formFields.emailAndPass.map((field) => (
-                <Input
-                  key={field.id}
-                  label={field.label}
-                  htmlFor={field.id}
-                  type={field.type}
-                  name={field.id}
-                  id={field.id}
-                  required={true}
-                  placeholder={field.placeholder}
-                  containerClassName="w-full"
-                ></Input>
+                  <Input
+                    key={field.id}
+                    label={field.label}
+                    htmlFor={field.id}
+                    type={field.type}
+                    name={field.id}
+                    id={field.id}
+                    required={true}
+                    placeholder={field.placeholder}
+                    containerClassName="w-full"
+                  ></Input>
                 ))}
               </div>
               <div className="address-phone flex flex-col  gap-4 mb-4 lg:flex-row">
                 {formFields.addressAndPhone.map((field) => (
-                <Input
-                  key={field.id}
-                  label={field.label}
-                  htmlFor={field.id}
-                  type={field.type}
-                  name={field.id}
-                  id={field.id}
-                  required={true}
-                  placeholder={field.placeholder}
-                  containerClassName="w-full"
-                ></Input>
+                  <Input
+                    key={field.id}
+                    label={field.label}
+                    htmlFor={field.id}
+                    type={field.type}
+                    name={field.id}
+                    id={field.id}
+                    required={true}
+                    placeholder={field.placeholder}
+                    containerClassName="w-full"
+                  ></Input>
                 ))}
               </div>
               <div className="button-container flex flex-row justify-between gap-3 lg:justify-end">
                 <Button
                   label="Cancel"
-                  className="text-light-gray flex-1 lg:flex-0 hover:text-red hover:border-red" 
+                  className="text-light-gray flex-1 lg:flex-0 hover:text-red hover:border-red"
                 ></Button>
                 <Button
                   label="Submit"
