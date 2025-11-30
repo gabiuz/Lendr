@@ -23,7 +23,7 @@ export default function Register() {
     ],
     addressAndPhone: [
       { label: "Address", id: "address", type: "text", placeholder: "123 st. Metro Manila" },
-      { label: "Contact Number", id: "contactNo", type: "tel", placeholder: "+63" },
+      { label: "Phone Number", id: "contactNo", type: "tel", placeholder: "+63" },
     ]
   };
 
