@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Search from "../components/Search";
 
 export default function Homepage() {
   return (
@@ -44,7 +45,6 @@ export default function Homepage() {
             </Link>
           </div>
         </nav>
-        {/* Hero Section */}
         <header>
           <div className="relative h-[600px] xl:h-[750px]">
             <Image
@@ -63,6 +63,10 @@ export default function Homepage() {
                 Search thousands of listings across categories. Compare prices,
                 check availability, and rent securely — all in one place.
               </p>
+            </div>
+
+            <div className="relative z-10 flex bg-white justify-center items-center lg:px-4 lg:py-4 lg:w-fit">
+              <Search></Search>
             </div>
           </div>
         </header>
