@@ -75,6 +75,9 @@ export default function Homepage() {
               </div>
             </div>
         </header>
+        <div className="category-container bg-white"> 
+          <h2 className="flex text-black font-bold lg:text-4xl lg:pt-28 lg:pb-12 lg:justify-center">Browse By Category</h2>
+        </div>
       </div>
     </>
   );
