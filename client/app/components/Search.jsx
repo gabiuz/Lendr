@@ -22,7 +22,7 @@ export default function Search() {
         name={field.id}
         id={field.id}
         required={false}
-        containerClassName="font-semibold w-full lg:w-auto"
+        containerClassName="w-full lg:w-auto"
         className="w-full lg:w-48 xl:w-56 "
       ></Input>
     ))}

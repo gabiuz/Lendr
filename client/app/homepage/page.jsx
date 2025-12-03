@@ -53,18 +53,15 @@ export default function Homepage() {
               className="object-cover opacity-55"
               fill
             />
-
             <div className="relative z-10 flex flex-col items-center gap-6 pt-40 text-center px-4">
               <h1 className="text-white font-bold text-4xl xl:text-6xl">
                 Rent Anything, <span className="text-red"> Anytime</span>
               </h1>
-
               <p className="text-white font-medium text-base xl:text-xl max-w-2xl">
                 Search thousands of listings across categories. Compare prices,
                 check availability, and rent securely — all in one place.
               </p>
             </div>
-
             <div className="relative z-10 flex justify-center items-center px-4 py-4">
               <div className="flex bg-white lg:px-4 lg:py-4 lg:w-fit lg:gap-5 items-center rounded-2xl lg:mt-16">
                 <Search></Search>
