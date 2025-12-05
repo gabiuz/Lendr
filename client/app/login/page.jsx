@@ -22,8 +22,8 @@ export default function Login() {
   ];
   return (
     <>
-      <div className="relative min-h-screen bg-[url('/bg-login.jpg')] bg-cover bg-center">
-        <div className="absolute z-10 flex justify-center w-full top-6 md:w-full md:justify-center lg:w-auto lg:justify-end lg:right-24 lg:top-16">
+      <div className="min-h-screen flex flex-col justify-between bg-[url('/bg-login.jpg')] bg-cover bg-center">
+        <div className="flex justify-center w-full pt-6 md:w-full md:justify-center lg:w-auto lg:justify-end lg:pr-24 lg:pt-16">
           <Image
             src="/lendr-logo.png"
             alt="Lendr Logo"
@@ -31,7 +31,7 @@ export default function Login() {
             height={54}
           />
         </div>
-        <div className="z-10 relative flex justify-center items-end lg:justify-start min-h-screen">
+        <div className="flex lg:justify-start lg:items-end">
           <Form className="login w-full lg:w-auto">
             <div className="bg-white px-6 py-10 lg:px-22 lg:py-20 lg:ml-28">
               <div className="red-line mx-auto mb-8"></div>
@@ -67,7 +67,9 @@ export default function Login() {
                   label="Remember Me"
                 ></Checkbox>
                 <Link href="/">
-                  <span className="text-light-gray hover:text-red">Forgot Password</span>
+                  <span className="text-light-gray hover:text-red">
+                    Forgot Password
+                  </span>
                 </Link>
               </div>
               <div className="button-container flex flex-row justify-between gap-3 lg:justify-end">
