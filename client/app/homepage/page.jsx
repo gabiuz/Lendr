@@ -109,7 +109,7 @@ export default function Homepage() {
         <h2 className="flex text-black font-bold lg:text-4xl lg:pt-28 lg:pb-12 lg:justify-center">
           Browse By Category
         </h2>
-        <div className="flex gap-6 categories-container mx-24">
+        <div className="flex justify-center gap-6 categories-container ">
           {categories.map((category) => (
             <Categories
               key={category.id}
