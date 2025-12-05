@@ -48,12 +48,11 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-[url('/bg-image-register.jpg')] bg-cover bg-center">
+    <div className="min-h-screen flex flex-col justify-between bg-[url('/bg-image-register.jpg')] bg-cover bg-center bg-no-repeat">
       <div className="flex justify-center w-full pt-6 md:justify-center lg:justify-start lg:pl-24 lg:pt-16">
         <Image src="/lendr-logo.png" alt="Lendr Logo" width={142} height={54} />
       </div>
-
-      <div className="flex justify-center items-end lg:justify-end h-screen">
+      <div className="flex lg:justify-end lg:items-end">
         <Form className="register w-full lg:w-5xl">
           <div className="bg-white px-6 py-10 lg:px-22 lg:py-20 lg:mr-28">
             <div className="red-line mx-auto mb-8"></div>
