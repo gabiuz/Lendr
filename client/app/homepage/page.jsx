@@ -3,6 +3,7 @@ import Link from "next/link";
 import Search from "../components/Search";
 import Categories from "../components/Categories";
 import ProductCard from "../components/ProductCard";
+import InfoCard from "../components/Infocard";
 
 export default function Homepage() {
   const categories = [
@@ -122,13 +123,24 @@ export default function Homepage() {
         </div>
       </div>
       {/* product card */}
-      <div className="productCard-container mx-36 bg-white grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <ProductCard></ProductCard>
-      <ProductCard></ProductCard>
-      <ProductCard></ProductCard>
-      <ProductCard></ProductCard>
-      <ProductCard></ProductCard>
-      <ProductCard></ProductCard>
+      <div className="productCard-container mx-36 bg-white grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-[150px]">
+        <ProductCard></ProductCard>
+        <ProductCard></ProductCard>
+        <ProductCard></ProductCard>
+        <ProductCard></ProductCard>
+        <ProductCard></ProductCard>
+        <ProductCard></ProductCard>
+      </div>
+      <div className="flex bg-zinc-800 justify-center items-center gap-36 px-36 py-14">
+        <div className="text">
+          <h2 className="lg:text-2xl font-semibold">Renting Made Simple</h2>
+          <h1 className="lg:text-6xl font-bold">How Lendr Works?</h1>
+        </div>
+        <div className="flex info-cards bg-zinc gap-14">
+          <InfoCard icon="search" text="searchText" />
+          <InfoCard icon="calendar" text="calendarText" />
+          <InfoCard icon="deliver" text="deliverText"/>
+        </div>
       </div>
     </div>
   );
