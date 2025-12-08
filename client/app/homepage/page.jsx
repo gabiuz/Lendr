@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Search from "../components/Search";
 import Categories from "../components/Categories";
+import ProductCard from "../components/ProductCard";
 
 export default function Homepage() {
   const categories = [
@@ -15,7 +16,7 @@ export default function Homepage() {
   ];
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="min-h-screen w-full bg-white">
       <nav className="bg-white flex justify-between items-center px-8 py-4 xl:px-24 xl:py-8">
         <Link href="/homepage" className="cursor-pointer">
           <Image
@@ -105,7 +106,8 @@ export default function Homepage() {
           </div>
         </div>
       </header>
-      <div className="category-container bg-white">
+      {/* category container */}
+      <div className="category-container bg-white mb-20">
         <h2 className="flex text-black font-bold lg:text-4xl lg:pt-28 lg:pb-12 lg:justify-center">
           Browse By Category
         </h2>
@@ -118,6 +120,15 @@ export default function Homepage() {
             ></Categories>
           ))}
         </div>
+      </div>
+      {/* product card */}
+      <div className="productCard-container mx-36 bg-white grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <ProductCard></ProductCard>
+      <ProductCard></ProductCard>
+      <ProductCard></ProductCard>
+      <ProductCard></ProductCard>
+      <ProductCard></ProductCard>
+      <ProductCard></ProductCard>
       </div>
     </div>
   );
