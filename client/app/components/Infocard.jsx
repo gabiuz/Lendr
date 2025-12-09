@@ -45,23 +45,23 @@ export const icons = {
 };
 
 export const texts = {
-  searchText : {
+  searchText: {
     h3: "Search & Compare",
-    h4: "Find what you need with easy filters."
+    h4: "Find what you need with easy filters.",
   },
-  calendarText : {
+  calendarText: {
     h3: "Book Securely",
-    h4: "Choose dates and confirm instantly."
+    h4: "Choose dates and confirm instantly.",
   },
-  deliverText : {
+  deliverText: {
     h3: "Enjoy & Return",
-    h4: "Pick up or get delivery, then return with ease"
+    h4: "Pick up or get delivery, then return with ease",
   },
-}
+};
 
 export default function InfoCard({ icon, text }) {
   const iconData = icons[icon];
-  const textsData = texts[text]
+  const textsData = texts[text];
   return (
     <>
       <div className="container p-7 flex flex-col border justify-center items-center bg-white border-black rounded-xl gap-5">
@@ -83,10 +83,12 @@ export default function InfoCard({ icon, text }) {
             ))}
           </svg>
         </div>
-          <div className="texts text-center flex flex-col gap-2">
-            <h3 className="text-2xl font-bold text-zinc-800">{textsData.h3}</h3>
-            <h4 className="text-base font-normal text-zinc-800">{textsData.h4}</h4>
-          </div>
+        <div className="texts text-center flex flex-col gap-2">
+          <h3 className="text-2xl font-bold text-zinc-800">{textsData.h3}</h3>
+          <h4 className="text-base font-normal text-zinc-800">
+            {textsData.h4}
+          </h4>
+        </div>
       </div>
     </>
   );

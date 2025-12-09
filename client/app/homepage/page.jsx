@@ -131,7 +131,7 @@ export default function Homepage() {
         <ProductCard></ProductCard>
         <ProductCard></ProductCard>
       </div>
-      <div className="flex bg-zinc-800 justify-center items-center gap-36 px-36 py-14">
+      <div className="info-card-container flex bg-zinc-800 justify-center items-center gap-36 px-36 py-14">
         <div className="text">
           <h2 className="lg:text-2xl font-semibold">Renting Made Simple</h2>
           <h1 className="lg:text-6xl font-bold">How Lendr Works?</h1>
@@ -139,7 +139,13 @@ export default function Homepage() {
         <div className="flex info-cards bg-zinc gap-14">
           <InfoCard icon="search" text="searchText" />
           <InfoCard icon="calendar" text="calendarText" />
-          <InfoCard icon="deliver" text="deliverText"/>
+          <InfoCard icon="deliver" text="deliverText" />
+        </div>
+      </div>
+      <div className="testimonial-container flex justify-center mt-24">
+        <div className="testimonial-texts flex flex-col gap-4 text-center text-black">
+          <h3 className="font-bold text-2xl">Testimonial</h3>
+          <h2 className="font-bold text-5xl">What our customers say?</h2>
         </div>
       </div>
     </div>
