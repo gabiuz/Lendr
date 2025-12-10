@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.17",
+    "motion": "^12.23.25",
     "next": "16.0.3",
     "node": "^25.2.1",
     "postcss": "^8.5.6",
