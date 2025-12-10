@@ -1,9 +1,11 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import Search from "../components/Search";
 import Categories from "../components/Categories";
 import ProductCard from "../components/ProductCard";
 import InfoCard from "../components/Infocard";
+import TestimonialCard, { quoteIcon } from "../components/TestimonialCard";
 
 export default function Homepage() {
   const categories = [
@@ -14,6 +16,23 @@ export default function Homepage() {
     { id: "tools", icon: "tools", label: "Tools & Equipment" },
     { id: "furniture", icon: "bed", label: "Furniture & Home" },
     { id: "party", icon: "party", label: "Party & Events" },
+  ];
+
+  const testimonials = [
+    {
+      name: "Maria Reyes",
+      renter: "Camera Renter",
+      description: (
+        <p>
+          I needed a professional-grade prime camera lens for a one-day photo
+          shoot, but buying one was completely out of the question. Your app
+          made finding a local photographer{" "}
+          <span className="text-red-800">willing to rent</span> theirs
+          incredibly easy.
+        </p>
+      ),
+      image: "/pictures/testimonials-pfp/Image.png",
+    },
   ];
 
   return (
@@ -142,10 +161,22 @@ export default function Homepage() {
           <InfoCard icon="deliver" text="deliverText" />
         </div>
       </div>
-      <div className="testimonial-container flex justify-center mt-24">
+      <div className="testimonial-container flex flex-col justify-center mt-24">
         <div className="testimonial-texts flex flex-col gap-4 text-center text-black">
           <h3 className="font-bold text-2xl">Testimonial</h3>
           <h2 className="font-bold text-5xl">What our customers say?</h2>
+        </div>
+        <div className="testimonialCard-container">
+          {testimonials.map((testimonial, idx) => (
+            <TestimonialCard
+              key={idx}
+              quoteIcon={quoteIcon}
+              name={testimonial.name}
+              renter={testimonial.renter}
+              description={testimonial.description}
+              image={testimonial.image}
+            />
+          ))}
         </div>
       </div>
     </div>
