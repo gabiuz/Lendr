@@ -7,6 +7,7 @@ import ProductCard from "../components/ProductCard";
 import InfoCard from "../components/Infocard";
 import TestimonialCard, { quoteIcon } from "../components/TestimonialCard";
 import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function Homepage() {
   const categories = [
@@ -68,15 +69,30 @@ export default function Homepage() {
   ];
 
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [direction, setDirection] = useState(0);
 
   const nextTestimonial = () => {
+    setDirection(1);
     setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
   };
 
   const prevTestimonial = () => {
+    setDirection(-1);
     setCurrentTestimonial((prev) =>
       prev === 0 ? testimonials.length - 1 : prev - 1,
     );
+  };
+
+  const variants = {
+    enter: {
+      opacity: 0,
+    },
+    center: {
+      opacity: 1,
+    },
+    exit: {
+      opacity: 0,
+    },
   };
 
   return (
@@ -139,7 +155,10 @@ export default function Homepage() {
         </div>
       </nav>
 
-      <header className="h-[600px] xl:h-[750px] bg-[url('/homepage-bg-image.jpg')] bg-opacity bg-cover bg-center">
+      <header
+        className="h-[600px] xl:h-[750px] bg-[url('/homepage-bg-image.jpg')] bg-opacity bg-cover bg-center"
+        id="home"
+      >
         <div className="flex flex-col items-center gap-6 pt-40 text-center px-4">
           <h1 className="text-white font-bold text-4xl xl:text-6xl">
             Rent Anything, <span className="text-red"> Anytime</span>
@@ -171,7 +190,7 @@ export default function Homepage() {
         </div>
       </header>
       {/* category container */}
-      <div className="category-container bg-white mb-20">
+      <div className="category-container bg-white mb-20" id="categories">
         <h2 className="flex text-black font-bold lg:text-4xl lg:pt-28 lg:pb-12 lg:justify-center">
           Browse By Category
         </h2>
@@ -186,7 +205,10 @@ export default function Homepage() {
         </div>
       </div>
       {/* product card */}
-      <div className="productCard-container mx-36 bg-white grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-[150px]">
+      <div
+        className="productCard-container mx-36 bg-white grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-[150px]"
+        id="browse"
+      >
         <ProductCard></ProductCard>
         <ProductCard></ProductCard>
         <ProductCard></ProductCard>
@@ -199,7 +221,7 @@ export default function Homepage() {
           <h2 className="lg:text-2xl font-semibold">Renting Made Simple</h2>
           <h1 className="lg:text-6xl font-bold">How Lendr Works?</h1>
         </div>
-        <div className="flex info-cards bg-zinc gap-14">
+        <div className="flex info-cards bg-zinc gap-14" id="aboutUs">
           <InfoCard icon="search" text="searchText" />
           <InfoCard icon="calendar" text="calendarText" />
           <InfoCard icon="deliver" text="deliverText" />
@@ -210,7 +232,7 @@ export default function Homepage() {
           <h3 className="font-bold text-2xl">Testimonial</h3>
           <h2 className="font-bold text-5xl">What our customers say?</h2>
         </div>
-        <div className="testimonialCard-container flex justify-center items-center mx-[280px]">
+        <div className="testimonialCard-container flex justify-center items-center mx-[280px] gap-36">
           <button className="cursor-pointer" onClick={prevTestimonial}>
             <svg
               width="56"
@@ -230,13 +252,27 @@ export default function Homepage() {
               />
             </svg>
           </button>
-          <TestimonialCard
-            quoteIcon={quoteIcon}
-            name={testimonials[currentTestimonial].name}
-            renter={testimonials[currentTestimonial].renter}
-            description={testimonials[currentTestimonial].description}
-            image={testimonials[currentTestimonial].image}
-          />
+          <AnimatePresence initial={false} custom={direction} mode="wait">
+            <motion.div
+              key={currentTestimonial}
+              custom={direction}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{
+                duration: 0.5,
+              }}
+            >
+              <TestimonialCard
+                quoteIcon={quoteIcon}
+                name={testimonials[currentTestimonial].name}
+                renter={testimonials[currentTestimonial].renter}
+                description={testimonials[currentTestimonial].description}
+                image={testimonials[currentTestimonial].image}
+              />
+            </motion.div>
+          </AnimatePresence>
           <button className="cursor-pointer" onClick={nextTestimonial}>
             <svg
               width="56"
@@ -270,6 +306,161 @@ export default function Homepage() {
               }`}
             />
           ))}
+        </div>
+        <footer className="bg-zinc-100 text-stone-950 flex px-36 py-10 justify-between items-start gap-28">
+          <div className="flex flex-col gap-9 max-w-[368px]">
+            <Image
+              width={2109}
+              height={810}
+              alt="logo footer"
+              src="/lendr-log-gradient.png"
+              className="w-[179px]"
+            ></Image>
+            <p className="text-lg font-medium">
+              Platform designed to create an online marketplace exclusively for
+              RENT
+            </p>
+          </div>
+          <div className="footer-links">
+            <ul className="flex flex-col gap-3">
+              <li>
+                <span className="text-red-800 text-base font-bold">
+                  Quick Links
+                </span>
+              </li>
+              <li>
+                <Link href="#home">Home</Link>
+              </li>
+              <li>
+                <Link href="#browse">Browse Rentals</Link>
+              </li>
+              <li>
+                <Link href="#categories">Categories</Link>
+              </li>
+              <li>
+                <Link href="#aboutUs">About Us</Link>
+              </li>
+            </ul>
+          </div>
+          <div className="footer-links">
+            <ul className="flex flex-col gap-3">
+              <li>
+                <span className="text-red-800 text-base font-bold">
+                  Contact
+                </span>
+              </li>
+              <li>
+                <p>Call:</p>
+                <p>09123456789</p>
+              </li>
+              <li>
+                <p>Email:</p>
+                <p>lendr@gmail.com</p>
+              </li>
+            </ul>
+          </div>
+          <div className="footer-links justify-start">
+            <ul className="flex flex-col gap-3">
+              <li>
+                <span className="text-red-800 text-base font-bold">
+                  Social Media
+                </span>
+              </li>
+              <li>
+                <svg
+                  width="172"
+                  height="27"
+                  viewBox="0 0 172 27"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <ellipse
+                    cx="12.8571"
+                    cy="13.5715"
+                    rx="12.8571"
+                    ry="12.8571"
+                    fill="#E93740"
+                  />
+                  <path
+                    d="M12.8551 11.0705C11.4779 11.0705 10.3541 12.1944 10.3541 13.5715C10.3541 14.9487 11.4779 16.0726 12.8551 16.0726C14.2323 16.0726 15.3561 14.9487 15.3561 13.5715C15.3561 12.1944 14.2323 11.0705 12.8551 11.0705ZM20.3563 13.5715C20.3563 12.5358 20.3657 11.5095 20.3075 10.4757C20.2493 9.27488 19.9754 8.20916 19.0973 7.33107C18.2174 6.4511 17.1536 6.17904 15.9528 6.12087C14.9171 6.06271 13.8908 6.07209 12.857 6.07209C11.8213 6.07209 10.795 6.06271 9.76119 6.12087C8.5604 6.17904 7.4947 6.45297 6.61663 7.33107C5.73667 8.21104 5.46462 9.27488 5.40646 10.4757C5.34829 11.5114 5.35767 12.5377 5.35767 13.5715C5.35767 14.6054 5.34829 15.6336 5.40646 16.6674C5.46462 17.8682 5.73855 18.9339 6.61663 19.812C7.49658 20.692 8.5604 20.964 9.76119 21.0222C10.7969 21.0804 11.8232 21.071 12.857 21.071C13.8927 21.071 14.919 21.0804 15.9528 21.0222C17.1536 20.964 18.2193 20.6901 19.0973 19.812C19.9773 18.932 20.2493 17.8682 20.3075 16.6674C20.3675 15.6336 20.3563 14.6072 20.3563 13.5715ZM12.8551 17.4198C10.7256 17.4198 9.00695 15.7011 9.00695 13.5715C9.00695 11.442 10.7256 9.72331 12.8551 9.72331C14.9846 9.72331 16.7033 11.442 16.7033 13.5715C16.7033 15.7011 14.9846 17.4198 12.8551 17.4198ZM16.8609 10.4644C16.3637 10.4644 15.9621 10.0629 15.9621 9.5657C15.9621 9.06849 16.3637 8.66697 16.8609 8.66697C17.3581 8.66697 17.7596 9.06849 17.7596 9.5657C17.7597 9.68377 17.7366 9.8007 17.6915 9.90981C17.6464 10.0189 17.5802 10.118 17.4967 10.2015C17.4132 10.285 17.3141 10.3512 17.205 10.3963C17.0959 10.4414 16.9789 10.4646 16.8609 10.4644Z"
+                    fill="white"
+                  />
+                  <ellipse
+                    cx="49.2854"
+                    cy="12.8571"
+                    rx="12.8571"
+                    ry="12.8571"
+                    fill="#E93740"
+                  />
+                  <path
+                    d="M56.7854 7.95055C56.2238 8.21298 55.628 8.38515 55.018 8.46133C55.6605 8.05583 56.1414 7.41774 56.3709 6.66599C55.7669 7.04415 55.106 7.31045 54.4169 7.45332C54.1289 7.12939 53.781 6.87129 53.3946 6.695C53.0082 6.51871 52.5916 6.42799 52.1706 6.42847C50.4712 6.42847 49.0932 7.88151 49.0932 9.67439C49.0932 9.92855 49.1205 10.1765 49.1731 10.4143C46.6154 10.2789 44.348 8.9865 42.8301 7.02247C42.5564 7.51785 42.4126 8.08111 42.4134 8.65447C42.413 9.18888 42.5378 9.71513 42.7766 10.1864C43.0155 10.6578 43.361 11.0595 43.7825 11.3561C43.2939 11.3397 42.816 11.2006 42.3887 10.9501C42.3883 10.9637 42.3883 10.977 42.3883 10.991C42.3883 12.5632 43.449 13.8751 44.8566 14.1736C44.4033 14.3031 43.9281 14.322 43.4669 14.2291C43.8584 15.5184 44.9949 16.4572 46.3415 16.4835C45.2514 17.3858 43.9053 17.8752 42.5196 17.873C42.2712 17.873 42.0264 17.8578 41.7854 17.8276C43.1925 18.7812 44.8301 19.2874 46.5026 19.2856C52.163 19.2856 55.2584 14.3399 55.2584 10.051C55.2584 9.91047 55.2553 9.77014 55.2494 9.63063C55.8522 9.1716 56.3724 8.60263 56.7854 7.95055Z"
+                    fill="white"
+                  />
+                  <circle
+                    cx="85.7141"
+                    cy="12.8571"
+                    r="12.8571"
+                    fill="#E93740"
+                  />
+                  <path
+                    d="M92.901 9.1423C92.8156 8.82428 92.6482 8.53427 92.4155 8.30129C92.1828 8.0683 91.893 7.90052 91.5751 7.81473C90.4049 7.5 85.7141 7.5 85.7141 7.5C85.7141 7.5 81.0232 7.5 79.853 7.81306C79.535 7.89857 79.245 8.06626 79.0123 8.29929C78.7795 8.53231 78.6122 8.82247 78.5271 9.14063C78.2141 10.3125 78.2141 12.7567 78.2141 12.7567C78.2141 12.7567 78.2141 15.2009 78.5271 16.3711C78.6995 17.0173 79.2085 17.5262 79.853 17.6987C81.0232 18.0134 85.7141 18.0134 85.7141 18.0134C85.7141 18.0134 90.4049 18.0134 91.5751 17.6987C92.2213 17.5262 92.7286 17.0173 92.901 16.3711C93.214 15.2009 93.2141 12.7567 93.2141 12.7567C93.2141 12.7567 93.214 10.3125 92.901 9.1423ZM84.2241 15V10.5134L88.108 12.74L84.2241 15Z"
+                    fill="white"
+                  />
+                  <ellipse
+                    cx="122.143"
+                    cy="12.8571"
+                    rx="12.8571"
+                    ry="12.8571"
+                    fill="#E93740"
+                  />
+                  <path
+                    d="M119.772 20.3571V13.8395H117.857V10.7985H119.772V8.20109C119.772 6.16002 120.903 4.28564 123.509 4.28564C124.564 4.28564 125.344 4.40363 125.344 4.40363L125.282 7.24342C125.282 7.24342 124.487 7.23439 123.618 7.23439C122.679 7.23439 122.528 7.73956 122.528 8.57801V10.7985H125.357L125.234 13.8395H122.528V20.3571H119.772Z"
+                    fill="white"
+                  />
+                  <ellipse
+                    cx="158.572"
+                    cy="12.8571"
+                    rx="12.8571"
+                    ry="12.8571"
+                    fill="#E93740"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M156.643 10.5839H159.429V11.9714C159.83 11.1734 160.859 10.4564 162.405 10.4564C165.368 10.4564 166.072 12.0449 166.072 14.9594V20.3572H163.072V15.6232C163.072 13.9634 162.67 13.0274 161.649 13.0274C160.232 13.0274 159.643 14.0362 159.643 15.6224V20.3572H156.643V10.5839ZM151.499 20.2297H154.499V10.4564H151.499V20.2297ZM154.929 7.26968C154.929 7.52113 154.879 7.7701 154.782 8.00212C154.685 8.23413 154.543 8.44456 154.364 8.62118C154.001 8.98165 153.51 9.18342 152.999 9.18218C152.489 9.18184 151.999 8.98058 151.636 8.62193C151.457 8.44471 151.316 8.23405 151.219 8.002C151.122 7.76996 151.072 7.5211 151.072 7.26968C151.072 6.76193 151.274 6.27593 151.636 5.91743C151.999 5.5583 152.489 5.35695 153 5.35718C153.511 5.35718 154.002 5.55893 154.364 5.91743C154.726 6.27593 154.929 6.76193 154.929 7.26968Z"
+                    fill="white"
+                  />
+                </svg>
+              </li>
+            </ul>
+          </div>
+          <div className="footer-links">
+            <ul className="flex flex-col gap-3">
+              <li>
+                <span className="text-red-800 text-base font-bold">
+                  View Map
+                </span>
+              </li>
+              <li>
+                <Image
+                  width={640}
+                  height={640}
+                  alt="photo of map"
+                  src="/map.png"
+                  className="self-stretch h-44"
+                ></Image>
+              </li>
+            </ul>
+          </div>
+        </footer>
+        <div className="text-white text-base font-normal bg-red-800 flex px-36 py-4 justify-between">
+          <div>
+            <p>© 2025 Lendr. All Rights Reserved. </p>
+          </div>
+          <div className="flex gap-11">
+            <p>Privacy Policy</p>
+            <p>Terms & Conditions</p>
+          </div>
         </div>
       </div>
     </div>
