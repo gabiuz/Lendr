@@ -1,10 +1,11 @@
 import Navbar from "../components/Navbar";
-import Image from "next/image";
 import Search from "../components/Search";
+import ProductCard from "../components/ProductCard";
+import Footer from "../components/Footer";
 
 export default function ProductResult() {
   return (
-    <>
+    <div className="bg-white">
       <Navbar />
       <div
         className="w-full h-96 bg-[url('/homepage-bg-image.jpg')] bg-cover bg-center"
@@ -31,6 +32,24 @@ export default function ProductResult() {
           </div>
         </div>
       </div>
-    </>
+      <div className="Products mx-36">
+        <div className="product-texts text-black flex flex-col gap-4 mt-10 mb-24">
+          <h1 className="text-5xl font-bold">Products</h1>
+          <p className="text-lg font-normal">Found 9 products</p>
+        </div>
+        <div className="productCard-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-[150px]">
+          <ProductCard showButton={true} />
+          <ProductCard showButton={true} />
+          <ProductCard showButton={true} />
+          <ProductCard showButton={true} />
+          <ProductCard showButton={true} />
+          <ProductCard showButton={true} />
+          <ProductCard showButton={true} />
+          <ProductCard showButton={true} />
+          <ProductCard showButton={true} />
+        </div>
+      </div>
+      <Footer />
+    </div>
   );
 }

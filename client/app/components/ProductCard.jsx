@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export default function ProductCard() {
+export default function ProductCard({ showButton = false }) {
   return (
     <>
       <div className="cursor-pointer hover:shadow-2xl transition-shadow rounded-xl outline outline-offset-1 outline-zinc-300 inline-flex flex-col justify-start items-start">
@@ -51,9 +51,13 @@ export default function ProductCard() {
               </div>
             </div>
           </div>
+          {showButton && (
+            <button className="w-full bg-red-600 hover:bg-red-700 rounded-xl px-6 py-2.5  text-white text-base font-semibold transition-colors duration-200">
+              View Item
+            </button>
+          )}
         </div>
       </div>
     </>
   );
 }
-
