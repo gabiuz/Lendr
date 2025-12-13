@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import Navbar from "../components/Navbar";
 import Search from "../components/Search";
 import Categories from "../components/Categories";
 import ProductCard from "../components/ProductCard";
@@ -97,63 +98,7 @@ export default function Homepage() {
 
   return (
     <div className="min-h-screen w-full bg-white">
-      <nav className="bg-white flex justify-between items-center px-8 py-4 xl:px-24 xl:py-8">
-        <Link href="/homepage" className="cursor-pointer">
-          <Image
-            src="/lendr-log-gradient.png"
-            width={142}
-            height={54}
-            alt="blendr logo"
-            className="w-20 xl:w-32"
-          />
-        </Link>
-        {/* Nav links */}
-        <div className="text-black">
-          <ul className="flex gap-8 xl:gap-16 font-semibold text-base xl:text-lg">
-            <li className="hover:text-red">
-              <Link href="/">Home</Link>
-            </li>
-            <li className="hover:text-red">
-              <Link href="/">Browse Rentals</Link>
-            </li>
-            <li className="hover:text-red">
-              <Link href="/">Categories</Link>
-            </li>
-            <li className="hover:text-red">
-              <Link href="/">About Us</Link>
-            </li>
-          </ul>
-        </div>
-        {/* Buttons */}
-        <div className="text-black flex items-center gap-4 xl:gap-6">
-          <Link href="/register">
-            <button className="bg-(--dark-red) hover:bg-red text-white font-semibold px-6 py-3 rounded-full cursor-pointer">
-              + Be a Rental Owner
-            </button>
-          </Link>
-          <Link href="/profile">
-            <button className="flex items-center gap-2 cursor-pointer font-semibold px-4 py-2">
-              <svg width="20" height="19" viewBox="0 0 19 19" fill="none">
-                <path
-                  d="M15.8333 16.625V15.0417C15.8333 14.2018 15.4997 13.3964 14.9058 12.8025C14.3119 12.2086 13.5065 11.875 12.6666 11.875H6.33329C5.49344 11.875 4.68799 12.2086 4.09412 12.8025C3.50026 13.3964 3.16663 14.2018 3.16663 15.0417V16.625"
-                  stroke="#211D1B"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M9.50004 8.70833C11.2489 8.70833 12.6667 7.29057 12.6667 5.54167C12.6667 3.79276 11.2489 2.375 9.50004 2.375C7.75114 2.375 6.33337 3.79276 6.33337 5.54167C6.33337 7.29057 7.75114 8.70833 9.50004 8.70833Z"
-                  stroke="#211D1B"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Profile
-            </button>
-          </Link>
-        </div>
-      </nav>
+      <Navbar />
 
       <header
         className="h-[600px] xl:h-[750px] bg-[url('/homepage-bg-image.jpg')] bg-opacity bg-cover bg-center"
@@ -425,8 +370,8 @@ export default function Homepage() {
                     fill="#E93740"
                   />
                   <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
+                    fillRule="evenodd"
+                    clipRule="evenodd"
                     d="M156.643 10.5839H159.429V11.9714C159.83 11.1734 160.859 10.4564 162.405 10.4564C165.368 10.4564 166.072 12.0449 166.072 14.9594V20.3572H163.072V15.6232C163.072 13.9634 162.67 13.0274 161.649 13.0274C160.232 13.0274 159.643 14.0362 159.643 15.6224V20.3572H156.643V10.5839ZM151.499 20.2297H154.499V10.4564H151.499V20.2297ZM154.929 7.26968C154.929 7.52113 154.879 7.7701 154.782 8.00212C154.685 8.23413 154.543 8.44456 154.364 8.62118C154.001 8.98165 153.51 9.18342 152.999 9.18218C152.489 9.18184 151.999 8.98058 151.636 8.62193C151.457 8.44471 151.316 8.23405 151.219 8.002C151.122 7.76996 151.072 7.5211 151.072 7.26968C151.072 6.76193 151.274 6.27593 151.636 5.91743C151.999 5.5583 152.489 5.35695 153 5.35718C153.511 5.35718 154.002 5.55893 154.364 5.91743C154.726 6.27593 154.929 6.76193 154.929 7.26968Z"
                     fill="white"
                   />
