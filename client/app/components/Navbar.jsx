@@ -2,9 +2,12 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Navbar({ logoSrc = "/lendr-log-gradient.png", logoAlt = "blendr logo" }) {
+export default function Navbar({
+  logoSrc = "/lendr-log-gradient.png",
+  logoAlt = "blendr logo",
+}) {
   return (
-    <nav className="bg-white flex justify-between items-center px-8 py-4 xl:px-24 xl:py-8">
+    <nav className="bg-white flex justify-between items-center px-8 py-4 xl:px-24 xl:py-8 shadow-2xl">
       <Link href="/homepage" className="cursor-pointer">
         <Image
           src={logoSrc}
