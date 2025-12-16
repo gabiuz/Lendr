@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "motion/react";
 export default function ProductDescription() {
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isBookOpen, setIsBookOpen] = useState(false);
+  const [isFAQOpen, setIsFAQOpen] = useState(false);
   const rental = {
     name: "Canon EOS 90D",
     pricePerDay: 950,
@@ -322,6 +323,107 @@ export default function ProductDescription() {
                       GCash
                     </li>
                   </ul>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          <div className="faq-container border-t-3 border-t-red-900 flex flex-col">
+            <div
+              className="faq-container-text flex items-center justify-between w-full cursor-pointer hover:bg-gray-50 transition-colors duration-200 rounded-lg px-2"
+              onClick={() => setIsFAQOpen(!isFAQOpen)}
+            >
+              <h2 className="text-xl font-semibold py-4">FAQ</h2>
+              <svg
+                width="27"
+                height="27"
+                viewBox="0 0 27 27"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className={`transition-transform duration-300 ${
+                  isFAQOpen ? "rotate-180" : "rotate-0"
+                }`}
+              >
+                <path
+                  opacity="0.4"
+                  d="M8.12109 14.85L13.4747 9.49638C13.4916 9.48373 13.5084 9.47107 13.5211 9.46685C15.3267 11.2598 17.1239 13.0528 18.9211 14.85H8.12109Z"
+                  fill="#990000"
+                />
+                <path
+                  d="M12.5677 8.49657C13.1119 8.00719 13.9345 7.95657 14.4745 8.49657L19.8745 13.8966C20.2627 14.2847 20.3766 14.8627 20.1656 15.3689L20.0728 15.5503C19.8324 15.9511 19.3936 16.2042 18.9169 16.2042H8.11688L7.91438 16.1916C7.51782 16.1325 7.16766 15.8963 6.96095 15.5545L6.86813 15.3731C6.69095 14.9259 6.75845 14.4281 7.03266 14.0484L7.16345 13.8923L12.5634 8.49235L12.5677 8.49657ZM13.5253 9.46688C13.5127 9.4711 13.4958 9.47954 13.4789 9.49641L8.1211 14.85H18.9211L13.5338 9.46266C13.5295 9.46266 13.5253 9.46688 13.5253 9.46688Z"
+                  fill="#990000"
+                />
+              </svg>
+            </div>
+            <AnimatePresence>
+              {isFAQOpen && (
+                <motion.div
+                  className="faq-container-lists overflow-hidden flex flex-col gap-4"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{
+                    duration: 0.3,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <div className="faq-item">
+                    <p className="text-base font-bold">1. What comes with the Canon EOS 90D when I rent it?</p>
+                    <p className="mt-1">Each rental includes the camera body, battery, charger, neck strap, and basic documentation. Everything is cleaned and tested before release.</p>
+                  </div>
+                  
+                  <div className="faq-item">
+                    <p className="text-base font-bold">2. Can beginners use this camera?</p>
+                    <p className="mt-1">Yes! The Canon EOS 90D is beginner-friendly and great for events, portraits, vlogging, and travel. You may search online for tutorials if you need guidance.</p>
+                  </div>
+                  
+                  <div className="faq-item">
+                    <p className="text-base font-bold">3. Can I extend my rental?</p>
+                    <p className="mt-1">Yes, as long as the camera isn&apos;t booked by another renter. Just send us a message before your return time so we can confirm availability.</p>
+                  </div>
+                  
+                  <div className="faq-item">
+                    <p className="text-base font-bold">4. Do you offer discounts for long-term rentals?</p>
+                    <p className="mt-1">Yes, we sometimes provide discounted rates for multi-day or extended rentals. Message us for the updated long-term pricing.</p>
+                  </div>
+                  
+                  <div className="faq-item">
+                    <p className="text-base font-bold">5. Do you provide lenses or accessories?</p>
+                    <p className="mt-1">Currently, our rental package includes only the camera body and default items listed. Additional lenses or accessories may be added in the future.</p>
+                  </div>
+                  
+                  <div className="faq-item">
+                    <p className="text-base font-bold">6. Can I see the camera before booking?</p>
+                    <p className="mt-1">Yes. If you prefer, we can arrange a brief video call or send updated photos of the unit so you can inspect its condition before confirming.</p>
+                  </div>
+                  
+                  <div className="faq-item">
+                    <p className="text-base font-bold">7. How early should I book?</p>
+                    <p className="mt-1">We recommend booking at least 1–3 days ahead, especially for weekends or event seasons, as the camera can be fully booked.</p>
+                  </div>
+                  
+                  <div className="faq-item">
+                    <p className="text-base font-bold">8. Do you allow refunds if my shoot is canceled?</p>
+                    <p className="mt-1">While the downpayment itself is non-refundable, you may request a date change if your new schedule is still available.</p>
+                  </div>
+                  
+                  <div className="faq-item">
+                    <p className="text-base font-bold">9. How will I know if the dates I want are available?</p>
+                    <p className="mt-1">Your selected dates will be reviewed, and we&apos;ll notify you through the app or message once your booking is confirmed.</p>
+                  </div>
+                  
+                  <div className="faq-item">
+                    <p className="text-base font-bold">10. What should I do if the item I receive seems different from the listing?</p>
+                    <p className="mt-1">Message us immediately. The camera is checked thoroughly before dispatch, but we encourage renters to report anything unusual upon arrival.</p>
+                  </div>
+                  
+                  <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-200">
+                    <p className="text-base font-bold mb-2">Please Note:</p>
+                    <ul className="list-disc flex flex-col gap-2 pl-5">
+                      <li>Incomplete requirements may result in booking denial.</li>
+                      <li>No downpayment = no confirmed reservation.</li>
+                      <li>Ensure your dates are final; cancellations are not allowed once booked.</li>
+                    </ul>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
