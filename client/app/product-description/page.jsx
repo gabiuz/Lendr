@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Navbar from "../components/Navbar";
 import Image from "next/image";
+import Footer from "../components/Footer";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -433,6 +434,7 @@ export default function ProductDescription() {
           {/* Second column - add content here */}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
