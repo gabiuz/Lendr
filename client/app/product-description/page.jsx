@@ -1,8 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import Navbar from "../components/Navbar";
 import Image from "next/image";
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function ProductDescription() {
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
   const rental = {
     name: "Canon EOS 90D",
     pricePerDay: 950,
@@ -101,9 +106,93 @@ export default function ProductDescription() {
             <button className="bg-red-600 hover:bg-red-700 hover:shadow-md rounded-xl px-6 py-2.5  text-white text-base font-semibold transition-colors duration-200 w-full cursor-pointer">
               Book Now
             </button>
-            <button className="bg-white border-2 hover:shadow-md border-light-gray hover:border-[#FF0000] hover:text-black hover:bg-[#FF000040] rounded-xl px-6 py-2.5 text-light-gray text-base font-semibold transition-colors duration-200 w-full cursor-pointer">
+            <button className="bg-white border-2 hover:shadow-md border-light-gray hover:border-red hover:text-black hover:bg-[#FF000040] rounded-xl px-6 py-2.5 text-light-gray text-base font-semibold transition-colors duration-200 w-full cursor-pointer">
               Message Owner
             </button>
+          </div>
+          <div className="terms-container border-t-3 border-t-red-900 flex flex-col">
+            <div 
+              className="terms-container-text flex items-center justify-between w-full cursor-pointer hover:bg-gray-50 transition-colors duration-200 rounded-lg px-2"
+              onClick={() => setIsTermsOpen(!isTermsOpen)}
+            >
+              <h2 className="text-xl font-semibold py-4">Terms & Conditions</h2>
+              <svg 
+                width="27" 
+                height="27" 
+                viewBox="0 0 27 27" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+                className={`transition-transform duration-300 ${isTermsOpen ? 'rotate-180' : 'rotate-0'}`}
+              >
+                <path opacity="0.4" d="M8.12109 14.85L13.4747 9.49638C13.4916 9.48373 13.5084 9.47107 13.5211 9.46685C15.3267 11.2598 17.1239 13.0528 18.9211 14.85H8.12109Z" fill="#990000"/>
+                <path d="M12.5677 8.49657C13.1119 8.00719 13.9345 7.95657 14.4745 8.49657L19.8745 13.8966C20.2627 14.2847 20.3766 14.8627 20.1656 15.3689L20.0728 15.5503C19.8324 15.9511 19.3936 16.2042 18.9169 16.2042H8.11688L7.91438 16.1916C7.51782 16.1325 7.16766 15.8963 6.96095 15.5545L6.86813 15.3731C6.69095 14.9259 6.75845 14.4281 7.03266 14.0484L7.16345 13.8923L12.5634 8.49235L12.5677 8.49657ZM13.5253 9.46688C13.5127 9.4711 13.4958 9.47954 13.4789 9.49641L8.1211 14.85H18.9211L13.5338 9.46266C13.5295 9.46266 13.5253 9.46688 13.5253 9.46688Z" fill="#990000"/>
+              </svg>
+            </div>
+            <AnimatePresence>
+              {isTermsOpen && (
+                <motion.div 
+                  className="terms-container-lists overflow-hidden flex flex-col gap-2"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ 
+                    duration: 0.3,
+                    ease: "easeInOut"
+                  }}
+                >
+                  <p className="text-base font-bold py-2">Eligibility</p>
+                  <ul className="list-disc flex flex-col justify-center pl-5">
+                    <li>Renter must be 18 years old or above.</li>
+                    <li>Must submit 2 valid IDs (1 government issued).</li>
+                    <li>Must provide a selfie holding the IDs.</li>
+                    <li>Must submit 2 recent proof of billing documents (matching the ID name).</li>
+                    <li>Renter must have public social media accounts for verification.</li>
+                  </ul>
+                  <p className="text-base font-bold py-2">Payment & Deposit</p>
+                  <ul className="list-disc flex flex-col justify-center pl-5">
+                    <li>A 50% non-refundable downpayment is required to reserve the item.</li>
+                    <li>₱475 security deposit is required before release.</li>
+                    <li>Remaining balance must be paid before dispatch.</li>
+                    <li>Security deposit is refunded within 24 hours after inspection of the returned unit.</li>
+                  </ul>
+                  <p className="text-base font-bold py-2">Cancellation</p>
+                  <ul className="list-disc flex flex-col justify-center pl-5">
+                    <li>Downpayment is strictly non-refundable.</li>
+                    <li>Rescheduling may be allowed depending on availability.</li>
+                  </ul>
+                  <p className="text-base font-bold py-2">Returns</p>
+                  <ul className="list-disc flex flex-col justify-center pl-5">
+                    <li>Items must be returned in the same condition as released.</li>
+                    <li>A ₱200/hour late fee will be deducted from the security deposit.</li>
+                    <li>Additional charges apply if the deposit is insufficient.</li>
+                    <li>A ₱500/day fee applies if the delay affects the next renter.</li>
+                  </ul>
+                  <p className="text-base font-bold py-2">Damage / Loss</p>
+                  <ul className="list-disc flex flex-col justify-center pl-5">
+                    <li>Renter is responsible for repair or replacement costs.</li>
+                    <li>Full replacement cost may be charged for total loss or theft.</li>
+                  </ul>
+                  <p className="text-base font-bold py-2">Delivery</p>
+                  <ul className="list-disc flex flex-col justify-center pl-5">
+                    <li>Delivery is via Lalamove / Angkas / Grab Express Premium.</li>
+                    <li>Shipping fees are shouldered by the renter.</li>
+                    <li>A photo of the rider and plate number must be submitted for monitoring.</li>
+                  </ul>
+                  <p className="text-base font-bold py-2">Transparency</p>
+                  <ul className="list-disc flex flex-col justify-center pl-5">
+                    <li>Renter is encouraged to send photos/videos upon receiving and before returning the item.</li>
+                  </ul>
+                  <p className="text-base font-bold py-2">International Travel</p>
+                  <ul className="list-disc flex flex-col justify-center pl-5">
+                    <li>Requires itinerary + proof of billing.</li>
+                  </ul>
+                  <p className="text-base font-bold py-2">Conduct</p>
+                  <ul className="list-disc flex flex-col justify-center pl-5">
+                    <li>Rude or abusive behavior may result in service refusal and future blocking.</li>
+                  </ul>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
         <div className="flex flex-col gap-6">
