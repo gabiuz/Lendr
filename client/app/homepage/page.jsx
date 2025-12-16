@@ -250,11 +250,10 @@ export default function Homepage() {
             <button
               key={index}
               onClick={() => setCurrentTestimonial(index)}
-              className={`w-6 h-6 rounded-full transition-colors ${
-                index === currentTestimonial
-                  ? "bg-red-800"
-                  : "bg-gray-300 hover:bg-zinc-300"
-              }`}
+              className={`w-6 h-6 rounded-full transition-colors ${index === currentTestimonial
+                ? "bg-red-800"
+                : "bg-gray-300 hover:bg-zinc-300"
+                }`}
             />
           ))}
         </div>
