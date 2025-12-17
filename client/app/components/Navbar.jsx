@@ -37,7 +37,7 @@ export default function Navbar({
       {/* Buttons */}
       <div className="text-black flex items-center gap-4 xl:gap-6">
         <Link href="/register">
-          <button className="bg-(--dark-red) hover:bg-red text-white font-semibold px-6 py-3 rounded-full cursor-pointer">
+          <button className="bg-red-800 hover:bg-red-900 text-white font-semibold px-6 py-3 rounded-full cursor-pointer">
             + Be a Rental Owner
           </button>
         </Link>

@@ -168,7 +168,7 @@ export default function Homepage() {
         <ProductCard></ProductCard>
       </div>
       <div className="info-card-container flex bg-zinc-800 justify-center items-center gap-36 px-36 py-14">
-        <div className="text">
+        <div className="text text-white">
           <h2 className="lg:text-2xl font-semibold">Renting Made Simple</h2>
           <h1 className="lg:text-6xl font-bold">How Lendr Works?</h1>
         </div>

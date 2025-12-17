@@ -6,11 +6,21 @@ import Image from "next/image";
 import Footer from "../components/Footer";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import Review from "../components/Review";
 
 export default function ProductDescription() {
-  const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [isTermsOpen, setIsTermsOpen] = useState(true);
   const [isBookOpen, setIsBookOpen] = useState(false);
   const [isFAQOpen, setIsFAQOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState("/pictures/product-img-placeholder/Row.png");
+
+  const thumbnailImages = [
+    "/pictures/product-img-placeholder/Placeholder Image.png",
+    "/pictures/product-img-placeholder/Placeholder Image-1.png",
+    "/pictures/product-img-placeholder/Placeholder Image-2.png",
+    "/pictures/product-img-placeholder/Placeholder Image-3.png",
+    "/pictures/product-img-placeholder/Placeholder Image-4.png",
+  ];
   const rental = {
     name: "Canon EOS 90D",
     pricePerDay: 950,
@@ -20,7 +30,7 @@ export default function ProductDescription() {
   return (
     <div className="h-screen bg-white">
       <Navbar />
-      <div className="product-desc-container text-black mt-36 ml-36 grid grid-cols-2 gap-6">
+      <div className="product-desc-container text-black mt-36 mb-16 mx-36 grid grid-cols-2 gap-6">
         <div className="flex flex-col gap-6">
           <div className="breadcrumbs flex items-center gap-2 ">
             <Link href="/homepage" className="text-sm">
@@ -431,7 +441,41 @@ export default function ProductDescription() {
           </div>
         </div>
         <div className="flex flex-col gap-6">
-          {/* Second column - add content here */}
+          <div className="image-gallery-container flex flex-col gap-4">
+            <div className="main-image-container rounded-xl overflow-hidden">
+              <Image
+                width={791}
+                height={677}
+                alt="product image"
+                src={selectedImage}
+                className="w-full object-cover transition-opacity duration-300"
+              />
+            </div>
+            <div className="thumbnail-container grid grid-cols-5 gap-3">
+              {thumbnailImages.map((image, index) => (
+                <div
+                  key={index}
+                  onClick={() => setSelectedImage(image)}
+                  className={`thumbnail-item rounded-lg overflow-hidden cursor-pointer border-2 transition-all duration-200 ${
+                    selectedImage === image
+                      ? "border-red-900 shadow-lg scale-105"
+                      : "border-gray-300 hover:border-red-500 hover:shadow-md"
+                  }`}
+                >
+                  <Image
+                    width={150}
+                    height={128}
+                    alt={`thumbnail ${index + 1}`}
+                    src={image}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="reviews-container w-fit">
+              <Review />
+            </div>
+          </div>
         </div>
       </div>
       <Footer />
