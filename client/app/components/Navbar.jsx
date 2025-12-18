@@ -21,16 +21,16 @@ export default function Navbar({
       <div className="text-black">
         <ul className="flex gap-8 xl:gap-16 font-semibold text-base xl:text-lg">
           <li className="hover:text-red">
-            <Link href="/">Home</Link>
+            <Link href="#home">Home</Link>
           </li>
           <li className="hover:text-red">
-            <Link href="/">Browse Rentals</Link>
+            <Link href="#browse">Browse Rentals</Link>
           </li>
           <li className="hover:text-red">
-            <Link href="/">Categories</Link>
+            <Link href="#categories">Categories</Link>
           </li>
           <li className="hover:text-red">
-            <Link href="/">About Us</Link>
+            <Link href="#aboutUs">About Us</Link>
           </li>
         </ul>
       </div>
