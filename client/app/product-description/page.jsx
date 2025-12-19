@@ -6,12 +6,14 @@ import Image from "next/image";
 import Footer from "../components/Footer";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import Booking from "../components/Booking";
 import Review from "../components/Review";
 
 export default function ProductDescription() {
   const [isTermsOpen, setIsTermsOpen] = useState(true);
   const [isBookOpen, setIsBookOpen] = useState(false);
   const [isFAQOpen, setIsFAQOpen] = useState(false);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("/pictures/product-img-placeholder/Row.png");
 
   const thumbnailImages = [
@@ -116,7 +118,7 @@ export default function ProductDescription() {
             </div>
           </div>
           <div className="buttons-container flex flex-col gap-4">
-            <button className="bg-red-600 hover:bg-red-700 hover:shadow-md rounded-xl px-6 py-2.5  text-white text-base font-semibold transition-colors duration-200 w-full cursor-pointer">
+            <button onClick={() => setIsBookingOpen(true)} className="bg-red-600 hover:bg-red-700 hover:shadow-md rounded-xl px-6 py-2.5  text-white text-base font-semibold transition-colors duration-200 w-full cursor-pointer">
               Book Now
             </button>
             <button className="bg-white border-2 hover:shadow-md border-light-gray hover:border-red hover:text-black hover:bg-[#FF000040] rounded-xl px-6 py-2.5 text-light-gray text-base font-semibold transition-colors duration-200 w-full cursor-pointer">
@@ -478,6 +480,7 @@ export default function ProductDescription() {
           </div>
         </div>
       </div>
+      <Booking isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
       <Footer />
     </div>
   );
