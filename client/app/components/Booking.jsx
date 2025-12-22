@@ -9,11 +9,20 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
     end: null,
   });
   const [monthOffset, setMonthOffset] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState("");
 
   // Get current month and next month based on offset
   const today = new Date();
-  const currentMonth = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
-  const nextMonth = new Date(today.getFullYear(), today.getMonth() + monthOffset + 1, 1);
+  const currentMonth = new Date(
+    today.getFullYear(),
+    today.getMonth() + monthOffset,
+    1
+  );
+  const nextMonth = new Date(
+    today.getFullYear(),
+    today.getMonth() + monthOffset + 1,
+    1
+  );
 
   // Navigation handlers
   const goToPreviousMonth = () => setMonthOffset(monthOffset - 1);
@@ -89,7 +98,7 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
           key={day}
           onClick={() => !isPast && handleDateClick(date)}
           disabled={isPast}
-          className={`h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-all
+          className={`h-8 px-3 py-3 flex items-center justify-center rounded-lg text-sm font-normal transition-all
             ${
               isPast
                 ? "text-gray-300 cursor-not-allowed"
@@ -130,7 +139,7 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
               />
             </svg>
           </button>
-          <h3 className="text-sm font-bold text-gray-800">{monthName}</h3>
+          <h3 className="text-sm font-medium text-neutral-600">{monthName}</h3>
           <button
             onClick={goToNextMonth}
             className="p-1.5 hover:bg-gray-200 rounded transition-colors"
@@ -153,17 +162,17 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
             </svg>
           </button>
         </div>
-        <div className="grid grid-cols-7 gap-1 mb-1">
-          {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+        <div className="grid grid-cols-7 gap-2 mb-1 px-3 py-3 bg-slate-100">
+          {["S", "M", "T", "W", "Th", "F", "Sa"].map((day) => (
             <div
               key={day}
-              className="h-6 flex items-center justify-center text-xs font-semibold text-gray-600"
+              className="h-6 w-6 flex items-center justify-center text-sm font-normal text-neutral-700"
             >
               {day}
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-1">{days}</div>
+        <div className="grid grid-cols-7 gap-2 px-3 py-3">{days}</div>
       </div>
     );
   };
@@ -176,23 +185,21 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
           onClick={onClose}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl w-fit max-w-6xl mx-auto overflow-hidden animate-slideUp max-h-[90vh] flex flex-col"
+            className="bg-white rounded-2xl shadow-2xl w-fit max-w-7xl mx-auto overflow-hidden animate-slideUp max-h-[90vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="modal-container py-6 px-10 overflow-y-auto">
+            <div className="modal-container py-24 px-20 overflow-y-hidden">
               <div className="red-line mx-auto"></div>
               <div className="modal-header flex justify-between items-center">
-                <h1 className="text-2xl font-extrabold w-full mt-3 flex justify-center">
+                <h1 className="text-5xl font-extrabold w-full mt-10 flex justify-center">
                   Booking Page
                 </h1>
               </div>
-              <div className="modal-body mt-3 grid grid-cols-2 gap-6">
-                <div className="calendar-column w-full">
+              <div className="modal-body mt-10 grid grid-cols-2 gap-20">
+                <div className="calendar-column w-full flex flex-col gap-6">
                   {/* Booking Details */}
                   <div className="product-info mb-3">
-                    <h3 className="text-xl font-extrabold mb-1">
-                      Canon EOS 90D
-                    </h3>
+                    <h3 className="text-4xl font-bold mb-1">Canon EOS 90D</h3>
                   </div>
                   <div className="inline-flex justify-start items-center gap-2.5 mb-4">
                     <Image
@@ -203,65 +210,116 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
                       alt="profile photo image"
                     />
                     <div className="w-52 inline-flex flex-col justify-start items-start">
-                      <div className="self-stretch justify-start text-black text-base font-semibold font-['Montserrat'] leading-5">
+                      <div className="self-stretch justify-start text-black text-base font-semibold leading-5">
                         Rental Owner Name
                       </div>
-                      <div className="self-stretch justify-start text-zinc-800 text-sm font-normal font-['Montserrat'] leading-5">
+                      <div className="self-stretch justify-start text-zinc-800 text-sm font-normal leading-5">
                         Rental Owner
                       </div>
                     </div>
                   </div>
                   {/* Two Months Side by Side */}
-                  <div className="flex gap-4">
-                    <div className="flex-1">{renderCalendar(currentMonth)}</div>
-                    <div className="flex-1">{renderCalendar(nextMonth)}</div>
-                  </div>
-
-
-                  <div className="flex items-center justify-end gap-2 mt-4">
-                  {/* Selected Dates Display */}
-                  {selectedDates.start && (
-                    <p className="text-xs font-base text-gray-700">
-                        <span>
-                        {selectedDates.start.toLocaleDateString()}
-                        </span>
-                        <span> - </span>
-                        {selectedDates.end && (
+                  <div className="border border-gray-200 rounded-lg p-4 shadow-xl">
+                    <div className="flex gap-4">
+                      <div className="flex-1">
+                        {renderCalendar(currentMonth)}
+                      </div>
+                      <div className="flex-1">{renderCalendar(nextMonth)}</div>
+                    </div>
+                    <div className="flex items-center justify-end gap-2 mt-4">
+                      {/* Selected Dates Display */}
+                      {selectedDates.start && (
+                        <p className="text-xs font-base text-gray-700">
                           <span>
-                             {selectedDates.end.toLocaleDateString()}
+                            {selectedDates.start.toLocaleDateString()}
                           </span>
-                        )}
-                      </p>
-                  )}
-                  {/* Action Buttons */}
-                    <button
-                      onClick={onClose}
-                      className="cursor-pointer px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() => {
-                        // Handle apply/booking logic here
-                        console.log("Selected dates:", selectedDates);
-                        onClose();
-                      }}
-                      disabled={!selectedDates.start || !selectedDates.end}
-                      className={`cursor-pointer px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                        selectedDates.start && selectedDates.end
-                          ? "bg-red-600 hover:bg-red-700 text-white hover:shadow-md"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      }`}
-                    >
-                      Apply
-                    </button>
+                          <span> - </span>
+                          {selectedDates.end && (
+                            <span>
+                              {selectedDates.end.toLocaleDateString()}
+                            </span>
+                          )}
+                        </p>
+                      )}
+                      {/* Action Buttons */}
+                      <button
+                        onClick={onClose}
+                        className="cursor-pointer px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => {
+                          // Handle apply/booking logic here
+                          console.log("Selected dates:", selectedDates);
+                          onClose();
+                        }}
+                        disabled={!selectedDates.start || !selectedDates.end}
+                        className={`cursor-pointer px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                          selectedDates.start && selectedDates.end
+                            ? "bg-red-600 hover:bg-red-700 text-white hover:shadow-md"
+                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        }`}
+                      >
+                        Apply
+                      </button>
+                    </div>
                   </div>
                 </div>
 
                 {/* Second Column - Placeholder */}
                 <div className="rental-details w-full">
-                  <div className="border border-gray-200 rounded-lg h-full">
-                    <p className="text-gray-500 text-sm">Placeholder</p>
+                  <div className="border border-gray-200 rounded-lg h-full px-8 py-10">
+                    <div className="rental-date-container flex justify-between items-start gap-4">
+                      <h2 className="font-extrabold text-base pt-3.5">
+                        Rental Date:
+                      </h2>
+                      <div className="dates flex flex-col gap-2.5">
+                        <p className="font-extrabold text-base border border-gray-200 p-3.5 rounded-lg">
+                          Start Date:{" "}
+                          <span className="font-normal">
+                            {selectedDates.start
+                              ? selectedDates.start.toLocaleDateString()
+                              : today.toLocaleDateString()}
+                          </span>
+                        </p>
+                        <p className="font-extrabold text-base border border-gray-200 p-3.5 rounded-lg">
+                          End Date:{" "}
+                          <span className="font-normal">
+                            {selectedDates.end
+                              ? selectedDates.end.toLocaleDateString()
+                              : "   "}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="payment-container flex items-center justify-between pt-5 pr-24">
+                      <h2 className="font-extrabold text-base">Payment:</h2>
+                      <div className="payment flex gap-2.5">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="gcash"
+                            checked={paymentMethod === "gcash"}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                            className="w-4 h-4 cursor-pointer"
+                          />
+                          <span className="text-base font-normal">GCash</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="cash"
+                            checked={paymentMethod === "cash"}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                            className="w-4 h-4 cursor-pointer"
+                          />
+                          <span className="text-base font-normal">Cash</span>
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
