@@ -186,7 +186,7 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
                   Booking Page
                 </h1>
               </div>
-              <div className="modal-body mt-3">
+              <div className="modal-body mt-3 grid grid-cols-2 gap-6">
                 <div className="calendar-column w-full">
                   {/* Booking Details */}
                   <div className="product-info mb-3">
@@ -211,32 +211,29 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
                       </div>
                     </div>
                   </div>
-
-
-                  <h2 className="text-xl font-bold mb-3">Select Dates</h2>
-
                   {/* Two Months Side by Side */}
                   <div className="flex gap-4">
                     <div className="flex-1">{renderCalendar(currentMonth)}</div>
                     <div className="flex-1">{renderCalendar(nextMonth)}</div>
                   </div>
 
+
+                  <div className="flex items-center justify-end gap-2 mt-4">
                   {/* Selected Dates Display */}
                   {selectedDates.start && (
-                    <div className="mt-3 p-2.5 bg-gray-100 rounded-lg">
-                      <p className="text-xs font-semibold text-gray-700">
-                        Start: {selectedDates.start.toLocaleDateString()}
+                    <p className="text-xs font-base text-gray-700">
+                        <span>
+                        {selectedDates.start.toLocaleDateString()}
+                        </span>
+                        <span> - </span>
+                        {selectedDates.end && (
+                          <span>
+                             {selectedDates.end.toLocaleDateString()}
+                          </span>
+                        )}
                       </p>
-                      {selectedDates.end && (
-                        <p className="text-xs font-semibold text-gray-700">
-                          End: {selectedDates.end.toLocaleDateString()}
-                        </p>
-                      )}
-                    </div>
                   )}
-
                   {/* Action Buttons */}
-                  <div className="flex justify-end gap-2 mt-4">
                     <button
                       onClick={onClose}
                       className="cursor-pointer px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-colors"
@@ -258,6 +255,13 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
                     >
                       Apply
                     </button>
+                  </div>
+                </div>
+
+                {/* Second Column - Placeholder */}
+                <div className="rental-details w-full">
+                  <div className="border border-gray-200 rounded-lg h-full">
+                    <p className="text-gray-500 text-sm">Placeholder</p>
                   </div>
                 </div>
               </div>
