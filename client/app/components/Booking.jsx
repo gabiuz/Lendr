@@ -4,12 +4,20 @@ import Image from "next/image";
 import { useState } from "react";
 
 export default function Booking({ isOpen = false, onClose = () => {} }) {
-  const [selectedDates, setSelectedDates] = useState({ start: null, end: null });
+  const [selectedDates, setSelectedDates] = useState({
+    start: null,
+    end: null,
+  });
+  const [monthOffset, setMonthOffset] = useState(0);
 
-  // Get current month and next month
+  // Get current month and next month based on offset
   const today = new Date();
-  const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-  const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+  const currentMonth = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
+  const nextMonth = new Date(today.getFullYear(), today.getMonth() + monthOffset + 1, 1);
+
+  // Navigation handlers
+  const goToPreviousMonth = () => setMonthOffset(monthOffset - 1);
+  const goToNextMonth = () => setMonthOffset(monthOffset + 1);
 
   // Helper function to get days in a month
   const getDaysInMonth = (date) => {
@@ -40,18 +48,25 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
   // Check if date is in selected range
   const isDateInRange = (date) => {
     if (!selectedDates.start) return false;
-    if (!selectedDates.end) return date.getTime() === selectedDates.start.getTime();
+    if (!selectedDates.end)
+      return date.getTime() === selectedDates.start.getTime();
     return date >= selectedDates.start && date <= selectedDates.end;
   };
 
   // Check if date is start or end
-  const isStartDate = (date) => selectedDates.start && date.getTime() === selectedDates.start.getTime();
-  const isEndDate = (date) => selectedDates.end && date.getTime() === selectedDates.end.getTime();
+  const isStartDate = (date) =>
+    selectedDates.start && date.getTime() === selectedDates.start.getTime();
+  const isEndDate = (date) =>
+    selectedDates.end && date.getTime() === selectedDates.end.getTime();
 
   // Render calendar for a specific month
-  const renderCalendar = (baseDate) => {
-    const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(baseDate);
-    const monthName = baseDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+  const renderCalendar = (baseDate, isFirstMonth = false) => {
+    const { daysInMonth, startingDayOfWeek, year, month } =
+      getDaysInMonth(baseDate);
+    const monthName = baseDate.toLocaleString("default", {
+      month: "long",
+      year: "numeric",
+    });
     const days = [];
 
     // Add empty cells for days before month starts
@@ -63,7 +78,8 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
       const isToday = date.toDateString() === today.toDateString();
-      const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const isPast =
+        date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
       const inRange = isDateInRange(date);
       const isStart = isStartDate(date);
       const isEnd = isEndDate(date);
@@ -73,11 +89,15 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
           key={day}
           onClick={() => !isPast && handleDateClick(date)}
           disabled={isPast}
-          className={`h-10 flex items-center justify-center rounded-lg text-sm font-medium transition-all
-            ${isPast ? 'text-gray-300 cursor-not-allowed' : 'cursor-pointer hover:bg-red-100'}
-            ${isToday && !inRange ? 'border-2 border-red-600' : ''}
-            ${inRange ? 'bg-red-600 text-white' : 'text-gray-800'}
-            ${isStart || isEnd ? 'bg-red-700 font-bold' : ''}
+          className={`h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-all
+            ${
+              isPast
+                ? "text-gray-300 cursor-not-allowed"
+                : "cursor-pointer hover:bg-red-100"
+            }
+            ${isToday && !inRange ? "border border-red-600" : ""}
+            ${inRange ? "bg-red-600 text-white" : "text-gray-800"}
+            ${isStart || isEnd ? "bg-red-700 font-bold" : ""}
           `}
         >
           {day}
@@ -86,18 +106,64 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
     }
 
     return (
-      <div className="mb-6">
-        <h3 className="text-lg font-bold mb-3 text-gray-800">{monthName}</h3>
-        <div className="grid grid-cols-7 gap-1 mb-2">
-          {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
-            <div key={day} className="h-8 flex items-center justify-center text-xs font-semibold text-gray-600">
+      <div className="mb-3">
+        {/* Month header with navigation */}
+        <div className="flex justify-between items-center mb-2">
+          <button
+            onClick={goToPreviousMonth}
+            className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+            aria-label="Previous month"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12.5 15L7.5 10L12.5 5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <h3 className="text-sm font-bold text-gray-800">{monthName}</h3>
+          <button
+            onClick={goToNextMonth}
+            className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+            aria-label="Next month"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M7.5 15L12.5 10L7.5 5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+        <div className="grid grid-cols-7 gap-1 mb-1">
+          {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+            <div
+              key={day}
+              className="h-6 flex items-center justify-center text-xs font-semibold text-gray-600"
+            >
               {day}
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-1">
-          {days}
-        </div>
+        <div className="grid grid-cols-7 gap-1">{days}</div>
       </div>
     );
   };
@@ -110,66 +176,88 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
           onClick={onClose}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl w-fit max-w-6xl mx-auto overflow-hidden animate-slideUp"
+            className="bg-white rounded-2xl shadow-2xl w-fit max-w-6xl mx-auto overflow-hidden animate-slideUp max-h-[90vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="modal-container py-24 px-28">
+            <div className="modal-container py-6 px-10 overflow-y-auto">
               <div className="red-line mx-auto"></div>
               <div className="modal-header flex justify-between items-center">
-                <h1 className="text-4xl font-extrabold w-full mt-11">
+                <h1 className="text-2xl font-extrabold w-full mt-3 flex justify-center">
                   Booking Page
                 </h1>
               </div>
-              <div className="modal-body grid grid-cols-2 gap-12 mt-6">
+              <div className="modal-body mt-3">
                 <div className="calendar-column w-full">
-                  <h2 className="text-2xl font-bold mb-4">Select Dates</h2>
-                  
-                  {/* Two Months Side by Side */}
-                  <div className="flex gap-6">
-                    <div className="flex-1">
-                      {renderCalendar(currentMonth)}
-                    </div>
-                    <div className="flex-1">
-                      {renderCalendar(nextMonth)}
-                    </div>
+                  {/* Booking Details */}
+                  <div className="product-info mb-3">
+                    <h3 className="text-xl font-extrabold mb-1">
+                      Canon EOS 90D
+                    </h3>
                   </div>
-                  
-                  {/* Selected Dates Display */}
-                  {selectedDates.start && (
-                    <div className="mt-4 p-4 bg-gray-100 rounded-lg">
-                      <p className="text-sm font-semibold text-gray-700">
-                        Start: {selectedDates.start.toLocaleDateString()}
-                      </p>
-                      {selectedDates.end && (
-                        <p className="text-sm font-semibold text-gray-700">
-                          End: {selectedDates.end.toLocaleDateString()}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-                <div className="column-2 w-full">
-                  <h2 className="text-2xl font-bold mb-4">Booking Details</h2>
-                  <div className="inline-flex justify-start items-center gap-3.5 mb-4">
+                  <div className="inline-flex justify-start items-center gap-2.5 mb-4">
                     <Image
-                      width={54}
-                      height={54}
+                      width={40}
+                      height={40}
                       className="rounded-full"
                       src="/pictures/sample-pfp-productCard.png"
                       alt="profile photo image"
                     />
                     <div className="w-52 inline-flex flex-col justify-start items-start">
-                      <div className="self-stretch justify-start text-black text-xl font-semibold font-['Montserrat'] leading-6">
+                      <div className="self-stretch justify-start text-black text-base font-semibold font-['Montserrat'] leading-5">
                         Rental Owner Name
                       </div>
-                      <div className="self-stretch justify-start text-zinc-800 text-base font-normal font-['Montserrat'] leading-6">
+                      <div className="self-stretch justify-start text-zinc-800 text-sm font-normal font-['Montserrat'] leading-5">
                         Rental Owner
                       </div>
                     </div>
                   </div>
-                  <div className="product-info">
-                    <h3 className="text-lg font-semibold mb-2">Canon EOS 90D</h3>
-                    <p className="text-gray-600">Select your rental dates from the calendar</p>
+
+
+                  <h2 className="text-xl font-bold mb-3">Select Dates</h2>
+
+                  {/* Two Months Side by Side */}
+                  <div className="flex gap-4">
+                    <div className="flex-1">{renderCalendar(currentMonth)}</div>
+                    <div className="flex-1">{renderCalendar(nextMonth)}</div>
+                  </div>
+
+                  {/* Selected Dates Display */}
+                  {selectedDates.start && (
+                    <div className="mt-3 p-2.5 bg-gray-100 rounded-lg">
+                      <p className="text-xs font-semibold text-gray-700">
+                        Start: {selectedDates.start.toLocaleDateString()}
+                      </p>
+                      {selectedDates.end && (
+                        <p className="text-xs font-semibold text-gray-700">
+                          End: {selectedDates.end.toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex justify-end gap-2 mt-4">
+                    <button
+                      onClick={onClose}
+                      className="cursor-pointer px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => {
+                        // Handle apply/booking logic here
+                        console.log("Selected dates:", selectedDates);
+                        onClose();
+                      }}
+                      disabled={!selectedDates.start || !selectedDates.end}
+                      className={`cursor-pointer px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                        selectedDates.start && selectedDates.end
+                          ? "bg-red-600 hover:bg-red-700 text-white hover:shadow-md"
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      }`}
+                    >
+                      Apply
+                    </button>
                   </div>
                 </div>
               </div>
