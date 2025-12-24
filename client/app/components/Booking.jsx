@@ -98,7 +98,7 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
           key={day}
           onClick={() => !isPast && handleDateClick(date)}
           disabled={isPast}
-          className={`h-6 lg:h-8 px-2 lg:px-3 py-2 lg:py-3 flex items-center justify-center rounded-lg text-[10px] lg:text-sm font-normal transition-all
+          className={`h-5 lg:h-8 px-1 lg:px-3 py-1 lg:py-3 flex items-center justify-center rounded-lg text-[9px] lg:text-sm font-normal transition-all
             ${
               isPast
                 ? "text-gray-300 cursor-not-allowed"
@@ -115,9 +115,9 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
     }
 
     return (
-      <div className="mb-2 lg:mb-3">
+      <div className="mb-1.5 lg:mb-3">
         {/* Month header with navigation */}
-        <div className="flex justify-between items-center mb-1 lg:mb-2">
+        <div className="flex justify-between items-center mb-0.5 lg:mb-2">
           <button
             onClick={goToPreviousMonth}
             className="p-1.5 hover:bg-gray-200 rounded transition-colors"
@@ -139,7 +139,7 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
               />
             </svg>
           </button>
-          <h3 className="text-xs lg:text-sm font-medium text-neutral-600">{monthName}</h3>
+          <h3 className="text-[10px] lg:text-sm font-medium text-neutral-600">{monthName}</h3>
           <button
             onClick={goToNextMonth}
             className="p-1.5 hover:bg-gray-200 rounded transition-colors"
@@ -162,17 +162,17 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
             </svg>
           </button>
         </div>
-        <div className="grid grid-cols-7 gap-1 lg:gap-2 mb-0.5 lg:mb-1 px-1.5 lg:px-3 py-1.5 lg:py-3 bg-slate-100">
+        <div className="grid grid-cols-7 gap-0.5 lg:gap-2 mb-0.5 lg:mb-1 px-1 lg:px-3 py-1 lg:py-3 bg-slate-100">
           {["S", "M", "T", "W", "Th", "F", "Sa"].map((day) => (
             <div
               key={day}
-              className="h-4 lg:h-6 w-4 lg:w-6 flex items-center justify-center text-[10px] lg:text-sm font-normal text-neutral-700"
+              className="h-3 lg:h-6 w-3 lg:w-6 flex items-center justify-center text-[8px] lg:text-sm font-normal text-neutral-700"
             >
               {day}
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-1 lg:gap-2 px-1.5 lg:px-3 py-1.5 lg:py-3">{days}</div>
+        <div className="grid grid-cols-7 gap-0.5 lg:gap-2 px-1 lg:px-3 py-1 lg:py-3">{days}</div>
       </div>
     );
   };
@@ -185,42 +185,42 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
           onClick={onClose}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl w-fit max-w-4xl xl:max-w-7xl mx-auto overflow-hidden animate-slideUp max-h-[90vh] flex flex-col"
+            className="bg-white rounded-2xl shadow-2xl w-fit max-w-3xl xl:max-w-7xl mx-auto overflow-hidden animate-slideUp max-h-[90vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="modal-container py-3 px-2.5 lg:py-16 xl:py-24 lg:px-12 xl:px-20 overflow-y-hidden">
+            <div className="modal-container py-2 px-2 lg:py-16 xl:py-24 lg:px-12 xl:px-20 overflow-y-hidden">
               <div className="red-line mx-auto"></div>
               <div className="modal-header flex justify-between items-center">
-                <h1 className="text-xl lg:text-3xl xl:text-4xl font-extrabold w-full mt-2 lg:mt-6 xl:mt-10 flex justify-center">
+                <h1 className="text-base lg:text-3xl xl:text-4xl font-extrabold w-full mt-1 lg:mt-6 xl:mt-10 flex justify-center">
                   Booking Page
                 </h1>
               </div>
-              <div className="modal-body mt-2 lg:mt-8 xl:mt-10 grid grid-cols-2 gap-3 lg:gap-12 xl:gap-20">
-                <div className="calendar-column w-full flex flex-col gap-1.5 lg:gap-5 xl:gap-6">
+              <div className="modal-body mt-1.5 lg:mt-8 xl:mt-10 grid grid-cols-2 gap-2 lg:gap-12 xl:gap-20">
+                <div className="calendar-column w-full flex flex-col gap-1 lg:gap-5 xl:gap-6">
                   {/* Booking Details */}
                   <div className="product-info mb-0.5 lg:mb-2.5 xl:mb-3">
-                    <h3 className="text-lg lg:text-3xl xl:text-4xl font-bold mb-0.5">Canon EOS 90D</h3>
+                    <h3 className="text-base lg:text-3xl xl:text-4xl font-bold mb-0">Canon EOS 90D</h3>
                   </div>
-                  <div className="inline-flex justify-start items-center gap-1.5 mb-1.5 lg:mb-4">
+                  <div className="inline-flex justify-start items-center gap-1 mb-1 lg:mb-4">
                     <Image
-                      width={28}
-                      height={28}
+                      width={24}
+                      height={24}
                       className="rounded-full"
                       src="/pictures/sample-pfp-productCard.png"
                       alt="profile photo image"
                     />
-                    <div className="w-36 lg:w-52 inline-flex flex-col justify-start items-start">
-                      <div className="self-stretch justify-start text-black text-xs lg:text-base font-semibold leading-4">
+                    <div className="w-32 lg:w-52 inline-flex flex-col justify-start items-start">
+                      <div className="self-stretch justify-start text-black text-[10px] lg:text-base font-semibold leading-3">
                         Rental Owner Name
                       </div>
-                      <div className="self-stretch justify-start text-zinc-800 text-[10px] lg:text-sm font-normal leading-4">
+                      <div className="self-stretch justify-start text-zinc-800 text-[8px] lg:text-sm font-normal leading-3">
                         Rental Owner
                       </div>
                     </div>
                   </div>
                   {/* Two Months Side by Side */}
-                  <div className="border border-gray-200 rounded-lg p-1 lg:p-3 xl:p-4 shadow-xl">
-                    <div className="flex gap-1 lg:gap-3 xl:gap-4">
+                  <div className="border border-gray-200 rounded-lg p-0.5 lg:p-3 xl:p-4 shadow-xl">
+                    <div className="flex gap-0.5 lg:gap-3 xl:gap-4">
                       <div className="flex-1">
                         {renderCalendar(currentMonth)}
                       </div>
@@ -269,13 +269,13 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
 
                 {/* Second Column - Placeholder */}
                 <div className="rental-details w-full">
-                  <div className="border border-gray-200 rounded-lg h-full px-3 lg:px-6 xl:px-8 py-4 lg:py-8 xl:py-10">
-                    <div className="rental-date-container flex justify-between items-start gap-1.5 lg:gap-3 xl:gap-4">
-                      <h2 className="font-extrabold text-xs lg:text-base pt-2.5 lg:pt-3.5">
+                  <div className="border border-gray-200 rounded-lg h-full px-2 lg:px-6 xl:px-8 py-2 lg:py-8 xl:py-10">
+                    <div className="rental-date-container flex justify-between items-start gap-1 lg:gap-3 xl:gap-4">
+                      <h2 className="font-extrabold text-[10px] lg:text-base pt-1.5 lg:pt-3.5">
                         Rental Date:
                       </h2>
-                      <div className="dates flex flex-col gap-1.5 lg:gap-2.5">
-                        <p className="font-extrabold text-xs lg:text-base border border-gray-200 p-2 lg:p-3 xl:p-3.5 rounded-lg">
+                      <div className="dates flex flex-col gap-1 lg:gap-2.5">
+                        <p className="font-extrabold text-[10px] lg:text-base border border-gray-200 p-1.5 lg:p-3 xl:p-3.5 rounded-lg">
                           Start Date:{" "}
                           <span className="font-normal">
                             {selectedDates.start
@@ -293,9 +293,9 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
                         </p>
                       </div>
                     </div>
-                    <div className="payment-container flex items-center justify-between pt-3 lg:pt-5 pr-8 lg:pr-18 xl:pr-24">
-                      <h2 className="font-extrabold text-xs lg:text-base">Payment:</h2>
-                      <div className="payment flex gap-1.5 lg:gap-2.5">
+                    <div className="payment-container flex items-center justify-between pt-2 lg:pt-5 pr-6 lg:pr-18 xl:pr-24">
+                      <h2 className="font-extrabold text-[10px] lg:text-base">Payment:</h2>
+                      <div className="payment flex gap-1 lg:gap-2.5">
                         <label className="flex items-center gap-2 cursor-pointer">
                           <input
                             type="radio"
@@ -305,7 +305,7 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
                             onChange={(e) => setPaymentMethod(e.target.value)}
                             className="w-4 h-4 cursor-pointer"
                           />
-                          <span className="text-xs lg:text-base font-normal">GCash</span>
+                          <span className="text-[10px] lg:text-base font-normal">GCash</span>
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer">
                           <input
@@ -316,7 +316,7 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
                             onChange={(e) => setPaymentMethod(e.target.value)}
                             className="w-4 h-4 cursor-pointer"
                           />
-                          <span className="text-xs lg:text-base font-normal">Cash</span>
+                          <span className="text-[10px] lg:text-base font-normal">Cash</span>
                         </label>
                       </div>
                     </div>
