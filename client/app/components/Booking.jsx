@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 
-export default function Booking({ isOpen = false, onClose = () => {} }) {
+export default function Booking({ isOpen = false, onClose = () => {}, pricePerDay = 950 }) {
   const [selectedDates, setSelectedDates] = useState({
     start: null,
     end: null,
@@ -268,9 +268,9 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
                   </div>
                 </div>
 
-                {/* Second Column - Placeholder */}
                 <div className="rental-details w-full">
                   <div className="border border-gray-200 rounded-lg h-full px-2 lg:px-6 xl:px-8 py-2 lg:py-8 xl:py-10">
+                    <div className="flex flex-col gap-10">
                     <div className="rental-date-container flex justify-between items-start gap-1 lg:gap-3 xl:gap-4">
                       <h2 className="font-extrabold text-[10px] lg:text-base pt-1.5 lg:pt-3.5">
                         Rental Date:
@@ -294,7 +294,7 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
                         </p>
                       </div>
                     </div>
-                    <div className="payment-container flex items-center justify-between pt-2 lg:pt-5 pr-6 lg:pr-18 xl:pr-24">
+                    <div className="payment-container flex items-center justify-between pr-6 lg:pr-18 xl:pr-24">
                       <h2 className="font-extrabold text-[10px] lg:text-base">Payment Method:</h2>
                       <div className="payment flex gap-1 lg:gap-2.5">
                         <label className="flex items-center gap-2 cursor-pointer">
@@ -321,7 +321,7 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
                         </label>
                       </div>
                     </div>
-                    <div className="delivery-container flex items-center justify-between gap-2 lg:gap-3 pt-2 lg:pt-5">
+                    <div className="delivery-container flex items-center justify-between gap-2 lg:gap-3">
                       <h2 className="font-extrabold text-[10px] lg:text-base">Delivery Options:</h2>
                       <div className="delivery flex gap-1 lg:gap-2.5">
                         <label className="flex items-center gap-2 cursor-pointer">
@@ -347,6 +347,24 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
                           <span className="text-[10px] lg:text-base font-normal">Delivery via Lalamove</span>
                         </label>
                       </div>
+                    </div>
+                    
+                    {/* Total Price */}
+                    <div className="total-container border border-gray-200 w-fit rounded-xl p-2 lg:p-4">
+                      <div className="flex justify-between items-center">
+                        <h2 className="font-extrabold text-[10px] lg:text-base">Total:</h2>
+                        <p className="font-normal text-[10px] lg:text-base">
+                          ₱{selectedDates.start && selectedDates.end
+                            ? (Math.ceil((selectedDates.end - selectedDates.start) / (1000 * 60 * 60 * 24)) + 1) * pricePerDay
+                            : 0}
+                        </p>
+                      </div>
+                      {selectedDates.start && selectedDates.end && (
+                        <p className="text-[8px] lg:text-xs text-gray-600 text-right mt-0.5 lg:mt-1">
+                          {Math.ceil((selectedDates.end - selectedDates.start) / (1000 * 60 * 60 * 24)) + 1} day(s) × ₱{pricePerDay}/day
+                        </p>
+                      )}
+                    </div>
                     </div>
                   </div>
                 </div>
