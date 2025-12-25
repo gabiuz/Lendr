@@ -32,7 +32,7 @@ export default function ProductDescription() {
   return (
     <div className="h-screen bg-white">
       <Navbar />
-      <div className="product-desc-container text-black mt-36 mb-16 mx-36 grid grid-cols-2 gap-6">
+      <div className="product-desc-container text-black mt-20 md:mt-24 lg:mt-36 mb-8 md:mb-12 lg:mb-16 mx-4 md:mx-8 lg:mx-20 xl:mx-36 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-6">
         <div className="flex flex-col gap-6">
           <div className="breadcrumbs flex items-center gap-2 ">
             <Link href="/homepage" className="text-sm">
@@ -72,7 +72,7 @@ export default function ProductDescription() {
             <p className="text-sm font-semibold">{rental.name}</p>
           </div>
           <div className="title">
-            <h1 className="text-4xl font-bold">{rental.name}</h1>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold">{rental.name}</h1>
           </div>
           <div className="price">
             <h2 className="text-base font-bold">
@@ -117,7 +117,7 @@ export default function ProductDescription() {
               </p>
             </div>
           </div>
-          <div className="buttons-container flex flex-col gap-4">
+          <div className="buttons-container flex flex-col gap-3 md:gap-4">
             <button onClick={() => setIsBookingOpen(true)} className="bg-red-600 hover:bg-red-700 hover:shadow-md rounded-xl px-6 py-2.5  text-white text-base font-semibold transition-colors duration-200 w-full cursor-pointer">
               Book Now
             </button>
@@ -130,7 +130,7 @@ export default function ProductDescription() {
               className="terms-container-text flex items-center justify-between w-full cursor-pointer hover:bg-gray-50 transition-colors duration-200 rounded-lg px-2"
               onClick={() => setIsTermsOpen(!isTermsOpen)}
             >
-              <h2 className="text-xl font-semibold py-4">Terms & Conditions</h2>
+              <h2 className="text-lg md:text-xl font-semibold py-3 md:py-4">Terms & Conditions</h2>
               <svg
                 width="27"
                 height="27"
@@ -265,7 +265,7 @@ export default function ProductDescription() {
               className="how-to-book-container-text flex items-center justify-between w-full cursor-pointer hover:bg-gray-50 transition-colors duration-200 rounded-lg px-2"
               onClick={() => setIsBookOpen(!isBookOpen)}
             >
-              <h2 className="text-xl font-semibold py-4">How to Book</h2>
+              <h2 className="text-lg md:text-xl font-semibold py-3 md:py-4">How to Book</h2>
               <svg
                 width="27"
                 height="27"
@@ -345,7 +345,7 @@ export default function ProductDescription() {
               className="faq-container-text flex items-center justify-between w-full cursor-pointer hover:bg-gray-50 transition-colors duration-200 rounded-lg px-2"
               onClick={() => setIsFAQOpen(!isFAQOpen)}
             >
-              <h2 className="text-xl font-semibold py-4">FAQ</h2>
+              <h2 className="text-lg md:text-xl font-semibold py-3 md:py-4">FAQ</h2>
               <svg
                 width="27"
                 height="27"
@@ -453,7 +453,7 @@ export default function ProductDescription() {
                 className="w-full object-cover transition-opacity duration-300"
               />
             </div>
-            <div className="thumbnail-container grid grid-cols-5 gap-3">
+            <div className="thumbnail-container grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-3">
               {thumbnailImages.map((image, index) => (
                 <div
                   key={index}
