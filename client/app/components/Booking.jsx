@@ -10,6 +10,7 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
   });
   const [monthOffset, setMonthOffset] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [deliveryOption, setDeliveryOption] = useState("");
 
   // Get current month and next month based on offset
   const today = new Date();
@@ -294,7 +295,7 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
                       </div>
                     </div>
                     <div className="payment-container flex items-center justify-between pt-2 lg:pt-5 pr-6 lg:pr-18 xl:pr-24">
-                      <h2 className="font-extrabold text-[10px] lg:text-base">Payment:</h2>
+                      <h2 className="font-extrabold text-[10px] lg:text-base">Payment Method:</h2>
                       <div className="payment flex gap-1 lg:gap-2.5">
                         <label className="flex items-center gap-2 cursor-pointer">
                           <input
@@ -317,6 +318,33 @@ export default function Booking({ isOpen = false, onClose = () => {} }) {
                             className="w-4 h-4 cursor-pointer"
                           />
                           <span className="text-[10px] lg:text-base font-normal">Cash</span>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="delivery-container flex items-center justify-between gap-2 lg:gap-3 pt-2 lg:pt-5">
+                      <h2 className="font-extrabold text-[10px] lg:text-base">Delivery Options:</h2>
+                      <div className="delivery flex gap-1 lg:gap-2.5">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="deliveryOption"
+                            value="pickup"
+                            checked={deliveryOption === "pickup"}
+                            onChange={(e) => setDeliveryOption(e.target.value)}
+                            className="w-4 h-4 cursor-pointer"
+                          />
+                          <span className="text-[10px] lg:text-base font-normal">Pick up</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="deliveryOption"
+                            value="lalamove"
+                            checked={deliveryOption === "lalamove"}
+                            onChange={(e) => setDeliveryOption(e.target.value)}
+                            className="w-4 h-4 cursor-pointer"
+                          />
+                          <span className="text-[10px] lg:text-base font-normal">Delivery via Lalamove</span>
                         </label>
                       </div>
                     </div>
