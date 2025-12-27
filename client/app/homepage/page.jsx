@@ -102,14 +102,14 @@ export default function Homepage() {
       <Navbar />
 
       <header
-        className="h-[600px] xl:h-[750px] bg-[url('/homepage-bg-image.jpg')] bg-opacity bg-cover bg-center"
+        className="h-[500px] md:h-[600px] xl:h-[750px] bg-[url('/homepage-bg-image.jpg')] bg-opacity bg-cover bg-center"
         id="home"
       >
-        <div className="flex flex-col items-center gap-6 pt-40 text-center px-4">
-          <h1 className="text-white font-bold text-4xl xl:text-6xl">
+        <div className="flex flex-col items-center gap-4 md:gap-6 pt-32 md:pt-40 text-center px-4">
+          <h1 className="text-white font-bold text-3xl md:text-4xl xl:text-6xl">
             Rent Anything, <span className="text-red"> Anytime</span>
           </h1>
-          <p className="text-white font-medium text-base xl:text-xl max-w-2xl">
+          <p className="text-white font-medium text-sm md:text-base xl:text-xl max-w-2xl">
             Search thousands of listings across categories. Compare prices,
             check availability, and rent securely — all in one place.
           </p>
@@ -136,11 +136,11 @@ export default function Homepage() {
         </div>
       </header>
       {/* category container */}
-      <div className="category-container bg-white" id="categories">
-        <h2 className="flex text-black font-bold lg:text-4xl lg:pt-28 lg:pb-12 lg:justify-center">
+      <div className="category-container bg-white py-12 md:py-16 lg:py-20" id="categories">
+        <h2 className="flex text-black font-bold text-2xl md:text-3xl lg:text-4xl pb-8 md:pb-10 lg:pb-12 justify-center px-4">
           Browse By Category
         </h2>
-        <div className="flex justify-center gap-6 categories-container ">
+        <div className="flex flex-wrap justify-center gap-4 md:gap-5 lg:gap-6 categories-container px-4">
           {categories.map((category) => (
             <Categories
               key={category.id}
@@ -150,14 +150,14 @@ export default function Homepage() {
           ))}
         </div>
       </div>
-      <div className="flex justify-center items-baseline text-center mt-32 mb-20">
-        <h2 className="text-black text-5xl font-bold">
+      <div className="flex justify-center items-baseline text-center mt-16 md:mt-24 lg:mt-32 mb-10 md:mb-16 lg:mb-20 px-4">
+        <h2 className="text-black text-3xl md:text-4xl lg:text-5xl font-bold">
           Most Rented Items Near You
         </h2>
       </div>
       {/* product card */}
       <div
-        className="productCard-container mx-36 bg-white grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-[150px]"
+        className="productCard-container mx-4 md:mx-8 lg:mx-20 xl:mx-36 bg-white grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-20 md:mb-28 lg:mb-[150px]"
         id="browse"
       >
         <ProductCard></ProductCard>
@@ -167,24 +167,24 @@ export default function Homepage() {
         <ProductCard></ProductCard>
         <ProductCard></ProductCard>
       </div>
-      <div className="info-card-container flex bg-zinc-800 justify-center items-center gap-36 px-36 py-14">
-        <div className="text text-white">
-          <h2 className="lg:text-2xl font-semibold">Renting Made Simple</h2>
-          <h1 className="lg:text-6xl font-bold">How Lendr Works?</h1>
+      <div className="info-card-container flex flex-col lg:flex-row bg-zinc-800 justify-center items-center gap-8 md:gap-12 lg:gap-36 px-4 md:px-8 lg:px-20 xl:px-36 py-10 md:py-12 lg:py-14">
+        <div className="text text-white text-center lg:text-left">
+          <h2 className="text-xl md:text-2xl font-semibold">Renting Made Simple</h2>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">How Lendr Works?</h1>
         </div>
-        <div className="flex info-cards bg-zinc gap-14" id="aboutUs">
+        <div className="flex flex-col md:flex-row info-cards bg-zinc gap-8 md:gap-10 lg:gap-14" id="aboutUs">
           <InfoCard icon="search" text="searchText" />
           <InfoCard icon="calendar" text="calendarText" />
           <InfoCard icon="deliver" text="deliverText" />
         </div>
       </div>
-      <div className="testimonial-container flex flex-col justify-center mt-24">
-        <div className="testimonial-texts flex flex-col gap-4 text-center text-black">
-          <h3 className="font-bold text-2xl">Testimonial</h3>
-          <h2 className="font-bold text-5xl">What our customers say?</h2>
+      <div className="testimonial-container flex flex-col justify-center mt-16 md:mt-20 lg:mt-24">
+        <div className="testimonial-texts flex flex-col gap-3 md:gap-4 text-center text-black px-4">
+          <h3 className="font-bold text-xl md:text-2xl">Testimonial</h3>
+          <h2 className="font-bold text-3xl md:text-4xl lg:text-5xl">What our customers say?</h2>
         </div>
-        <div className="testimonialCard-container flex justify-center items-center mx-[280px] gap-36">
-          <button className="cursor-pointer" onClick={prevTestimonial}>
+        <div className="testimonialCard-container flex justify-center items-center mx-4 md:mx-8 lg:mx-[280px] gap-6 md:gap-12 lg:gap-36">
+          <button className="cursor-pointer hidden md:block" onClick={prevTestimonial}>
             <svg
               width="56"
               height="56"
@@ -224,7 +224,7 @@ export default function Homepage() {
               />
             </motion.div>
           </AnimatePresence>
-          <button className="cursor-pointer" onClick={nextTestimonial}>
+          <button className="cursor-pointer hidden md:block" onClick={nextTestimonial}>
             <svg
               width="56"
               height="56"
@@ -250,7 +250,7 @@ export default function Homepage() {
             <button
               key={index}
               onClick={() => setCurrentTestimonial(index)}
-              className={`w-6 h-6 rounded-full transition-colors ${index === currentTestimonial
+              className={`w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 rounded-full transition-colors ${index === currentTestimonial
                 ? "bg-red-800"
                 : "bg-gray-300 hover:bg-zinc-300"
                 }`}
