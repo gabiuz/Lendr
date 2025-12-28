@@ -7,7 +7,7 @@ import Checkbox from "../components/Checkbox";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function Login() {
+export default function OwnerLogin() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const formFields = [
@@ -35,7 +35,7 @@ export default function Login() {
         password: fd.get('password'),
       };
 
-      //change api for owners login
+      //change api endpoit for owner login
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -43,7 +43,7 @@ export default function Login() {
       });
       const data = await res.json();
       if (data.success) {
-        //change storage key for owners
+        // change stoage key for owner
         localStorage.setItem('customer_id', String(data.customer_id));
         router.push('/');
       } else {
@@ -74,11 +74,11 @@ export default function Login() {
                <div className="red-line mx-auto mb-8"></div>
                <div className="flex flex-col justify-center items-center lg:w-xl  lg:gap-4 lg:items-start lg:mb-[88px]">
                  <h1 className="text-2xl font-bold text-black mt-0 mb-1 w-fit text-center lg:text-5xl">
-                   Welcome, Owner <span className="m-0 p-0 text-red">.</span>
+                   Welcome, Owner<span className="m-0 p-0 text-red">.</span>
                  </h1>
                  <p className="text-sm text-black mb-6 lg:text-base">
-                   Don&apos;t have an account?
-                   <Link href="/register" className="font-bold">
+                   Don&apos;t have an owner account?
+                   <Link href="/owner-register" className="font-bold">
                      <span> Sign Up</span>
                    </Link>
                  </p>
