@@ -1,11 +1,16 @@
+"use client";
+
 import Image from "next/image";
-import Form from "next/form";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import RadioButtons from "../components/RadioButtons";
 import Input from "../components/Input";
 import Button from "../components/Button";
+import { useState } from "react";
 
 export default function Register() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const formFields = {
     name: [
       { label: "First Name", id: "FirstName", placeholder: "First Name" },
@@ -47,13 +52,51 @@ export default function Register() {
     ],
   };
 
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const fd = new FormData(e.target);
+      const payload = {
+        first_name: fd.get('FirstName'),
+        middle_name: fd.get('MiddleName'),
+        last_name: fd.get('LastName'),
+        gender: fd.get('sex'),
+        birthday: fd.get('bday'),
+        email: fd.get('email'),
+        password: fd.get('password'),
+        phone_number: fd.get('contactNo'),
+        address: fd.get('address'),
+      };
+
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem('customer_id', data.customer_id);
+        router.push('/');
+      } else {
+        console.error(data.error);
+        alert('Registration failed');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Registration error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col justify-between bg-[url('/bg-image-register.jpg')] bg-cover bg-center bg-no-repeat">
       <div className="flex justify-center w-full pt-6 md:justify-center lg:justify-start lg:pl-24 lg:pt-16">
         <Image src="/lendr-logo.png" alt="Lendr Logo" width={142} height={54} />
       </div>
       <div className="flex lg:justify-end lg:items-end">
-        <Form className="register w-full lg:w-5xl">
+        <form className="register w-full lg:w-5xl" onSubmit={handleSubmit}>
           <div className="bg-white px-6 py-10 lg:px-22 lg:py-20 lg:mr-28">
             <div className="red-line mx-auto mb-8"></div>
             <div className="flex flex-col justify-center items-center lg:mb-8 lg:items-start">
@@ -91,7 +134,7 @@ export default function Register() {
                     <RadioButtons
                       key={field.id}
                       id={field.id}
-                      name={field.id}
+                      name="sex"
                       value={field.value}
                       label={field.label}
                     />
@@ -143,14 +186,19 @@ export default function Register() {
               <Button
                 label="Cancel"
                 className="text-light-gray flex-1 lg:flex-0 hover:text-red hover:border-red"
+                // prevent submit
+                onClick={(e) => e.preventDefault()}
               />
-              <Button
-                label="Submit"
-                className="text-white bg-light-gray flex-1 lg:flex-0 hover:bg-red hover:border-red"
-              />
+              <button
+                type="submit"
+                className="text-white bg-light-gray flex-1 lg:flex-0 hover:bg-red hover:border-red font-semibold border-2 border-light-gray px-[26px]! py-2.5! rounded-[11px]! cursor-pointer"
+                disabled={loading}
+              >
+                {loading ? 'Submitting...' : 'Submit'}
+              </button>
             </div>
           </div>
-        </Form>
+        </form>
       </div>
     </div>
   );
