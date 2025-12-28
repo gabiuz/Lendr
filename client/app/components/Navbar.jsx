@@ -6,11 +6,17 @@ import { useState } from "react";
 export default function Navbar({
   logoSrc = "/lendr-log-gradient.png",
   logoAlt = "blendr logo",
+  links = [
+    { href: "#home", label: "Home" },
+    { href: "#browse", label: "Browse Rentals" },
+    { href: "#categories", label: "Categories" },
+    { href: "#aboutUs", label: "About Us" },
+  ],
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-white shadow-2xl sticky top-0 z-50">
+    <nav className="bg-white shadow-2xl fixed top-0 right-0 left-0 z-50">
       <div className="flex justify-between items-center px-4 md:px-6 lg:px-8 xl:px-24 py-3 md:py-4 xl:py-8">
         <Link href="/homepage" className="cursor-pointer">
           <Image
@@ -25,18 +31,11 @@ export default function Navbar({
         {/* Desktop Nav links */}
         <div className="hidden lg:block text-black">
           <ul className="flex gap-6 lg:gap-8 xl:gap-16 font-semibold text-sm lg:text-base xl:text-lg">
-            <li className="hover:text-red transition-colors">
-              <Link href="#home">Home</Link>
-            </li>
-            <li className="hover:text-red transition-colors">
-              <Link href="#browse">Browse Rentals</Link>
-            </li>
-            <li className="hover:text-red transition-colors">
-              <Link href="#categories">Categories</Link>
-            </li>
-            <li className="hover:text-red transition-colors">
-              <Link href="#aboutUs">About Us</Link>
-            </li>
+            {links.map((link, index) => (
+              <li key={index} className="hover:text-red transition-colors">
+                <Link href={link.href}>{link.label}</Link>
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -115,42 +114,17 @@ export default function Navbar({
           <div className="px-4 py-4 space-y-4">
             {/* Mobile Nav Links */}
             <ul className="space-y-3 text-black font-semibold">
-              <li>
-                <Link
-                  href="#home"
-                  className="block py-2 hover:text-red transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#browse"
-                  className="block py-2 hover:text-red transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Browse Rentals
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#categories"
-                  className="block py-2 hover:text-red transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Categories
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#aboutUs"
-                  className="block py-2 hover:text-red transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  About Us
-                </Link>
-              </li>
+              {links.map((link, index) => (
+                <li key={index}>
+                  <Link
+                    href={link.href}
+                    className="block py-2 hover:text-red transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
 
             {/* Mobile Buttons */}
