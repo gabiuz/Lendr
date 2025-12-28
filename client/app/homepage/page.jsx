@@ -99,7 +99,7 @@ export default function Homepage() {
 
   return (
     <div className="min-h-screen w-full bg-white">
-      <Navbar />
+      <Navbar className="sticky" />
 
       <header
         className="h-[500px] md:h-[600px] xl:h-[750px] bg-[url('/homepage-bg-image.jpg')] bg-opacity bg-cover bg-center"

@@ -8,7 +8,7 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import { useState } from "react";
 
-export default function Register() {
+export default function OwnerRegister() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const formFields = {

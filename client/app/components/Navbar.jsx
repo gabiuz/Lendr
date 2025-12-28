@@ -50,7 +50,7 @@ export default function Navbar({
               </button>
             </Link>
           )}
-          <Link href="/owner-profile">
+          <Link href={`${profileInCircle ? "/owner-profile" : "/profile"}`}>
             <button className={`flex items-center gap-2 cursor-pointer font-semibold transition-colors ${
               profileInCircle 
                 ? "bg-red-800 hover:bg-red-900 text-white px-3 lg:px-7 lg:py-3.5 rounded-full" 
