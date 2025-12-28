@@ -12,6 +12,8 @@ export default function Navbar({
     { href: "#categories", label: "Categories" },
     { href: "#aboutUs", label: "About Us" },
   ],
+  showOwnerButton = true,
+  profileInCircle = false,
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -41,13 +43,19 @@ export default function Navbar({
 
         {/* Desktop Buttons */}
         <div className="hidden lg:flex text-black items-center gap-3 lg:gap-4 xl:gap-6">
-          <Link href="/register">
-            <button className="bg-red-800 hover:bg-red-900 text-white font-semibold px-4 lg:px-5 xl:px-6 py-2 lg:py-2.5 xl:py-3 rounded-full cursor-pointer text-sm lg:text-base transition-colors whitespace-nowrap">
-              + Be a Rental Owner
-            </button>
-          </Link>
-          <Link href="/profile">
-            <button className="flex items-center gap-2 cursor-pointer font-semibold px-3 lg:px-4 py-2 hover:text-red transition-colors">
+          {showOwnerButton && (
+            <Link href="/register">
+              <button className="bg-red-800 hover:bg-red-900 text-white font-semibold px-4 lg:px-5 xl:px-6 py-2 lg:py-2.5 xl:py-3 rounded-full cursor-pointer text-sm lg:text-base transition-colors whitespace-nowrap">
+                + Be a Rental Owner
+              </button>
+            </Link>
+          )}
+          <Link href="/owner-profile">
+            <button className={`flex items-center gap-2 cursor-pointer font-semibold transition-colors ${
+              profileInCircle 
+                ? "bg-red-800 hover:bg-red-900 text-white px-3 lg:px-7 lg:py-3.5 rounded-full" 
+                : "px-3 lg:px-4 py-2 hover:text-red"
+            }`}>
               <svg width="20" height="19" viewBox="0 0 19 19" fill="none">
                 <path
                   d="M15.8333 16.625V15.0417C15.8333 14.2018 15.4997 13.3964 14.9058 12.8025C14.3119 12.2086 13.5065 11.875 12.6666 11.875H6.33329C5.49344 11.875 4.68799 12.2086 4.09412 12.8025C3.50026 13.3964 3.16663 14.2018 3.16663 15.0417V16.625"
@@ -127,19 +135,25 @@ export default function Navbar({
               ))}
             </ul>
 
-            {/* Mobile Buttons */}
+            {/* Mobile Buttons*/}
             <div className="space-y-3 border-t border-gray-200 pt-4">
-              <Link href="/register" className="block">
+              {showOwnerButton && (
+                <Link href="/register" className="block">
+                  <button
+                    className="w-full bg-red-800 hover:bg-red-900 text-white font-semibold px-4 py-3 rounded-full cursor-pointer transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    + Be a Rental Owner
+                  </button>
+                </Link>
+              )}
+              <Link href="/owner-profile" className="block">
                 <button
-                  className="w-full bg-red-800 hover:bg-red-900 text-white font-semibold px-4 py-3 rounded-full cursor-pointer transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  + Be a Rental Owner
-                </button>
-              </Link>
-              <Link href="/profile" className="block">
-                <button
-                  className="w-full flex items-center justify-center gap-2 cursor-pointer font-semibold px-4 py-3 border border-gray-300 rounded-full hover:border-red hover:text-red transition-colors"
+                  className={`w-full flex items-center justify-center gap-2 cursor-pointer font-semibold px-4 py-3 rounded-full transition-colors ${
+                    profileInCircle
+                      ? "bg-red-800 hover:bg-red-900 text-white"
+                      : "border border-gray-300 hover:border-red hover:text-red"
+                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <svg width="20" height="19" viewBox="0 0 19 19" fill="none">
