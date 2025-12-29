@@ -3,9 +3,10 @@
 import Image from "next/image";
 import Input from "../components/Input";
 import RadioButtons from "../components/RadioButtons";
+import Navbar from "../components/Navbar";
 import Button from "../components/Button";
-import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Profile() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function Profile() {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    const id = localStorage.getItem('customer_id');
+    const id = localStorage.getItem("customer_id");
     if (!id) return;
     setHasAccount(true);
     fetch(`/api/profile?customer_id=${id}`)
@@ -27,7 +28,8 @@ export default function Profile() {
         if (data.success) {
           setProfile(data.profile || {});
           setOriginalProfile(data.profile || {});
-          if (data.profile && data.profile.profile_picture) setPreviewSrc(data.profile.profile_picture);
+          if (data.profile && data.profile.profile_picture)
+            setPreviewSrc(data.profile.profile_picture);
         } else {
           setHasAccount(false);
         }
@@ -42,12 +44,13 @@ export default function Profile() {
     if (!profile) return;
     setLoading(true);
     try {
-      const id = localStorage.getItem('customer_id');
+      const id = localStorage.getItem("customer_id");
       const payload = { customer_id: id, ...profile };
-      if (previewSrc && previewSrc !== profile.profile_picture) payload.profile_picture = previewSrc;
-      const res = await fetch('/api/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      if (previewSrc && previewSrc !== profile.profile_picture)
+        payload.profile_picture = previewSrc;
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -58,13 +61,13 @@ export default function Profile() {
           setOriginalProfile(data.profile);
           setPreviewSrc(data.profile.profile_picture || null);
         }
-        alert('Profile updated');
+        alert("Profile updated");
       } else {
-        alert(data.error || 'Update failed');
+        alert(data.error || "Update failed");
       }
     } catch (err) {
       console.error(err);
-      alert('Update error');
+      alert("Update error");
     } finally {
       setLoading(false);
     }
@@ -77,43 +80,48 @@ export default function Profile() {
     reader.onload = () => {
       const result = reader.result;
       setPreviewSrc(result);
-      setProfile((p) => (p ? { ...p, profile_picture: result } : { profile_picture: result }));
+      setProfile((p) =>
+        p ? { ...p, profile_picture: result } : { profile_picture: result },
+      );
     };
     reader.readAsDataURL(f);
   }
 
   const formFields = {
     name: [
-      { key: 'first_name', label: 'First Name', placeholder: 'First Name' },
-      { key: 'middle_name', label: 'Middle Name', placeholder: 'Middle Name' },
-      { key: 'last_name', label: 'Last Name', placeholder: 'Last Name' },
+      { key: "first_name", label: "First Name", placeholder: "First Name" },
+      { key: "middle_name", label: "Middle Name", placeholder: "Middle Name" },
+      { key: "last_name", label: "Last Name", placeholder: "Last Name" },
     ],
     sex: [
-      { id: 'male', value: 'male', label: 'Male' },
-      { id: 'female', value: 'female', label: 'Female' },
-      { id: 'other', value: 'other', label: 'Prefer Not to Say' },
+      { id: "male", value: "male", label: "Male" },
+      { id: "female", value: "female", label: "Female" },
+      { id: "other", value: "other", label: "Prefer Not to Say" },
     ],
     emailAndPhone: [
-      { key: 'email', label: 'Email', type: 'email', placeholder: 'Abcde@gmail.com' },
-      { key: 'phone_number', label: 'Phone Number', type: 'tel', placeholder: '+63' },
+      {
+        key: "email",
+        label: "Email",
+        type: "email",
+        placeholder: "Abcde@gmail.com",
+      },
+      {
+        key: "phone_number",
+        label: "Phone Number",
+        type: "tel",
+        placeholder: "+63",
+      },
     ],
-    address: [{ key: 'address', label: 'Address', placeholder: '123 st. Metro Manila' }],
-    birthday: [{ key: 'birthday', label: 'Birthday', type: 'date' }],
+    address: [
+      { key: "address", label: "Address", placeholder: "123 st. Metro Manila" },
+    ],
+    birthday: [{ key: "birthday", label: "Birthday", type: "date" }],
   };
 
   return (
     <div className="bg-white min-h-screen w-full">
-      <nav className="bg-white flex justify-between shadow-md">
-        <Image
-          src="/lendr-log-gradient.png"
-          width={142}
-          height={54}
-          alt="lendr logo"
-          className="w-24 md:w-28 lg:w-30 xl:w-32 px-2 md:px-3 py-2 md:py-3"
-        />
-      </nav>
-
-      <div className="text-black flex justify-between px-4 py-8 lg:px-36 pt-24">
+      <Navbar />
+      <div className="text-black flex justify-between px-4 py-8 lg:px-36 lg:pt-36">
         <h1 className="text-3xl font-semibold lg:text-4xl">Profile Settings</h1>
         <button
           onClick={() => {
@@ -126,9 +134,9 @@ export default function Profile() {
             }
           }}
           disabled={!hasAccount}
-          className={`flex justify-center items-center gap-1.5 ${!hasAccount ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          className={`flex justify-center items-center gap-1.5 ${!hasAccount ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
         >
-          <p>{editing ? 'Cancel' : 'Edit Profile'}</p>
+          <p>{editing ? "Cancel" : "Edit Profile"}</p>
         </button>
       </div>
 
@@ -139,19 +147,38 @@ export default function Profile() {
               {previewSrc ? (
                 // previewSrc may be a data URL
                 // use regular img to support data URLs
-                <img src={previewSrc} alt="profile photo" className="w-full h-full object-cover" />
+                <img
+                  src={previewSrc}
+                  alt="profile photo"
+                  className="w-full h-full object-cover"
+                />
               ) : (
-                <Image src="/pictures/sample-profile-photo.jpg" alt="profile photo" height={300} width={300} className="w-full h-full object-cover" />
+                <Image
+                  src="/pictures/sample-profile-photo.jpg"
+                  alt="profile photo"
+                  height={300}
+                  width={300}
+                  className="w-full h-full object-cover"
+                />
               )}
             </div>
 
             <div className="flex gap-3">
-              <input ref={fileInputRef} id="profileFile" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+              <input
+                ref={fileInputRef}
+                id="profileFile"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
               <button
                 type="button"
-                onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                onClick={() =>
+                  fileInputRef.current && fileInputRef.current.click()
+                }
                 disabled={!editing}
-                className={`px-3 py-2 border rounded ${!editing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                className={`px-3 py-2 border rounded ${!editing ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
               >
                 Upload Photo
               </button>
@@ -176,8 +203,14 @@ export default function Profile() {
                   key={f.key}
                   label={f.label}
                   placeholder={f.placeholder}
-                  value={profile ? profile[f.key] || '' : ''}
-                  onChange={(e) => setProfile((p) => (p ? { ...p, [f.key]: e.target.value } : { [f.key]: e.target.value }))}
+                  value={profile ? profile[f.key] || "" : ""}
+                  onChange={(e) =>
+                    setProfile((p) =>
+                      p
+                        ? { ...p, [f.key]: e.target.value }
+                        : { [f.key]: e.target.value },
+                    )
+                  }
                   readOnly={!editing}
                   containerClassName="w-full"
                 />
@@ -194,8 +227,15 @@ export default function Profile() {
                     name="gender"
                     value={s.value}
                     label={s.label}
-                    checked={!!profile && (profile.gender || '').toLowerCase() === s.value}
-                    onChange={() => setProfile((p) => (p ? { ...p, gender: s.value } : { gender: s.value }))}
+                    checked={
+                      !!profile &&
+                      (profile.gender || "").toLowerCase() === s.value
+                    }
+                    onChange={() =>
+                      setProfile((p) =>
+                        p ? { ...p, gender: s.value } : { gender: s.value },
+                      )
+                    }
                     disabled={!editing}
                   />
                 ))}
@@ -205,8 +245,14 @@ export default function Profile() {
                     key={b.key}
                     label={b.label}
                     type={b.type}
-                    value={profile ? profile[b.key] || '' : ''}
-                    onChange={(e) => setProfile((p) => (p ? { ...p, [b.key]: e.target.value } : { [b.key]: e.target.value }))}
+                    value={profile ? profile[b.key] || "" : ""}
+                    onChange={(e) =>
+                      setProfile((p) =>
+                        p
+                          ? { ...p, [b.key]: e.target.value }
+                          : { [b.key]: e.target.value },
+                      )
+                    }
                     readOnly={!editing}
                     containerClassName="w-full lg:ml-6"
                   />
@@ -221,8 +267,14 @@ export default function Profile() {
                   label={f.label}
                   type={f.type}
                   placeholder={f.placeholder}
-                  value={profile ? profile[f.key] || '' : ''}
-                  onChange={(e) => setProfile((p) => (p ? { ...p, [f.key]: e.target.value } : { [f.key]: e.target.value }))}
+                  value={profile ? profile[f.key] || "" : ""}
+                  onChange={(e) =>
+                    setProfile((p) =>
+                      p
+                        ? { ...p, [f.key]: e.target.value }
+                        : { [f.key]: e.target.value },
+                    )
+                  }
                   readOnly={!editing}
                   containerClassName="w-full"
                 />
@@ -233,8 +285,14 @@ export default function Profile() {
               <Input
                 label="Address"
                 placeholder={formFields.address[0].placeholder}
-                value={profile ? profile.address || '' : ''}
-                onChange={(e) => setProfile((p) => (p ? { ...p, address: e.target.value } : { address: e.target.value }))}
+                value={profile ? profile.address || "" : ""}
+                onChange={(e) =>
+                  setProfile((p) =>
+                    p
+                      ? { ...p, address: e.target.value }
+                      : { address: e.target.value },
+                  )
+                }
                 readOnly={!editing}
                 containerClassName="w-full"
               />
@@ -262,7 +320,7 @@ export default function Profile() {
                 className="text-white bg-light-gray flex-1 lg:flex-0 hover:bg-red hover:border-red font-semibold border-2 border-light-gray px-6 py-2.5 rounded-[11px]"
                 disabled={!editing || loading}
               >
-                {loading ? 'Saving...' : 'Save Changes'}
+                {loading ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>
@@ -271,10 +329,23 @@ export default function Profile() {
         <div className="w-full px-4 lg:px-36 pt-12">
           <div className="border rounded-lg p-6 bg-white shadow-sm text-center">
             <h2 className="text-xl font-semibold mb-2">No account found</h2>
-            <p className="mb-4">You are not logged in. Please log in or create an account to view and edit your profile.</p>
+            <p className="mb-4">
+              You are not logged in. Please log in or create an account to view
+              and edit your profile.
+            </p>
             <div className="flex justify-center gap-4">
-              <button onClick={() => router.push('/login')} className="px-4 py-2 border rounded">Log in</button>
-              <button onClick={() => router.push('/register')} className="px-4 py-2 bg-light-gray text-white rounded">Register</button>
+              <button
+                onClick={() => router.push("/login")}
+                className="px-4 py-2 border rounded"
+              >
+                Log in
+              </button>
+              <button
+                onClick={() => router.push("/register")}
+                className="px-4 py-2 bg-light-gray text-white rounded"
+              >
+                Register
+              </button>
             </div>
           </div>
         </div>
@@ -282,4 +353,3 @@ export default function Profile() {
     </div>
   );
 }
-

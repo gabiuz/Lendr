@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import Input from "../components/Input";
 import Checkbox from "../components/Checkbox";
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function OwnerLogin() {
   const router = useRouter();
@@ -31,27 +31,27 @@ export default function OwnerLogin() {
     try {
       const fd = new FormData(e.target);
       const payload = {
-        email: fd.get('email'),
-        password: fd.get('password'),
+        email: fd.get("email"),
+        password: fd.get("password"),
       };
 
       //change api endpoit for owner login
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (data.success) {
         // change stoage key for owner
-        localStorage.setItem('customer_id', String(data.customer_id));
-        router.push('/');
+        localStorage.setItem("customer_id", String(data.customer_id));
+        router.push("/");
       } else {
-        alert(data.error || 'Invalid credentials');
+        alert(data.error || "Invalid credentials");
       }
     } catch (err) {
       console.error(err);
-      alert('Login error');
+      alert("Login error");
     } finally {
       setLoading(false);
     }
@@ -71,57 +71,57 @@ export default function OwnerLogin() {
         <div className="flex lg:justify-start lg:items-end">
           <form className="login w-full lg:w-auto" onSubmit={handleSubmit}>
             <div className="bg-white px-6 py-10 lg:px-22 lg:py-20 lg:ml-28">
-               <div className="red-line mx-auto mb-8"></div>
-               <div className="flex flex-col justify-center items-center lg:w-xl  lg:gap-4 lg:items-start lg:mb-[88px]">
-                 <h1 className="text-2xl font-bold text-black mt-0 mb-1 w-fit text-center lg:text-5xl">
-                   Welcome, Owner<span className="m-0 p-0 text-red">.</span>
-                 </h1>
-                 <p className="text-sm text-black mb-6 lg:text-base">
-                   Don&apos;t have an owner account?
-                   <Link href="/owner-register" className="font-bold">
-                     <span> Sign Up</span>
-                   </Link>
-                 </p>
-               </div>
-               <div className="email-password flex flex-col gap-4 mb-4 lg:flex-col">
-                 {formFields.map((field) => (
-                   <Input
-                     key={field.name}
-                     label={field.label}
-                     type={field.type}
-                     name={field.name}
-                     id={field.name}
-                     required={true}
-                     placeholder={field.placeholder}
-                     containerClassName="w-full! mb-6! password-container"
-                   ></Input>
-                 ))}
-               </div>
-               <div className="remember-me-forgot-container flex justify-between items-center mb-[45px]">
-                 <Checkbox
-                   id="remember-me"
-                   name="remember-me"
-                   label="Remember Me"
-                 ></Checkbox>
-                 <Link href="/">
-                   <span className="text-light-gray hover:text-red">
-                     Forgot Password
-                   </span>
-                 </Link>
-               </div>
-               <div className="button-container flex flex-row justify-between gap-3 lg:justify-end">
+              <div className="red-line mx-auto mb-8"></div>
+              <div className="flex flex-col justify-center items-center lg:w-xl  lg:gap-4 lg:items-start lg:mb-[88px]">
+                <h1 className="text-2xl font-bold text-black mt-0 mb-1 w-fit text-center lg:text-5xl">
+                  Welcome, Owner<span className="m-0 p-0 text-red">.</span>
+                </h1>
+                <p className="text-sm text-black mb-6 lg:text-base">
+                  Don&apos;t have an owner account?
+                  <Link href="/owner-register" className="font-bold">
+                    <span> Sign Up</span>
+                  </Link>
+                </p>
+              </div>
+              <div className="email-password flex flex-col gap-4 mb-4 lg:flex-col">
+                {formFields.map((field) => (
+                  <Input
+                    key={field.name}
+                    label={field.label}
+                    type={field.type}
+                    name={field.name}
+                    id={field.name}
+                    required={true}
+                    placeholder={field.placeholder}
+                    containerClassName="w-full! mb-6! password-container"
+                  ></Input>
+                ))}
+              </div>
+              <div className="remember-me-forgot-container flex justify-between items-center mb-[45px]">
+                <Checkbox
+                  id="remember-me"
+                  name="remember-me"
+                  label="Remember Me"
+                ></Checkbox>
+                <Link href="/">
+                  <span className="text-light-gray hover:text-red">
+                    Forgot Password
+                  </span>
+                </Link>
+              </div>
+              <div className="button-container flex flex-row justify-between gap-3 lg:justify-end">
                 <button
                   type="submit"
                   disabled={loading}
                   className="text-white bg-light-gray flex-1 lg:flex-1 hover:bg-red hover:border-red font-semibold border-2 border-light-gray px-[26px]! py-2.5! rounded-[11px]! cursor-pointer"
                 >
-                  {loading ? 'Logging in...' : 'Log in'}
+                  {loading ? "Logging in..." : "Log in"}
                 </button>
               </div>
             </div>
           </form>
-         </div>
-       </div>
-     </>
-   );
+        </div>
+      </div>
+    </>
+  );
 }
