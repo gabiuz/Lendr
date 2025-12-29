@@ -1,9 +1,43 @@
+"use client";
+
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Navbar from "../components/Navbar";
 import Search from "../components/Search";
 import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
 
 export default function ProductResult() {
+  const searchParams = useSearchParams();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchResults() {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams();
+        const q = searchParams.get('q');
+        const location = searchParams.get('location');
+        const startDate = searchParams.get('startDate');
+        const endDate = searchParams.get('endDate');
+        if (q) params.set('q', q);
+        if (location) params.set('location', location);
+        if (startDate) params.set('startDate', startDate);
+        if (endDate) params.set('endDate', endDate);
+
+        const res = await fetch(`/api/search?${params.toString()}`);
+        const data = await res.json();
+        if (data.success) setProducts(data.products || []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchResults();
+  }, [searchParams]);
+
   return (
     <div className="bg-white">
       <Navbar />
@@ -13,8 +47,16 @@ export default function ProductResult() {
       >
         <div className="flex justify-center items-center px-4 py-4">
           <div className="flex bg-white lg:px-4 lg:py-4 lg:w-fit lg:gap-5 items-center rounded-2xl lg:mt-16">
-            <Search />
-            <button className="cursor-pointer">
+            <Search formId="productSearchForm" />
+            <button
+              onClick={() => {
+                const f = document.getElementById('productSearchForm');
+                if (f && typeof f.requestSubmit === 'function') f.requestSubmit();
+                else if (f) f.dispatchEvent(new Event('submit', { cancelable: true }));
+              }}
+              className="cursor-pointer ml-2"
+              aria-label="Search"
+            >
               <svg
                 width="66"
                 height="66"
@@ -35,18 +77,14 @@ export default function ProductResult() {
       <div className="Products mx-36">
         <div className="product-texts text-black flex flex-col gap-4 mt-10 mb-24">
           <h1 className="text-5xl font-bold">Products</h1>
-          <p className="text-lg font-normal">Found 9 products</p>
+          <p className="text-lg font-normal">Found {products.length} products</p>
         </div>
         <div className="productCard-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-[150px]">
-          <ProductCard showButton={true} />
-          <ProductCard showButton={true} />
-          <ProductCard showButton={true} />
-          <ProductCard showButton={true} />
-          <ProductCard showButton={true} />
-          <ProductCard showButton={true} />
-          <ProductCard showButton={true} />
-          <ProductCard showButton={true} />
-          <ProductCard showButton={true} />
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            products.map((p) => <ProductCard key={p.product_id} product={p} showButton={true} />)
+          )}
         </div>
       </div>
       <Footer />

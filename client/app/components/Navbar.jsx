@@ -7,7 +7,7 @@ export default function Navbar({
   logoSrc = "/lendr-log-gradient.png",
   logoAlt = "blendr logo",
   links = [
-    { href: "#home", label: "Home" },
+    { href: "/homepage", label: "Home" },
     { href: "#browse", label: "Browse Rentals" },
     { href: "#categories", label: "Categories" },
     { href: "#aboutUs", label: "About Us" },

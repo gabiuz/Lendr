@@ -77,7 +77,7 @@ export default function Register() {
       const data = await res.json();
       if (data.success) {
         localStorage.setItem('customer_id', data.customer_id);
-        router.push('/');
+        router.push('/homepage');
       } else {
         console.error(data.error);
         alert('Registration failed');

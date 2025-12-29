@@ -4,34 +4,44 @@ import Link from "next/link";
 import Navbar from "../components/Navbar";
 import Image from "next/image";
 import Footer from "../components/Footer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Booking from "../components/Booking";
 import Review from "../components/Review";
+import { useSearchParams } from 'next/navigation';
 
 export default function ProductDescription() {
+  const searchParams = useSearchParams();
+  const productId = searchParams.get('product_id');
   const [isTermsOpen, setIsTermsOpen] = useState(true);
   const [isBookOpen, setIsBookOpen] = useState(false);
   const [isFAQOpen, setIsFAQOpen] = useState(false);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState("/pictures/product-img-placeholder/Row.png");
+  const [selectedImage, setSelectedImage] = useState('/pictures/product-img-placeholder/Row.png');
+  const [product, setProduct] = useState(null);
+  const thumbnailImages = (product && product.images && product.images.length)
+    ? product.images
+    : [
+        '/pictures/product-img-placeholder/Row.png',
+        '/pictures/product-img-placeholder/Row-1.png',
+        '/pictures/product-img-placeholder/Row-2.png',
+      ];
 
-  const thumbnailImages = [
-    "/pictures/product-img-placeholder/Placeholder Image.png",
-    "/pictures/product-img-placeholder/Placeholder Image-1.png",
-    "/pictures/product-img-placeholder/Placeholder Image-2.png",
-    "/pictures/product-img-placeholder/Placeholder Image-3.png",
-    "/pictures/product-img-placeholder/Placeholder Image-4.png",
-  ];
-  const rental = {
-    name: "Canon EOS 90D",
-    pricePerDay: 950,
-    rating: 4.5,
-    reviews: 10,
-  };
-  return (
-    <div className="h-screen bg-white">
-      <Navbar />
+  useEffect(() => {
+    async function load() {
+      if (!productId) return;
+      try {
+        const res = await fetch(`/api/product?product_id=${productId}`);
+        const data = await res.json();
+        if (data.success) setProduct(data.product);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    load();
+  }, [productId]);
+  
+    return (
       <div className="product-desc-container text-black mt-20 md:mt-24 lg:mt-36 mb-8 md:mb-12 lg:mb-16 mx-4 md:mx-8 lg:mx-20 xl:mx-36 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-6">
         <div className="flex flex-col gap-6">
           <div className="breadcrumbs flex items-center gap-2 ">
@@ -69,51 +79,31 @@ export default function ProductDescription() {
                 strokeWidth="0.666667"
               />
             </svg>
-            <p className="text-sm font-semibold">{rental.name}</p>
+            <p className="text-sm font-semibold">{product ? product.product_name : 'Product'}</p>
           </div>
           <div className="title">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold">{rental.name}</h1>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold">{product ? product.product_name : 'Product'}</h1>
           </div>
           <div className="price">
             <h2 className="text-base font-bold">
-              <span className="text-sky-800">{rental.pricePerDay}</span>/day | (
-              {rental.rating} stars) | {rental.reviews} reviews
+              <span className="text-sky-800">{product ? product.product_rate : ''}</span>/day
             </h2>
           </div>
           <div className="product-description font-medium text-base">
-            <p>
-              The Canon EOS 90D is a fast, high-resolution DSLR ideal for
-              events, portraits, travel, and professional content creation. Each
-              rental unit undergoes a full check before release—cleaned, tested,
-              and confirmed to be in excellent working condition. The package
-              includes the camera body, battery, charger, neck strap, and basic
-              documentation, ensuring you have everything you need for a smooth
-              shoot. Whether you&apos;re a hobbyist or a professional, our goal
-              is to provide reliable gear that performs consistently throughout
-              your rental period.
-            </p>
-            <br />
-            <p className="font-bold">What&apos;s Included:</p>
-            <ul className="list-disc flex flex-col justify-center pl-5">
-              <li>Canon EOS 90D Body</li>
-              <li>Original Battery & Charger</li>
-              <li>Neck Strap</li>
-              <li>Basic Documentation</li>
-              <li>Clean and tested before dispatch</li>
-            </ul>
+            <p>{product ? product.description : 'Product details will appear here.'}</p>
           </div>
           <div className="owner-container flex items-center gap-3.5">
             <Image
-              src="/pictures/sample-pfp-productCard.png"
+              src={product && product.owner_avatar ? product.owner_avatar : '/pictures/sample-pfp-productCard.png'}
               alt="Owner-profile-picture"
               width={54}
               height={54}
               className="rounded-full w-14 h-14"
             />
             <div>
-              <p className="font-bold">Rental Owner Name</p>
+              <p className="font-bold">{product ? (product.business_name || 'Rental Owner Name') : 'Rental Owner Name'}</p>
               <p className="text-zinc-800 text-base font-normal font-['Montserrat'] leading-6">
-                Rental Owner
+                {product ? (product.business_address || 'Rental Owner') : 'Rental Owner'}
               </p>
             </div>
           </div>
@@ -479,9 +469,8 @@ export default function ProductDescription() {
             </div>
           </div>
         </div>
-      </div>
-      <Booking isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
-      <Footer />
-    </div>
+          <Booking isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
+          <Footer />
+        </div>
   );
 }

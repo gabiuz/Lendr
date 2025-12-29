@@ -98,13 +98,36 @@ export const icons = {
 };
 
 // Category.jsx - Simple Category Component
+import { useRouter } from 'next/navigation';
+
 export default function Categories({ icon, label }) {
   const iconData = icons[icon];
+  const router = useRouter();
 
   if (!iconData) return null;
 
+  // map human label to category_code used in DB
+  const mapLabelToCode = (lab) => {
+    switch (lab) {
+      case 'Vehicles': return 'V';
+      case 'Devices & Electronics': return 'DE';
+      case 'Clothing & Apparel': return 'CA';
+      case 'Tools & Equipment': return 'TE';
+      case 'Furniture & Home': return 'FH';
+      case 'Party & Events': return 'PE';
+      default: return '';
+    }
+  };
+
+  const handleClick = () => {
+    const code = mapLabelToCode(label);
+    const params = new URLSearchParams();
+    if (code) params.set('category', code);
+    router.push(`/product-result?${params.toString()}`);
+  };
+
   return (
-    <button className="cursor-pointer">
+    <button className="cursor-pointer" onClick={handleClick}>
       <div className="flex items-center gap-2.5 text-black rounded-3xl border border-light-gray w-fit py-2 pr-5 pl-2">
         <div className="border border-red-50 bg-red-50 rounded-full py-2 px-2">
           <svg

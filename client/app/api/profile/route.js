@@ -19,6 +19,24 @@ export async function GET(request) {
 
     // Normalize birthday to YYYY-MM-DD using local date components to avoid timezone shifts
     const profile = { ...rows[0] };
+    // If profile_picture is stored as a Buffer (BLOB), convert to base64 data URL
+    try {
+      if (profile.profile_picture) {
+        const p = profile.profile_picture;
+        if (Buffer.isBuffer(p)) {
+          const base64 = p.toString('base64');
+          // assume jpeg by default; clients should handle variety if needed
+          profile.profile_picture = `data:image/jpeg;base64,${base64}`;
+        } else if (typeof p === 'string' && p.startsWith('\\x')) {
+          // mysql may return hex escaped string; attempt to convert
+          const hex = p.replace(/\\x/g, '');
+          const buf = Buffer.from(hex, 'hex');
+          profile.profile_picture = `data:image/jpeg;base64,${buf.toString('base64')}`;
+        }
+      }
+    } catch (e) {
+      // ignore image transform errors
+    }
     try {
       const b = profile.birthday;
       if (b) {
@@ -72,11 +90,23 @@ export async function PUT(request) {
       customer_id = digits;
     }
 
-    const allowed = ['first_name','middle_name','last_name','gender','birthday','email','phone_number','address'];
+    const allowed = ['first_name','middle_name','last_name','gender','birthday','email','phone_number','address','profile_picture'];
     const updates = [];
     const values = [];
     for (const key of allowed) {
       if (fields[key] !== undefined) {
+        // handle profile_picture data URL -> Buffer conversion
+        if (key === 'profile_picture' && typeof fields[key] === 'string' && fields[key].startsWith('data:')) {
+          // data:[<mediatype>][;base64],<data>
+          const matches = fields[key].match(/^data:(.+);base64,(.+)$/);
+          if (matches) {
+            const base64 = matches[2];
+            const buf = Buffer.from(base64, 'base64');
+            updates.push(`${key} = ?`);
+            values.push(buf);
+            continue;
+          }
+        }
         updates.push(`${key} = ?`);
         values.push(fields[key]);
       }
@@ -86,7 +116,24 @@ export async function PUT(request) {
 
     values.push(customer_id);
     const sql = `UPDATE customer SET ${updates.join(', ')} WHERE customer_id = ?`;
-    const result = await query({ query: sql, values });
+    // Attempt update, but if column `profile_picture` doesn't exist, create it and retry.
+    let result;
+    try {
+      result = await query({ query: sql, values });
+    } catch (err) {
+      const msg = (err && err.message) || '';
+      if (msg.toLowerCase().includes('unknown column') || (msg.toLowerCase().includes('column') && msg.toLowerCase().includes('unknown'))) {
+        // Create profile_picture column as LONGBLOB to store image data
+        try {
+          await query({ query: "ALTER TABLE customer ADD COLUMN profile_picture LONGBLOB DEFAULT NULL" });
+          result = await query({ query: sql, values });
+        } catch (e) {
+          throw e;
+        }
+      } else {
+        throw err;
+      }
+    }
 
     // mysql2 returns an OkPacket for UPDATE; check affectedRows to ensure update occurred
     if (result && result.affectedRows !== undefined && result.affectedRows === 0) {

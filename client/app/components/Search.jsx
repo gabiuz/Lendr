@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Input from "./Input";
+import { useRouter } from 'next/navigation';
 
 const formFields = {
   search: [
@@ -27,7 +28,8 @@ const formFields = {
   ],
 };
 
-export default function Search() {
+export default function Search({ formId = 'searchForm' }) {
+  const router = useRouter();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [dateError, setDateError] = useState("");
@@ -83,8 +85,22 @@ export default function Search() {
     validateDates(startDate, newEndDate);
   };
 
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!validateDates(startDate, endDate)) return;
+    const fd = new FormData(e.target);
+    const q = fd.get('search') || '';
+    const location = fd.get('location') || '';
+    const params = new URLSearchParams();
+    if (q) params.set('q', q);
+    if (location) params.set('location', location);
+    if (startDate) params.set('startDate', startDate);
+    if (endDate) params.set('endDate', endDate);
+    router.push(`/product-result?${params.toString()}`);
+  }
+
   return (
-    <>
+    <form id={formId} onSubmit={handleSubmit} className="flex flex-wrap gap-3 items-end">
       {formFields.search.map((field) => {
         // Handle date fields with validation
         if (field.id === "startDate") {
@@ -145,6 +161,6 @@ export default function Search() {
           <p className="text-red-600 text-sm font-medium px-2">{dateError}</p>
         </div>
       )}
-    </>
+    </form>
   );
 }
