@@ -328,21 +328,23 @@ export default function Profile() {
       ) : (
         <div className="w-full px-4 lg:px-36 pt-12">
           <div className="border rounded-lg p-6 bg-white shadow-sm text-center">
-            <h2 className="text-xl font-semibold mb-2">No account found</h2>
-            <p className="mb-4">
+            <h2 className="text-xl text-black font-semibold mb-2">
+              No account found
+            </h2>
+            <p className="mb-4 text-black">
               You are not logged in. Please log in or create an account to view
               and edit your profile.
             </p>
             <div className="flex justify-center gap-4">
               <button
                 onClick={() => router.push("/login")}
-                className="px-4 py-2 border rounded"
+                className="px-4 py-2 border rounded-xl cursor-pointer hover:text-red"
               >
                 Log in
               </button>
               <button
                 onClick={() => router.push("/register")}
-                className="px-4 py-2 bg-light-gray text-white rounded"
+                className="px-4 py-2 bg-light-gray text-white rounded-xl cursor-pointer hover:bg-red-600"
               >
                 Register
               </button>
