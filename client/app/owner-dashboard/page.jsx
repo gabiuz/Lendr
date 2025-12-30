@@ -144,8 +144,70 @@ export default function OwnerDashboard() {
             My Rentals
           </h2>
         </div>
-        <div className="rentals-card">
-
+        <div className="rentals-card px-4 md:px-8 lg:px-20 xl:px-36 mb-20 xl:mt-16">
+          <div className="flex flex-col shadow-lg rounded-2xl overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200 bg-neutral-200">
+                  <th className="text-center py-4 px-4 font-bold text-black">
+                    Products
+                  </th>
+                  <th className="text-center py-4 px-4 font-bold text-black">
+                    Customer
+                  </th>
+                  <th className="text-center py-4 px-4 font-bold text-black">
+                    Dates
+                  </th>
+                  <th className="text-center py-4 px-4 font-bold text-black">
+                    Total
+                  </th>
+                  <th className="text-center py-4 px-4 font-bold text-black">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-gray-200 hover:bg-gray-200 transition-colors">
+                  <td className="py-4 px-4 text-center text-sky-800">Toyota Vios</td>
+                  <td className="py-4 px-4 text-center text-gray-800">Kenneth Morales</td>
+                  <td className="py-4 px-4 text-center text-gray-800">Oct 10 - 12</td>
+                  <td className="py-4 px-4 text-center text-gray-800">₱3,000</td>
+                  <td className="py-4 px-4 text-center">
+                    <span className=" text-red-600 px-3 py-1 rounded-full text-sm font-medium">
+                      Ongoing
+                    </span>
+                  </td>
+                </tr>
+                <tr className="border-b border-gray-200 hover:bg-gray-200 transition-colors">
+                  <td className="py-4 px-4 text-center text-sky-800">Power Drill</td>
+                  <td className="py-4 px-4 text-center text-gray-800">Ali Gatmaitan</td>
+                  <td className="py-4 px-4 text-center text-gray-800">Oct 10 - 12</td>
+                  <td className="py-4 px-4 text-center text-gray-800">₱199</td>
+                  <td className="py-4 px-4 text-center">
+                    <span className="text-red-600 px-3 py-1 rounded-full text-sm font-medium">
+                      Pending
+                    </span>
+                  </td>
+                </tr>
+                <tr className="hover:bg-gray-200 transition-colors">
+                  <td className="py-4 px-4 text-center text-sky-800">Nikon D5600</td>
+                  <td className="py-4 px-4 text-center text-gray-800">Jay Roland</td>
+                  <td className="py-4 px-4 text-center text-gray-800">Oct 10 - 12</td>
+                  <td className="py-4 px-4 text-center text-gray-800">₱99</td>
+                  <td className="py-4 px-4 text-center">
+                    <span className="text-red-600 px-3 py-1 rounded-full text-sm font-medium">
+                      Pending
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div className=" bg-zinc-800 view-rentals-btn w-full flex justify-center mt-4 hover:bg-zinc-700 transition-colors">
+              <button className="text-white font-bold px-6 py-3 rounded-lg ">
+                View all rentals
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <Footer />
