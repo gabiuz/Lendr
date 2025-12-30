@@ -1,8 +1,25 @@
 "use client";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 export default function OwnerDashboard() {
+  const [activeTipIndex, setActiveTipIndex] = useState(0);
+
+  const tips = [
+    "Listing with clear photos and detailed descriptions get 3x more bookings!",
+    "Adding multiple angles of your item builds renter trust instantly!",
+    "Verified owners receeive more booking requests than unverified ones.",
+    "Responding withing 10 minutes increases your approval rate by 40%!"
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveTipIndex((prev) => (prev + 1) % tips.length);
+    }, 3000); // Change every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [tips.length]);
   return (
     <div className="min-h-screen w-full bg-white">
       <Navbar
@@ -209,6 +226,28 @@ export default function OwnerDashboard() {
             </div>
           </div>
         </div>
+      <div className="info-card-container flex flex-col lg:flex-row bg-zinc-800 justify-start items-center gap-6 md:gap-8 lg:gap-20 xl:gap-36 px-4 md:px-8 lg:px-20 xl:px-36 py-10 md:py-12 lg:py-14">
+        <div className="text text-white text-center lg:text-left">
+          <h1 className="max-w-xs md:max-w-md lg:max-w-lg text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold">Tips & Insights</h1>
+        </div>
+        <div className="tips-section flex flex-col gap-3 md:gap-4 w-full lg:w-auto">
+          <p className="text-white font-semibold text-xs md:text-sm lg:text-base xl:text-2xl min-h-8 md:min-h-10 lg:min-h-12 transition-opacity duration-500">
+            {tips[activeTipIndex]}
+          </p>
+          <div className="tips-list flex flex-row gap-2 md:gap-3 lg:gap-4 items-center">
+            {tips.map((tip, index) => (
+              <div
+                key={index}
+                className={`h-2 md:h-2.5 lg:h-3 rounded-full transition-all duration-500 ease-in-out ${
+                  index === activeTipIndex
+                    ? 'bg-red-600 w-24 md:w-32 lg:w-40 xl:w-48'
+                    : 'bg-gray-400 w-16 md:w-20 lg:w-28 xl:w-34'
+                }`}
+              ></div>
+            ))}
+          </div>
+        </div>
+      </div>
       </div>
       <Footer />
     </div>
