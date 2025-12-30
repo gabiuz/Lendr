@@ -230,7 +230,7 @@ export default function OwnerDashboard() {
         <div className="text text-white text-center lg:text-left">
           <h1 className="max-w-xs md:max-w-md lg:max-w-lg text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold">Tips & Insights</h1>
         </div>
-        <div className="tips-section flex flex-col gap-3 md:gap-4 w-full lg:w-auto">
+        <div className="tips-section flex flex-col justify-center items-center gap-3 md:gap-4 w-full lg:w-auto">
           <p className="text-white font-semibold text-xs md:text-sm lg:text-base xl:text-2xl min-h-8 md:min-h-10 lg:min-h-12 transition-opacity duration-500">
             {tips[activeTipIndex]}
           </p>
