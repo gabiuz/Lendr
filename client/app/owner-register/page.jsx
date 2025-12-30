@@ -17,39 +17,54 @@ export default function OwnerRegister() {
       { label: "Middle Name", id: "MiddleName", placeholder: "Middle Name" },
       { label: "Last Name", id: "LastName", placeholder: "Last Name" },
     ],
-    sex: [
-      { label: "Male", id: "male", value: "male" },
-      { label: "Female", id: "female", value: "female" },
-      { label: "Prefer Not to Say", id: "other", value: "other" },
-    ],
-    emailAndPass: [
+    businessInfo: [
       {
-        label: "Email",
+        label: "Business Name",
+        id: "businessName",
+        type: "text",
+        placeholder: "Your Business Name",
+      },
+      {
+        label: "Contact Email",
         id: "email",
         type: "email",
-        placeholder: "Abcde@gmail.com",
+        placeholder: "business@email.com",
       },
       {
-        label: "Password",
-        id: "password",
-        type: "password",
-        placeholder: "*********",
-      },
-    ],
-    addressAndPhone: [
-      {
-        label: "Address",
-        id: "address",
-        type: "text",
-        placeholder: "123 st. Metro Manila",
-      },
-      {
-        label: "Phone Number",
+        label: "Contact Number",
         id: "contactNo",
         type: "tel",
         placeholder: "+63",
       },
     ],
+    businessAddress: [
+      {
+        label: "Business Address",
+        id: "businessAddress",
+        type: "text",
+        placeholder: "123 st. Metro Manila",
+      },
+      {
+        label: "Postal Code",
+        id: "postalCode",
+        type: "number",
+        placeholder: "1234",
+      },
+    ],
+    credentials: [
+      {
+        label: "Password",
+        id: "password",
+        type: "password",
+        placeholder: "Enter a strong password",
+      },
+      {
+        label: "Confirm Password",
+        id: "confirmPassword",
+        type: "password",
+        placeholder: "Confirm your password",
+      },
+    ]
   };
 
   async function handleSubmit(e) {
@@ -57,29 +72,34 @@ export default function OwnerRegister() {
     setLoading(true);
     try {
       const fd = new FormData(e.target);
+      const password = fd.get('password');
+      const confirmPassword = fd.get('confirmPassword');
+      if (password !== confirmPassword) {
+        alert('Passwords do not match');
+        setLoading(false);
+        return;
+      }
       const payload = {
         first_name: fd.get('FirstName'),
         middle_name: fd.get('MiddleName'),
         last_name: fd.get('LastName'),
-        gender: fd.get('sex'),
-        birthday: fd.get('bday'),
-        email: fd.get('email'),
-        password: fd.get('password'),
-        phone_number: fd.get('contactNo'),
-        address: fd.get('address'),
+        contact_email: fd.get('email'),
+        contact_number: fd.get('contactNo'),
+        business_name: fd.get('businessName'),
+        business_address: fd.get('businessAddress'),
+        postal_code: fd.get('postalCode'),
+        password: password,
       };
 
-      //change api endpoint for owner register
-      const res = await fetch('/api/register', {
+      const res = await fetch('/api/owner-register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (data.success) {
-        //change storage key for owner register
-        localStorage.setItem('customer_id', data.customer_id);
-        router.push('/');
+        localStorage.setItem('owner_id', data.owner_id);
+        router.push('/owner-dashboard');
       } else {
         console.error(data.error);
         alert('Registration failed');
@@ -126,36 +146,8 @@ export default function OwnerRegister() {
                 />
               ))}
             </div>
-            <div className="bday-radio-container flex flex-col gap-4 mb-4 lg:flex-row">
-              <div className="radio-container w-full lg:mr-8">
-                <label className="text-black mb-1.5 block">
-                  Sex<span className="text-red">*</span>
-                </label>
-                <div className="flex w-full gap-3 justify-between lg:w-fit">
-                  {formFields.sex.map((field) => (
-                    <RadioButtons
-                      key={field.id}
-                      id={field.id}
-                      name="sex"
-                      value={field.value}
-                      label={field.label}
-                    />
-                  ))}
-                </div>
-              </div>
-              <Input
-                label="Birthday"
-                type="date"
-                name="bday"
-                id="bday"
-                placeholder="Birthday"
-                className="text-light-gray"
-                containerClassName="w-full"
-                required={true}
-              />
-            </div>
-            <div className="email-password flex flex-col gap-4 mb-4 lg:flex-row">
-              {formFields.emailAndPass.map((field) => (
+            <div className="business-info flex flex-col gap-4 mb-4 lg:flex-row">
+              {formFields.businessInfo.map((field) => (
                 <Input
                   key={field.id}
                   label={field.label}
@@ -169,8 +161,23 @@ export default function OwnerRegister() {
                 />
               ))}
             </div>
-            <div className="address-phone flex flex-col gap-4 mb-4 lg:flex-row">
-              {formFields.addressAndPhone.map((field) => (
+            <div className="business-address flex flex-col gap-4 mb-4 lg:flex-row">
+              {formFields.businessAddress.map((field) => (
+                <Input
+                  key={field.id}
+                  label={field.label}
+                  htmlFor={field.id}
+                  type={field.type}
+                  name={field.id}
+                  id={field.id}
+                  required={true}
+                  placeholder={field.placeholder}
+                  containerClassName="w-full"
+                />
+              ))}
+            </div>
+            <div className="credentials flex flex-col gap-4 mb-4 lg:flex-row">
+              {formFields.credentials.map((field) => (
                 <Input
                   key={field.id}
                   label={field.label}
@@ -188,8 +195,10 @@ export default function OwnerRegister() {
               <Button
                 label="Cancel"
                 className="text-light-gray flex-1 lg:flex-0 hover:text-red hover:border-red"
-                // prevent submit
-                onClick={(e) => e.preventDefault()}
+                onClick={(e) => {
+                  e.preventDefault();
+                   router.push('/homepage');
+                }}
               />
               <button
                 type="submit"

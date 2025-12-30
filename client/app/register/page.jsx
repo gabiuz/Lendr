@@ -186,12 +186,14 @@ export default function Register() {
               <Button
                 label="Cancel"
                 className="text-light-gray flex-1 lg:flex-0 hover:text-red hover:border-red"
-                // prevent submit
-                onClick={(e) => e.preventDefault()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  router.push('/homepage');
+                }}
               />
               <button
                 type="submit"
-                className="text-white bg-light-gray flex-1 lg:flex-0 hover:bg-red hover:border-red font-semibold border-2 border-light-gray px-[26px]! py-2.5! rounded-[11px]! cursor-pointer"
+                className="text-white bg-light-gray flex-1 lg:flex-0 hover:bg-red hover:border-red font-semibold border-2 border-light-gray px-[26px] py-2.5 rounded-[11px] cursor-pointer"
                 disabled={loading}
               >
                 {loading ? 'Submitting...' : 'Submit'}

@@ -121,24 +121,30 @@ export default function Profile() {
   return (
     <div className="bg-white min-h-screen w-full">
       <Navbar />
-      <div className="text-black flex justify-between px-4 py-8 lg:px-36 lg:pt-36">
-        <h1 className="text-3xl font-semibold lg:text-4xl">Profile Settings</h1>
-        <button
-          onClick={() => {
-            if (!hasAccount) return;
-            if (editing) {
-              setProfile(originalProfile);
-              setEditing(false);
-            } else {
-              setEditing(true);
-            }
-          }}
-          disabled={!hasAccount}
-          className={`flex justify-center items-center gap-1.5 ${!hasAccount ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-        >
-          <p>{editing ? "Cancel" : "Edit Profile"}</p>
-        </button>
-      </div>
+      {hasAccount && (
+        <div className="text-black flex justify-between px-4 py-8 lg:px-36 lg:pt-36">
+          <h1 className="text-3xl font-semibold lg:text-4xl">Profile Settings</h1>
+          <button
+            onClick={() => {
+              if (!hasAccount) return;
+              if (editing) {
+                setProfile(originalProfile);
+                setEditing(false);
+              } else {
+                setEditing(true);
+              }
+            }}
+            disabled={!hasAccount}
+            className={`flex justify-center items-center gap-1.5 ${!hasAccount ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            <p>{editing ? "Cancel" : "Edit Profile"}</p>
+          </button>
+        </div>
+      )}
 
       {hasAccount ? (
         <div className="flex flex-col lg:flex-row lg:gap-8 lg:px-36 px-4">
@@ -163,37 +169,37 @@ export default function Profile() {
               )}
             </div>
 
-            <div className="flex gap-3">
-              <input
-                ref={fileInputRef}
-                id="profileFile"
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              <button
-                type="button"
-                onClick={() =>
-                  fileInputRef.current && fileInputRef.current.click()
-                }
-                disabled={!editing}
-                className={`px-3 py-2 border rounded ${!editing ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-              >
-                Upload Photo
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setPreviewSrc(null);
-                  setProfile((p) => (p ? { ...p, profile_picture: null } : p));
-                }}
-                className="px-3 py-2 border rounded"
-                disabled={!editing}
-              >
-                Remove
-              </button>
-            </div>
+            {editing && (
+              <div className="flex gap-3">
+                <input
+                  ref={fileInputRef}
+                  id="profileFile"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    fileInputRef.current && fileInputRef.current.click()
+                  }
+                  className="px-3 py-2 border rounded cursor-pointer"
+                >
+                  Upload Photo
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPreviewSrc(null);
+                    setProfile((p) => (p ? { ...p, profile_picture: null } : p));
+                  }}
+                  className="px-3 py-2 border rounded"
+                >
+                  Remove
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="flex-1 mt-4 lg:mt-0">
@@ -298,53 +304,41 @@ export default function Profile() {
               />
             </div>
 
-            <div className="button-container flex flex-col justify-between gap-3 px-0 pb-6 mt-6 lg:flex-row lg:justify-end lg:items-center">
-              <button
-                className="text-light-gray flex-1 lg:flex-0 hover:text-red hover:border-red border-2 border-light-gray px-6 py-2.5 rounded-[11px]"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (editing) {
-                    setProfile(originalProfile);
-                    setEditing(false);
-                  }
-                }}
-              >
-                Cancel
-              </button>
-
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (editing) saveChanges();
-                }}
-                className="text-white bg-light-gray flex-1 lg:flex-0 hover:bg-red hover:border-red font-semibold border-2 border-light-gray px-6 py-2.5 rounded-[11px]"
-                disabled={!editing || loading}
-              >
-                {loading ? "Saving..." : "Save Changes"}
-              </button>
-            </div>
+            {editing && (
+              <div className="button-container flex flex-col justify-end gap-3 px-0 pb-6 mt-6 lg:flex-row lg:justify-end lg:items-center">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    saveChanges();
+                  }}
+                  className="text-white bg-light-gray flex-1 lg:flex-0 hover:bg-red hover:border-red font-semibold border-2 border-light-gray px-6 py-2.5 rounded-[11px]"
+                  disabled={loading}
+                >
+                  {loading ? "Saving..." : "Save"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       ) : (
-        <div className="w-full px-4 lg:px-36 pt-12">
-          <div className="border rounded-lg p-6 bg-white shadow-sm text-center">
-            <h2 className="text-xl text-black font-semibold mb-2">
-              No account found
+        <div className="w-full px-4 lg:px-36 pt-12 lg:pt-36">
+          <div className="border rounded-lg p-8 bg-white shadow-sm text-center max-w-md mx-auto">
+            <h2 className="text-2xl text-black font-semibold mb-4">
+              No Account Found
             </h2>
-            <p className="mb-4 text-black">
-              You are not logged in. Please log in or create an account to view
-              and edit your profile.
+            <p className="mb-6 text-gray-600">
+              You are not logged in. Please log in or create an account to view and edit your profile.
             </p>
-            <div className="flex justify-center gap-4">
+            <div className="flex flex-col gap-3">
               <button
                 onClick={() => router.push("/login")}
-                className="px-4 py-2 border rounded-xl cursor-pointer hover:text-red"
+                className="px-6 py-3 border-2 border-light-gray rounded-lg cursor-pointer hover:text-red hover:border-red font-semibold"
               >
                 Log in
               </button>
               <button
                 onClick={() => router.push("/register")}
-                className="px-4 py-2 bg-light-gray text-white rounded-xl cursor-pointer hover:bg-red-600"
+                className="px-6 py-3 bg-light-gray text-white rounded-lg cursor-pointer hover:bg-red font-semibold"
               >
                 Register
               </button>

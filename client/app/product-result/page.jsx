@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { useRouter } from "next/navigation";
 import { useSearchParams } from 'next/navigation';
 import Navbar from "../components/Navbar";
 import Search from "../components/Search";
@@ -10,6 +11,16 @@ import Footer from "../components/Footer";
 export default function ProductResult() {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const cid = localStorage.getItem("customer_id");
+      const oid = localStorage.getItem("owner_id");
+      if (!cid && !oid) router.push("/register");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
