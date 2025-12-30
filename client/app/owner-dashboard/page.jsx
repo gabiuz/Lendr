@@ -1,6 +1,6 @@
 "use client";
 import Navbar from "../components/Navbar";
-import Image from "next/image";
+import Footer from "../components/Footer";
 
 export default function OwnerDashboard() {
   return (
@@ -46,9 +46,8 @@ export default function OwnerDashboard() {
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-black text-center">
             Overview
           </h2>
-
           {/* Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="overview-card grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Total Products Card */}
             <div className="bg-white border-2 border-gray-200 shadow-lg rounded-2xl p-6 flex flex-col items-center gap-4 hover:shadow-lg transition-shadow">
               <div className="">
@@ -139,6 +138,17 @@ export default function OwnerDashboard() {
           </div>
         </div>
       </div>
+      <div className="rentals-container">
+        <div className="flex flex-col gap-8">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-black text-center">
+            My Rentals
+          </h2>
+        </div>
+        <div className="rentals-card">
+
+        </div>
+      </div>
+      <Footer />
     </div>
   );
 }
