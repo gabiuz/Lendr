@@ -4,67 +4,66 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <>
-      <footer className="bg-zinc-100 text-stone-950 flex px-36 py-10 justify-between items-start gap-28">
-        <div className="flex flex-col gap-9 max-w-[368px]">
+      <footer className="bg-zinc-100 text-stone-950 flex flex-col lg:flex-row px-4 md:px-8 lg:px-20 xl:px-36 py-6 md:py-8 lg:py-10 justify-between items-start gap-8 md:gap-12 lg:gap-16 xl:gap-28">
+        <div className="flex flex-col gap-4 md:gap-6 lg:gap-9 w-full lg:max-w-[368px]">
           <Image
             width={2109}
             height={810}
             alt="logo footer"
             src="/lendr-log-gradient.png"
-            className="w-[179px]"
-          ></Image>
-          <p className="text-lg font-medium">
+            className="w-32 md:w-40 lg:w-44"
+          />
+          <p className="text-sm md:text-base lg:text-lg font-medium">
             Platform designed to create an online marketplace exclusively for
             RENT
           </p>
         </div>
-        <div className="footer-links">
-          <ul className="flex flex-col gap-3">
+        <div className="footer-links w-full lg:w-auto">
+          <ul className="flex flex-col gap-2 md:gap-2.5 lg:gap-3">
             <li>
-              <span className="text-red-800 text-base font-bold">
+              <span className="text-red-800 text-sm md:text-15 lg:text-base font-bold">
                 Quick Links
               </span>
             </li>
-            <li>
+            <li className="text-sm md:text-base">
               <Link href="#home">Home</Link>
             </li>
-            <li>
+            <li className="text-sm md:text-base">
               <Link href="#browse">Browse Rentals</Link>
             </li>
-            <li>
+            <li className="text-sm md:text-base">
               <Link href="#categories">Categories</Link>
             </li>
-            <li>
+            <li className="text-sm md:text-base">
               <Link href="#aboutUs">About Us</Link>
             </li>
           </ul>
         </div>
-        <div className="footer-links">
-          <ul className="flex flex-col gap-3">
+        <div className="footer-links w-full lg:w-auto">
+          <ul className="flex flex-col gap-2 md:gap-2.5 lg:gap-3">
             <li>
-              <span className="text-red-800 text-base font-bold">Contact</span>
+              <span className="text-red-800 text-sm md:text-base font-bold">Contact</span>
             </li>
-            <li>
+            <li className="text-sm md:text-base">
               <p>Call:</p>
               <p>09123456789</p>
             </li>
-            <li>
+            <li className="text-sm md:text-base">
               <p>Email:</p>
               <p>lendr@gmail.com</p>
             </li>
           </ul>
         </div>
-        <div className="footer-links justify-start">
-          <ul className="flex flex-col gap-3">
+        <div className="footer-links justify-start w-full lg:w-auto">
+          <ul className="flex flex-col gap-2 md:gap-2.5 lg:gap-3">
             <li>
-              <span className="text-red-800 text-base font-bold">
+              <span className="text-red-800 text-sm md:text-base font-bold">
                 Social Media
               </span>
             </li>
             <li>
               <svg
-                width="172"
-                height="27"
+                className="w-32 md:w-40 lg:w-44"
                 viewBox="0 0 172 27"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -124,10 +123,10 @@ export default function Footer() {
             </li>
           </ul>
         </div>
-        <div className="footer-links">
-          <ul className="flex flex-col gap-3">
+        <div className="footer-links w-full lg:w-auto">
+          <ul className="flex flex-col gap-2 md:gap-2.5 lg:gap-3">
             <li>
-              <span className="text-red-800 text-base font-bold">View Map</span>
+              <span className="text-red-800 text-sm md:text-base font-bold">View Map</span>
             </li>
             <li>
               <Image
@@ -135,17 +134,17 @@ export default function Footer() {
                 height={640}
                 alt="photo of map"
                 src="/map.png"
-                className="self-stretch h-44"
-              ></Image>
+                className="w-full h-32 md:h-36 lg:h-44 object-cover rounded"
+              />
             </li>
           </ul>
         </div>
       </footer>
-      <div className="text-white text-base font-normal bg-red-800 flex px-36 py-4 justify-between">
+      <div className="text-white text-xs md:text-sm lg:text-base font-normal bg-red-800 flex flex-col md:flex-row px-4 md:px-8 lg:px-20 xl:px-36 py-3 md:py-4 justify-between items-center md:items-start gap-4 md:gap-0">
         <div>
-          <p>© 2025 Lendr. All Rights Reserved. </p>
+          <p>© 2025 Lendr. All Rights Reserved. </p>
         </div>
-        <div className="flex gap-11">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-8 lg:gap-11 text-center md:text-left">
           <p>Privacy Policy</p>
           <p>Terms & Conditions</p>
         </div>
