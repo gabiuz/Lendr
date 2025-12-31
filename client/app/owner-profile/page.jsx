@@ -119,11 +119,11 @@ export default function OwnerProfile() {
             </div>
 
             {/* Stats */}
-            <div className="flex flex-col md:flex-row gap-16 md:gap-6 justify-center items-end">
-              <div className="flex items-center gap-2">
-                <div className="w-12 h-12 md:w-16 md:h-16 mb-2 flex items-center justify-center">
+            <div className="flex flex-row gap-8 sm:gap-12 md:gap-16 lg:gap-6 justify-center items-center md:items-end">
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="w-16 h-16 md:w-20 md:h-20 lg:w-16 lg:h-16 flex items-center justify-center shrink-0">
                   <svg
-                    className="w-64 h-64 md:w-16 md:h-16"
+                    className="w-16 h-16 md:w-20 md:h-20 lg:w-16 lg:h-16"
                     width="1000"
                     height="1000"
                     viewBox="0 0 202 202"
@@ -136,21 +136,21 @@ export default function OwnerProfile() {
                     />
                   </svg>
                 </div>
-                <div className="text-start">
-                  <p className="text-2xl md:text-3xl font-bold text-black">
+                <div className="text-left">
+                  <p className="text-2xl md:text-3xl lg:text-2xl xl:text-3xl font-bold text-black">
                     10
                   </p>
-                  <p className="text-xs md:text-sm text-gray-600">Products</p>
+                  <p className="text-sm md:text-base lg:text-sm text-gray-600">Products</p>
                 </div>
               </div>
               
               {/* Divider */}
-              <div className="w-px h-20 bg-black mx-4"></div>
+              <div className="w-px h-16 md:h-20 bg-black mx-4"></div>
 
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-2 flex items-start justify-center">
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="w-16 h-16 md:w-20 md:h-20 lg:w-16 lg:h-16 flex items-center justify-center shrink-0">
                   <svg
-                    className="w-64 h-64 md:w-16 md:h-16"
+                    className="w-16 h-16 md:w-20 md:h-20 lg:w-16 lg:h-16"
                     width="1000"
                     height="1000"
                     viewBox="0 0 202 202"
@@ -163,9 +163,9 @@ export default function OwnerProfile() {
                     />
                   </svg>
                 </div>
-                <div className="text-start">
-                  <p className="text-2xl md:text-3xl font-bold text-black">5</p>
-                  <p className="text-xs md:text-sm text-gray-600">Rentals</p>
+                <div className="text-left">
+                  <p className="text-2xl md:text-3xl lg:text-2xl xl:text-3xl font-bold text-black">5</p>
+                  <p className="text-sm md:text-base lg:text-sm text-gray-600">Rentals</p>
                 </div>
               </div>
             </div>
@@ -176,25 +176,25 @@ export default function OwnerProfile() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8">
           {/* Top Earning Product */}
           {/* TODO: Replace with real data from backend - product name and earnings */}
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
-            <h3 className="text-sm text-gray-600 mb-2">Top Earning Product</h3>
-            <h2 className="text-2xl md:text-3xl font-bold text-black mb-4">
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-4 md:p-6">
+            <h3 className="text-xs md:text-sm text-gray-600 mb-2">Top Earning Product</h3>
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-black mb-3 md:mb-4">
               Toyota Vios
             </h2>
             <div className="text-right">
-              <p className="text-3xl md:text-4xl font-bold text-black">
+              <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-black">
                 ₱12,500
               </p>
-              <p className="text-gray-600">this month</p>
+              <p className="text-sm md:text-base text-gray-600">this month</p>
             </div>
           </div>
 
           {/* Monthly Revenue Chart */}
           {/* TODO: Replace with real data from backend - monthly revenue values for bar chart */}
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
-            <div className="flex justify-between items-start mb-6">
-              <h3 className="text-sm text-gray-600">Monthly Revenue</h3>
-              <p className="text-2xl md:text-3xl font-bold text-black">
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-4 md:p-6">
+            <div className="flex justify-between items-start mb-4 md:mb-6">
+              <h3 className="text-xs md:text-sm text-gray-600">Monthly Revenue</h3>
+              <p className="text-xl md:text-2xl lg:text-3xl font-bold text-black">
                 ₱18,854
               </p>
             </div>
@@ -229,9 +229,9 @@ export default function OwnerProfile() {
           {/* Most Rented Category */}
           {/* TODO: Replace with real data from backend - category distribution and counts */}
           <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
-            <h3 className="text-sm text-gray-600 mb-4">Most Rented Category</h3>
-            <div className="flex items-center justify-center gap-8">
-              <div className="relative w-48 h-48">
+            <h3 className="text-sm md:text-base text-gray-600 mb-4">Most Rented Category</h3>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8">
+              <div className="relative w-40 h-40 md:w-48 md:h-48">
                 <svg viewBox="0 0 100 100" className="transform -rotate-90">
                   <circle
                     cx="50"
@@ -258,10 +258,10 @@ export default function OwnerProfile() {
                 </div>
               </div>
               <div>
-                <div className="bg-black text-white px-4 py-2 rounded-lg mb-4">
-                  <p className="text-2xl font-bold">6 Tools</p>
+                <div className="bg-black text-white px-3 md:px-4 py-2 rounded-lg mb-3 md:mb-4">
+                  <p className="text-xl md:text-2xl font-bold">6 Tools</p>
                 </div>
-                <div className="space-y-2 text-sm">
+                <div className="space-y-2 text-xs md:text-sm">
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-gray-300"></span>
                     <span>2 Vehicles</span>
