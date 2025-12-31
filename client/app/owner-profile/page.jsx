@@ -175,6 +175,7 @@ export default function OwnerProfile() {
         {/* Analytics Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8">
           {/* Top Earning Product */}
+          {/* TODO: Replace with real data from backend - product name and earnings */}
           <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
             <h3 className="text-sm text-gray-600 mb-2">Top Earning Product</h3>
             <h2 className="text-2xl md:text-3xl font-bold text-black mb-4">
@@ -189,6 +190,7 @@ export default function OwnerProfile() {
           </div>
 
           {/* Monthly Revenue Chart */}
+          {/* TODO: Replace with real data from backend - monthly revenue values for bar chart */}
           <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
             <div className="flex justify-between items-start mb-6">
               <h3 className="text-sm text-gray-600">Monthly Revenue</h3>
@@ -197,6 +199,7 @@ export default function OwnerProfile() {
               </p>
             </div>
             <div className="h-48 flex items-end justify-between gap-2">
+              {/* Placeholder bar heights - replace with actual monthly revenue data */}
               {[40, 50, 55, 65, 70, 60, 75, 95, 70, 65, 70, 75].map(
                 (height, i) => (
                   <div
@@ -224,6 +227,7 @@ export default function OwnerProfile() {
           </div>
 
           {/* Most Rented Category */}
+          {/* TODO: Replace with real data from backend - category distribution and counts */}
           <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
             <h3 className="text-sm text-gray-600 mb-4">Most Rented Category</h3>
             <div className="flex items-center justify-center gap-8">
