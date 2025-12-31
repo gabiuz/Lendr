@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '../../../source/database.js';
+import fs from 'fs/promises';
+import path from 'path';
 
 export async function GET(request) {
   try {
@@ -19,19 +21,19 @@ export async function GET(request) {
 
     // Normalize birthday to YYYY-MM-DD using local date components to avoid timezone shifts
     const profile = { ...rows[0] };
-    // If profile_picture is stored as a Buffer (BLOB), convert to base64 data URL
+    // If user_profile_picture is stored as a Buffer (BLOB), convert to base64 data URL
     try {
-      if (profile.profile_picture) {
-        const p = profile.profile_picture;
+      if (profile.user_profile_picture) {
+        const p = profile.user_profile_picture;
         if (Buffer.isBuffer(p)) {
           const base64 = p.toString('base64');
           // assume jpeg by default; clients should handle variety if needed
-          profile.profile_picture = `data:image/jpeg;base64,${base64}`;
+          profile.user_profile_picture = `data:image/jpeg;base64,${base64}`;
         } else if (typeof p === 'string' && p.startsWith('\\x')) {
           // mysql may return hex escaped string; attempt to convert
           const hex = p.replace(/\\x/g, '');
           const buf = Buffer.from(hex, 'hex');
-          profile.profile_picture = `data:image/jpeg;base64,${buf.toString('base64')}`;
+          profile.user_profile_picture = `data:image/jpeg;base64,${buf.toString('base64')}`;
         }
       }
     } catch (e) {
@@ -90,20 +92,36 @@ export async function PUT(request) {
       customer_id = digits;
     }
 
-    const allowed = ['first_name','middle_name','last_name','gender','birthday','email','phone_number','address','profile_picture'];
+    const allowed = ['first_name','middle_name','last_name','gender','birthday','email','phone_number','address','user_profile_picture'];
     const updates = [];
     const values = [];
     for (const key of allowed) {
       if (fields[key] !== undefined) {
-        // handle profile_picture data URL -> Buffer conversion
-        if (key === 'profile_picture' && typeof fields[key] === 'string' && fields[key].startsWith('data:')) {
-          // data:[<mediatype>][;base64],<data>
+        // handle user_profile_picture data URL -> save file and store public path
+        if (key === 'user_profile_picture' && typeof fields[key] === 'string' && fields[key].startsWith('data:')) {
           const matches = fields[key].match(/^data:(.+);base64,(.+)$/);
           if (matches) {
+            const mime = matches[1];
             const base64 = matches[2];
-            const buf = Buffer.from(base64, 'base64');
+            // determine extension
+            let ext = 'jpg';
+            if (mime === 'image/png') ext = 'png';
+            else if (mime === 'image/webp') ext = 'webp';
+            else if (mime === 'image/svg+xml') ext = 'svg';
+            else if (mime === 'image/jpeg' || mime === 'image/jpg') ext = 'jpg';
+
+            const dir = path.join(process.cwd(), 'public', 'pictures', 'users');
+            try {
+              await fs.mkdir(dir, { recursive: true });
+            } catch (e) {
+              // ignore mkdir errors
+            }
+            const filename = `user_${customer_id || 'anon'}_${Date.now()}.${ext}`;
+            const filePath = path.join(dir, filename);
+            await fs.writeFile(filePath, Buffer.from(base64, 'base64'));
+            const publicPath = `/pictures/users/${filename}`;
             updates.push(`${key} = ?`);
-            values.push(buf);
+            values.push(publicPath);
             continue;
           }
         }
@@ -123,9 +141,9 @@ export async function PUT(request) {
     } catch (err) {
       const msg = (err && err.message) || '';
       if (msg.toLowerCase().includes('unknown column') || (msg.toLowerCase().includes('column') && msg.toLowerCase().includes('unknown'))) {
-        // Create profile_picture column as LONGBLOB to store image data
+        // Create user_profile_picture column as VARCHAR(255) to store image path
         try {
-          await query({ query: "ALTER TABLE customer ADD COLUMN profile_picture LONGBLOB DEFAULT NULL" });
+          await query({ query: "ALTER TABLE customer ADD COLUMN user_profile_picture VARCHAR(255) DEFAULT NULL" });
           result = await query({ query: sql, values });
         } catch (e) {
           throw e;

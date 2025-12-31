@@ -24,12 +24,12 @@ export default function Profile() {
     setHasAccount(true);
     fetch(`/api/profile?customer_id=${id}`)
       .then((r) => r.json())
-      .then((data) => {
+        .then((data) => {
         if (data.success) {
           setProfile(data.profile || {});
           setOriginalProfile(data.profile || {});
-          if (data.profile && data.profile.profile_picture)
-            setPreviewSrc(data.profile.profile_picture);
+          if (data.profile && data.profile.user_profile_picture)
+            setPreviewSrc(data.profile.user_profile_picture);
         } else {
           setHasAccount(false);
         }
@@ -46,8 +46,8 @@ export default function Profile() {
     try {
       const id = localStorage.getItem("customer_id");
       const payload = { customer_id: id, ...profile };
-      if (previewSrc && previewSrc !== profile.profile_picture)
-        payload.profile_picture = previewSrc;
+      if (previewSrc && previewSrc !== profile.user_profile_picture)
+        payload.user_profile_picture = previewSrc;
       const res = await fetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -59,7 +59,7 @@ export default function Profile() {
         if (data.profile) {
           setProfile(data.profile);
           setOriginalProfile(data.profile);
-          setPreviewSrc(data.profile.profile_picture || null);
+          setPreviewSrc(data.profile.user_profile_picture || null);
         }
         alert("Profile updated");
       } else {
@@ -81,7 +81,7 @@ export default function Profile() {
       const result = reader.result;
       setPreviewSrc(result);
       setProfile((p) =>
-        p ? { ...p, profile_picture: result } : { profile_picture: result },
+        p ? { ...p, user_profile_picture: result } : { user_profile_picture: result },
       );
     };
     reader.readAsDataURL(f);
@@ -158,14 +158,14 @@ export default function Profile() {
                   alt="profile photo"
                   className="w-full h-full object-cover"
                 />
-              ) : (
-                <Image
-                  src="/pictures/sample-profile-photo.jpg"
+              ) : profile && profile.user_profile_picture ? (
+                <img
+                  src={profile.user_profile_picture}
                   alt="profile photo"
-                  height={300}
-                  width={300}
                   className="w-full h-full object-cover"
                 />
+              ) : (
+                <div className="w-full h-full" />
               )}
             </div>
 
@@ -192,7 +192,7 @@ export default function Profile() {
                   type="button"
                   onClick={() => {
                     setPreviewSrc(null);
-                    setProfile((p) => (p ? { ...p, profile_picture: null } : p));
+                    setProfile((p) => (p ? { ...p, user_profile_picture: null } : p));
                   }}
                   className="px-3 py-2 border rounded"
                 >

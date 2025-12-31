@@ -13,6 +13,7 @@ export async function POST(request) {
       business_name,
       business_address,
       postal_code,
+      business_profile_picture,
     } = body;
 
     // Determine next numeric owner_id by taking the max numeric portion and adding 1.
@@ -27,8 +28,8 @@ export async function POST(request) {
     const owner_id = (max + 1).toString();
     const registration_date = new Date().toISOString().split('T')[0];
 
-    const sql = `INSERT INTO rental_owner (owner_id, first_name, middle_name, last_name, contact_email, contact_number, business_name, business_address, postal_code, registration_date)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO rental_owner (owner_id, first_name, middle_name, last_name, contact_email, contact_number, business_name, business_address, postal_code, registration_date, business_profile_picture)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const values = [
       owner_id,
       first_name,
@@ -40,6 +41,7 @@ export async function POST(request) {
       business_address,
       postal_code || null,
       registration_date,
+      business_profile_picture || null,
     ];
 
     await query({ query: sql, values });

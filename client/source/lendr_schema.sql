@@ -17,6 +17,7 @@ CREATE TABLE customer(
     address VARCHAR(150) NOT NULL,
     account_password VARCHAR(100) NOT NULL,
     date_account_made DATE NOT NULL DEFAULT (CURRENT_DATE()),
+    user_profile_picture VARCHAR(255),
 
     CONSTRAINT check_customer_middlename 
         CHECK (middle_name IS NULL OR LENGTH(middle_name) > 1),
@@ -39,6 +40,7 @@ CREATE TABLE rental_owner(
     business_address VARCHAR(150) NOT NULL,
     postal_code CHAR(4) NOT NULL, 
     registration_date DATE DEFAULT (CURRENT_DATE()),
+    business_profile_picture LONGTEXT,
 
     CONSTRAINT check_owner_middlename
         CHECK (middle_name IS NULL OR LENGTH(middle_name) > 1),

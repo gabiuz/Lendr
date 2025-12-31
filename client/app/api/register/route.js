@@ -34,8 +34,8 @@ export async function POST(request) {
     const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
 
     // include password column (account_password) if DB requires it
-    const sql = `INSERT INTO customer (customer_id, first_name, middle_name, last_name, gender, birthday, email, phone_number, address, account_password, date_account_made)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO customer (customer_id, first_name, middle_name, last_name, gender, birthday, email, phone_number, address, account_password, date_account_made, user_profile_picture)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const values = [
       customer_id,
       first_name,
@@ -48,6 +48,7 @@ export async function POST(request) {
       address,
       hashedPassword || null,
       date_account_made,
+      null, // user_profile_picture
     ];
 
     await query({ query: sql, values });
