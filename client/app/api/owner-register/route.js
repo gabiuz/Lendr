@@ -5,9 +5,7 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const {
-      first_name,
-      middle_name,
-      last_name,
+      customer_id: providedCustomerId,
       contact_email,
       contact_number,
       business_name,
@@ -15,6 +13,73 @@ export async function POST(request) {
       postal_code,
       business_profile_picture,
     } = body;
+
+    let customer_id = providedCustomerId;
+
+    // If no customer_id provided, find or create a customer based on email
+    if (!customer_id) {
+      let custRows = await query({ query: 'SELECT customer_id FROM customer WHERE email = ?', values: [contact_email] });
+      
+      if (!custRows || custRows.length === 0) {
+        // create a minimal customer record using business info
+        const allCust = await query({ query: 'SELECT customer_id FROM customer' });
+        let maxCust = 0;
+        for (const row of allCust) {
+          const raw = String(row.customer_id || '');
+          const digits = raw.replace(/\D/g, '');
+          const n = digits ? parseInt(digits, 10) : NaN;
+          if (!isNaN(n) && n > maxCust) maxCust = n;
+        }
+        customer_id = maxCust + 1 || 1;
+        const date_account_made = new Date().toISOString().split('T')[0];
+
+        const gender = 'other';
+        const birthday = '1970-01-01';
+        const phone_number = contact_number || '';
+        const address = business_address || '';
+
+        const custSql = `INSERT INTO customer (customer_id, gender, birthday, email, phone_number, address, date_account_made, user_profile_picture)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+        const custValues = [
+          customer_id,
+          gender,
+          birthday,
+          contact_email,
+          phone_number,
+          address,
+          date_account_made,
+          null,
+        ];
+
+        let custRetries = 0;
+        let custSuccess = false;
+        while (custRetries < 10 && !custSuccess) {
+          try {
+            await query({ query: custSql, values: custValues });
+            custSuccess = true;
+          } catch (e) {
+            const msg = (e && e.message) || '';
+            const match = msg.match(/Unknown column '([^']+)'/i);
+            if (match) {
+              const col = match[1];
+              try {
+                await query({ query: `ALTER TABLE customer ADD COLUMN \`${col}\` VARCHAR(255) DEFAULT NULL` });
+              } catch (err2) {
+                // ignore
+              }
+              custRetries++;
+            } else {
+              throw e;
+            }
+          }
+        }
+        if (!custSuccess) {
+          throw new Error('Failed to insert customer after 10 column creation attempts');
+        }
+      } else {
+        customer_id = custRows[0].customer_id;
+      }
+    }
 
     // Determine next numeric owner_id by taking the max numeric portion and adding 1.
     const all = await query({ query: 'SELECT owner_id FROM rental_owner' });
@@ -28,13 +93,11 @@ export async function POST(request) {
     const owner_id = (max + 1).toString();
     const registration_date = new Date().toISOString().split('T')[0];
 
-    const sql = `INSERT INTO rental_owner (owner_id, first_name, middle_name, last_name, contact_email, contact_number, business_name, business_address, postal_code, registration_date, business_profile_picture)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO rental_owner (owner_id, customer_id, contact_email, contact_number, business_name, business_address, postal_code, registration_date, business_profile_picture)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const values = [
       owner_id,
-      first_name,
-      middle_name || null,
-      last_name,
+      customer_id,
       contact_email,
       contact_number,
       business_name,
@@ -44,47 +107,34 @@ export async function POST(request) {
       business_profile_picture || null,
     ];
 
-    await query({ query: sql, values });
-
-    // Ensure the business email exists in the customer table so owner-login
-    // can validate password against the customer's account password.
-    const custRows = await query({ query: 'SELECT customer_id FROM customer WHERE email = ?', values: [contact_email] });
-    if (!custRows || custRows.length === 0) {
-      // create a minimal customer record using owner info
-      const allCust = await query({ query: 'SELECT customer_id FROM customer' });
-      let maxCust = 0;
-      for (const row of allCust) {
-        const raw = String(row.customer_id || '');
-        const digits = raw.replace(/\D/g, '');
-        const n = digits ? parseInt(digits, 10) : NaN;
-        if (!isNaN(n) && n > maxCust) maxCust = n;
+    let retries = 0;
+    let success = false;
+    while (retries < 10 && !success) {
+      try {
+        await query({ query: sql, values });
+        success = true;
+      } catch (e) {
+        const msg = (e && e.message) || '';
+        const match = msg.match(/Unknown column '([^']+)'/i);
+        if (match) {
+          const col = match[1];
+          try {
+            await query({ query: `ALTER TABLE rental_owner ADD COLUMN \`${col}\` VARCHAR(255) DEFAULT NULL` });
+          } catch (err2) {
+            // ignore alter errors
+          }
+          retries++;
+        } else {
+          throw e;
+        }
       }
-      const customer_id = maxCust + 1 || 1;
-      const date_account_made = registration_date;
-
-      const gender = 'other';
-      const birthday = '1970-01-01';
-      const phone_number = contact_number || '';
-      const address = business_address || '';
-
-      const custSql = `INSERT INTO customer (customer_id, first_name, middle_name, last_name, gender, birthday, email, phone_number, address, account_password, date_account_made)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-      const custValues = [
-        customer_id,
-        first_name,
-        middle_name || null,
-        last_name,
-        gender,
-        birthday,
-        contact_email,
-        phone_number,
-        address,
-        null,
-        date_account_made,
-      ];
-
-      await query({ query: custSql, values: custValues });
     }
+    if (!success) {
+      throw new Error('Failed to insert after 10 column creation attempts');
+    }
+
+    // Update customer's owner_id to link bidirectionally
+    await query({ query: 'UPDATE customer SET owner_id = ? WHERE customer_id = ?', values: [owner_id, customer_id] });
 
     return NextResponse.json({ success: true, owner_id });
   } catch (err) {

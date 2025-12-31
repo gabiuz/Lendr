@@ -44,6 +44,9 @@ export default function Login() {
       const data = await res.json();
       if (data.success) {
         localStorage.setItem('customer_id', String(data.customer_id));
+        if (data.owner_id) {
+          localStorage.setItem('owner_id', String(data.owner_id));
+        }
         router.push('/homepage');
       } else {
         alert(data.error || 'Invalid credentials');

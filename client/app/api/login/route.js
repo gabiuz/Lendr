@@ -8,7 +8,7 @@ export async function POST(request) {
     const { email, password } = body;
     if (!email || !password) return NextResponse.json({ success: false, error: 'missing credentials' }, { status: 400 });
 
-    const rows = await query({ query: 'SELECT customer_id, account_password FROM customer WHERE email = ?', values: [email] });
+    const rows = await query({ query: 'SELECT customer_id, account_password, owner_id FROM customer WHERE email = ?', values: [email] });
     if (!rows || rows.length === 0) return NextResponse.json({ success: false, error: 'invalid credentials' }, { status: 401 });
 
     const row = rows[0];
@@ -18,7 +18,7 @@ export async function POST(request) {
     const ok = await bcrypt.compare(password, hashed);
     if (!ok) return NextResponse.json({ success: false, error: 'invalid credentials' }, { status: 401 });
 
-    return NextResponse.json({ success: true, customer_id: row.customer_id });
+    return NextResponse.json({ success: true, customer_id: row.customer_id, owner_id: row.owner_id });
   } catch (err) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }

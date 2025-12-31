@@ -3,37 +3,35 @@ CREATE DATABASE lendr;
 USE lendr;
 
 /* ============================================================
-   CUSTOMER TABLE
+   1. CUSTOMER TABLE
    ============================================================ */
-CREATE TABLE customer(
+CREATE TABLE customer (
     customer_id INT PRIMARY KEY AUTO_INCREMENT,
-    first_name VARCHAR(50) NOT NULL,
+    owner_id INT UNIQUE DEFAULT NULL, -- Link to owner profile (Optional)
+    first_name VARCHAR(50) DEFAULT NULL,
     middle_name VARCHAR(50) DEFAULT NULL,
-    last_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) DEFAULT NULL,
     gender VARCHAR(50) NOT NULL,
     birthday DATE NOT NULL,
-    email VARCHAR(50) NOT NULL,
-    phone_number CHAR(12) NOT NULL,
+    email VARCHAR(50) NOT NULL UNIQUE,
+    phone_number CHAR(12) NOT NULL UNIQUE,
     address VARCHAR(150) NOT NULL,
-    account_password VARCHAR(100) NOT NULL,
+    account_password VARCHAR(100) DEFAULT NULL,
     date_account_made DATE NOT NULL DEFAULT (CURRENT_DATE()),
     user_profile_picture VARCHAR(255),
 
     CONSTRAINT check_customer_middlename 
         CHECK (middle_name IS NULL OR LENGTH(middle_name) > 1),
-
     CONSTRAINT check_customer_phone 
         CHECK (phone_number REGEXP '^639[0-9]{9}$')
 ) AUTO_INCREMENT = 1;
 
 /* ============================================================
-   RENTAL OWNER TABLE
+   2. RENTAL OWNER TABLE
    ============================================================ */
-CREATE TABLE rental_owner(
+CREATE TABLE rental_owner (
     owner_id INT PRIMARY KEY AUTO_INCREMENT, 
-    first_name VARCHAR(50) NOT NULL,
-    middle_name VARCHAR(50) DEFAULT NULL,
-    last_name VARCHAR(50) NOT NULL,
+    customer_id INT UNIQUE NOT NULL, -- The base user account
     contact_email VARCHAR(50) UNIQUE,
     contact_number CHAR(12) NOT NULL UNIQUE, 
     business_name VARCHAR(75) NOT NULL UNIQUE,
@@ -42,12 +40,15 @@ CREATE TABLE rental_owner(
     registration_date DATE DEFAULT (CURRENT_DATE()),
     business_profile_picture LONGTEXT,
 
-    CONSTRAINT check_owner_middlename
-        CHECK (middle_name IS NULL OR LENGTH(middle_name) > 1),
-
+    FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
     CONSTRAINT check_owner_phone
         CHECK (contact_number REGEXP '^639[0-9]{9}$')
 ) AUTO_INCREMENT = 10;
+
+-- Now that rental_owner exists, we link the customer's owner_id back to it
+ALTER TABLE customer 
+ADD CONSTRAINT fk_customer_is_owner 
+FOREIGN KEY (owner_id) REFERENCES rental_owner(owner_id);
 
 /* ============================================================
    CATEGORIES TABLE
@@ -101,11 +102,11 @@ CREATE TABLE rentals (
     customer_id INT,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
-    total_amount DECIMAL(6, 2) NOT NULL,
-    payment_id INT NOT NULL,
-    status VARCHAR(10) NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(15) NOT NULL,
 
-    CONSTRAINT check_status CHECK (status IN ('To ship','Shipped','Completed')),
+    CONSTRAINT check_rental_status CHECK (status IN ('To ship','Shipped','Completed', 'Cancelled')),
+    CONSTRAINT check_dates CHECK (end_date >= start_date),
 
     FOREIGN KEY (product_id) REFERENCES products(product_id),
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
@@ -128,7 +129,7 @@ CREATE TABLE payments (
 ) AUTO_INCREMENT = 1500;
 
 /* ============================================================
-   REVIEWS TABLE
+   8. REVIEWS TABLE
    ============================================================ */
 CREATE TABLE reviews (
     review_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -138,8 +139,32 @@ CREATE TABLE reviews (
     comment VARCHAR(500) DEFAULT NULL,
     created_at DATE NOT NULL DEFAULT (CURRENT_DATE()),
     FOREIGN KEY (product_id) REFERENCES products(product_id),
-    FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
+    FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
+    CONSTRAINT check_rating CHECK (rating >= 0 AND rating <= 5)
 ) AUTO_INCREMENT = 2000;
+
+/* ============================================================
+   TRIGGER: BUSINESS RULE FOR REVIEWS
+   ============================================================ */
+DELIMITER //
+CREATE TRIGGER before_review_insert
+BEFORE INSERT ON reviews
+FOR EACH ROW
+BEGIN
+    DECLARE rental_count INT;
+    
+    SELECT COUNT(*) INTO rental_count
+    FROM rentals
+    WHERE customer_id = NEW.customer_id 
+      AND product_id = NEW.product_id 
+      AND end_date < CURRENT_DATE();
+
+    IF rental_count = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Review Denied: You must complete a rental for this product before reviewing.';
+    END IF;
+END; //
+DELIMITER ;
 
 /* ============================================================
    INSERT SAMPLE DATA (PASSWORDS HASHED VIA SHA2)
@@ -161,18 +186,30 @@ VALUES
 /* ============================================================
    RENTAL OWNERS
    ============================================================ */
-INSERT INTO rental_owner(first_name,middle_name,last_name,contact_email,contact_number,business_name,business_address,postal_code)
+INSERT INTO rental_owner(customer_id,contact_email,contact_number,business_name,business_address,postal_code)
 VALUES
-('Carlos','Antonio','Dizon','carlos@biz.com','639999999990','Dizon Rentals','120 Apple St., Manila City','1000'),
-('Maria','Bianca','Lopez','maria@biz.com','639999999991','Lopez Events','55 Orange Ave., Quezon City','1100'),
-('Kevin','Carlos','Reyes','kevin@biz.com','639999999992','Reyes Motors','77 Grapes Road, Pasig City','1600'),
-('Ella','Danica','Cruz','ella@biz.com','639999999993','Cruz Tech','90 Lemon Drive, Makati City','1200'),
-('Tony','Edison','Garcia','tony@biz.com','639999999994','TG Tools','18 Cherry St., Taguig City','1630'),
-('Rina','Fatima','Santos','rina@biz.com','639999999995','Santos Furnitures','230 Peach Lane, Pasay City','1300'),
-('Jomar','Gabriel','Flores','jomar@biz.com','639999999996','Flores Apparel','15 Kiwi St., Caloocan City','1420'),
-('Bea','Helena','Lim','bea@biz.com','639999999997','Lim Electronics','300 Avocado Road, Mandaluyong City','1550'),
-('Albert','Ignacio','Go','albert@biz.com','639999999998','Go Rentals','80 Lychee St., San Juan City','1500'),
-('Sofia','Juliana','Tan','sofia@biz.com','639999999999','Tan Events','40 Watermelon Ave., Marikina City','1800');
+(1,'carlos@biz.com','639999999990','Dizon Rentals','120 Apple St., Manila City','1000'),
+(2,'maria@biz.com','639999999991','Lopez Events','55 Orange Ave., Quezon City','1100'),
+(3,'kevin@biz.com','639999999992','Reyes Motors','77 Grapes Road, Pasig City','1600'),
+(4,'ella@biz.com','639999999993','Cruz Tech','90 Lemon Drive, Makati City','1200'),
+(5,'tony@biz.com','639999999994','TG Tools','18 Cherry St., Taguig City','1630'),
+(6,'rina@biz.com','639999999995','Santos Furnitures','230 Peach Lane, Pasay City','1300'),
+(7,'jomar@biz.com','639999999996','Flores Apparel','15 Kiwi St., Caloocan City','1420'),
+(8,'bea@biz.com','639999999997','Lim Electronics','300 Avocado Road, Mandaluyong City','1550'),
+(9,'albert@biz.com','639999999998','Go Rentals','80 Lychee St., San Juan City','1500'),
+(10,'sofia@biz.com','639999999999','Tan Events','40 Watermelon Ave., Marikina City','1800');
+
+-- Update customer owner_id links
+UPDATE customer SET owner_id = 10 WHERE customer_id = 1;
+UPDATE customer SET owner_id = 11 WHERE customer_id = 2;
+UPDATE customer SET owner_id = 12 WHERE customer_id = 3;
+UPDATE customer SET owner_id = 13 WHERE customer_id = 4;
+UPDATE customer SET owner_id = 14 WHERE customer_id = 5;
+UPDATE customer SET owner_id = 15 WHERE customer_id = 6;
+UPDATE customer SET owner_id = 16 WHERE customer_id = 7;
+UPDATE customer SET owner_id = 17 WHERE customer_id = 8;
+UPDATE customer SET owner_id = 18 WHERE customer_id = 9;
+UPDATE customer SET owner_id = 19 WHERE customer_id = 10;
 
 /* ============================================================
    CATEGORIES
@@ -221,18 +258,18 @@ VALUES
 /* ============================================================
    RENTALS
    ============================================================ */
-INSERT INTO rentals(product_id,customer_id,start_date,end_date,total_amount,payment_id,status)
+INSERT INTO rentals(product_id,customer_id,start_date,end_date,total_amount,status)
 VALUES
-(1000,1,'2025-01-01','2025-01-03',1500,1500,'Completed'),
-(1001,2,'2025-01-05','2025-01-06',800,1501,'Completed'),
-(1002,3,'2025-01-10','2025-01-11',300,1502,'Completed'),
-(1003,4,'2025-01-12','2025-01-13',250,1503,'Shipped'),
-(1004,5,'2025-01-15','2025-01-16',600,1504,'To ship'),
-(1005,6,'2025-01-17','2025-01-18',700,1505,'Completed'),
-(1006,7,'2025-01-20','2025-01-23',1650,1506,'Completed'),
-(1007,8,'2025-01-25','2025-01-30',9000,1507,'Completed'),
-(1008,9,'2025-02-01','2025-02-02',450,1508,'To ship'),
-(1009,10,'2025-02-03','2025-02-04',350,1509,'Completed');
+(1000,1,'2025-01-01','2025-01-03',1500,'Completed'),
+(1001,2,'2025-01-05','2025-01-06',800,'Completed'),
+(1002,3,'2025-01-10','2025-01-11',300,'Completed'),
+(1003,4,'2025-01-12','2025-01-13',250,'Shipped'),
+(1004,5,'2025-01-15','2025-01-16',600,'To ship'),
+(1005,6,'2025-01-17','2025-01-18',700,'Completed'),
+(1006,7,'2025-01-20','2025-01-23',1650,'Completed'),
+(1007,8,'2025-01-25','2025-01-30',9000,'Completed'),
+(1008,9,'2025-02-01','2025-02-02',450,'To ship'),
+(1009,10,'2025-02-03','2025-02-04',350,'Completed');
 
 /* ============================================================
    PAYMENTS

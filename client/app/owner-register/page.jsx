@@ -12,11 +12,6 @@ export default function OwnerRegister() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const formFields = {
-    name: [
-      { label: "First Name", id: "FirstName", placeholder: "First Name" },
-      { label: "Middle Name", id: "MiddleName", placeholder: "Middle Name" },
-      { label: "Last Name", id: "LastName", placeholder: "Last Name" },
-    ],
     businessInfo: [
       {
         label: "Business Name",
@@ -50,20 +45,6 @@ export default function OwnerRegister() {
         type: "number",
         placeholder: "1234",
       },
-    ],
-    credentials: [
-      {
-        label: "Password",
-        id: "password",
-        type: "password",
-        placeholder: "Enter a strong password",
-      },
-      {
-        label: "Confirm Password",
-        id: "confirmPassword",
-        type: "password",
-        placeholder: "Confirm your password",
-      },
     ]
   };
 
@@ -72,24 +53,19 @@ export default function OwnerRegister() {
     setLoading(true);
     try {
       const fd = new FormData(e.target);
-      const password = fd.get('password');
-      const confirmPassword = fd.get('confirmPassword');
-      if (password !== confirmPassword) {
-        alert('Passwords do not match');
-        setLoading(false);
-        return;
-      }
+      // Check if user is already logged in
+      const customer_id = localStorage.getItem('customer_id');
       const payload = {
-        first_name: fd.get('FirstName'),
-        middle_name: fd.get('MiddleName'),
-        last_name: fd.get('LastName'),
         contact_email: fd.get('email'),
         contact_number: fd.get('contactNo'),
         business_name: fd.get('businessName'),
         business_address: fd.get('businessAddress'),
         postal_code: fd.get('postalCode'),
-        password: password,
       };
+      // If logged in, include their customer_id
+      if (customer_id) {
+        payload.customer_id = customer_id;
+      }
 
       const res = await fetch('/api/owner-register', {
         method: 'POST',
@@ -132,20 +108,6 @@ export default function OwnerRegister() {
                 </Link>
               </p>
             </div>
-            <div className="Name-container flex flex-col gap-4 mb-4 lg:flex-row">
-              {formFields.name.map((field) => (
-                <Input
-                  key={field.id}
-                  label={field.label}
-                  type="text"
-                  placeholder={field.placeholder}
-                  name={field.id}
-                  id={field.id}
-                  required={true}
-                  containerClassName="w-full lg:w-[235px]"
-                />
-              ))}
-            </div>
             <div className="business-info flex flex-col gap-4 mb-4 lg:flex-row">
               {formFields.businessInfo.map((field) => (
                 <Input
@@ -163,21 +125,6 @@ export default function OwnerRegister() {
             </div>
             <div className="business-address flex flex-col gap-4 mb-4 lg:flex-row">
               {formFields.businessAddress.map((field) => (
-                <Input
-                  key={field.id}
-                  label={field.label}
-                  htmlFor={field.id}
-                  type={field.type}
-                  name={field.id}
-                  id={field.id}
-                  required={true}
-                  placeholder={field.placeholder}
-                  containerClassName="w-full"
-                />
-              ))}
-            </div>
-            <div className="credentials flex flex-col gap-4 mb-4 lg:flex-row">
-              {formFields.credentials.map((field) => (
                 <Input
                   key={field.id}
                   label={field.label}

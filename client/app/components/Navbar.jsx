@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function Navbar({
   logoSrc = "/lendr-log-gradient.png",
@@ -18,13 +18,18 @@ export default function Navbar({
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [hasBusinessAccount, setHasBusinessAccount] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const customerId = localStorage.getItem("customer_id");
+    const ownerId = localStorage.getItem("owner_id");
     setIsLoggedIn(!!customerId);
+    setHasBusinessAccount(!!ownerId);
     function onStorage(e) {
       if (e.key === "customer_id") setIsLoggedIn(!!e.newValue);
+      if (e.key === "owner_id") setHasBusinessAccount(!!e.newValue);
     }
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
@@ -67,7 +72,7 @@ export default function Navbar({
 
         {/* Desktop Buttons */}
         <div className="hidden lg:flex text-black items-center gap-3 lg:gap-4 xl:gap-6">
-          {isLoggedIn && showOwnerButton && (
+          {isLoggedIn && showOwnerButton && !hasBusinessAccount && (
             <Link href="/owner-register">
               <button className="bg-red-800 hover:bg-red-900 text-white font-semibold px-4 lg:px-5 xl:px-6 py-2 lg:py-2.5 xl:py-3 rounded-full cursor-pointer text-sm lg:text-base transition-colors whitespace-nowrap">
                 + Be a Rental Owner
@@ -75,21 +80,47 @@ export default function Navbar({
             </Link>
           )}
 
+          {isLoggedIn && hasBusinessAccount && !profileInCircle && (
+            <Link href="/owner-dashboard">
+              <button className="bg-red-800 hover:bg-red-900 text-white font-semibold px-4 lg:px-5 xl:px-6 py-2 lg:py-2.5 xl:py-3 rounded-full cursor-pointer text-sm lg:text-base transition-colors whitespace-nowrap">
+                Business Profile
+              </button>
+            </Link>
+          )}
+
           {isLoggedIn ? (
             <>
-              <Link href={`${profileInCircle ? "/owner-profile" : "/profile"}`}>
-                <button className={`flex items-center gap-2 cursor-pointer font-semibold transition-colors ${
-                  profileInCircle
-                    ? "bg-red-800 hover:bg-red-900 text-white px-3 lg:px-7 lg:py-3.5 rounded-full"
-                    : "px-3 lg:px-4 py-2 hover:text-red"
-                }`}>
-                  <svg width="20" height="19" viewBox="0 0 19 19" fill="none">
-                    <path d="M15.8333 16.625V15.0417C15.8333 14.2018 15.4997 13.3964 14.9058 12.8025C14.3119 12.2086 13.5065 11.875 12.6666 11.875H6.33329C5.49344 11.875 4.68799 12.2086 4.09412 12.8025C3.50026 13.3964 3.16663 14.2018 3.16663 15.0417V16.625" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M9.50004 8.70833C11.2489 8.70833 12.6667 7.29057 12.6667 5.54167C12.6667 3.79276 11.2489 2.375 9.50004 2.375C7.75114 2.375 6.33337 3.79276 6.33337 5.54167C6.33337 7.29057 7.75114 8.70833 9.50004 8.70833Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span className="text-sm lg:text-base">Profile</span>
-                </button>
-              </Link>
+              {!profileInCircle && (
+                <Link href={`${profileInCircle ? "/owner-profile" : "/profile"}`}>
+                  <button className={`flex items-center gap-2 cursor-pointer font-semibold transition-colors ${
+                    profileInCircle
+                      ? "bg-red-800 hover:bg-red-900 text-white px-3 lg:px-7 lg:py-3.5 rounded-full"
+                      : "px-3 lg:px-4 py-2 hover:text-red"
+                  }`}>
+                    <svg width="20" height="19" viewBox="0 0 19 19" fill="none">
+                      <path d="M15.8333 16.625V15.0417C15.8333 14.2018 15.4997 13.3964 14.9058 12.8025C14.3119 12.2086 13.5065 11.875 12.6666 11.875H6.33329C5.49344 11.875 4.68799 12.2086 4.09412 12.8025C3.50026 13.3964 3.16663 14.2018 3.16663 15.0417V16.625" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M9.50004 8.70833C11.2489 8.70833 12.6667 7.29057 12.6667 5.54167C12.6667 3.79276 11.2489 2.375 9.50004 2.375C7.75114 2.375 6.33337 3.79276 6.33337 5.54167C6.33337 7.29057 7.75114 8.70833 9.50004 8.70833Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="text-sm lg:text-base">Profile</span>
+                  </button>
+                </Link>
+              )}
+
+              {profileInCircle && (
+                <Link href="/homepage">
+                  <button className="bg-red-800 hover:bg-red-900 text-white font-semibold px-4 lg:px-5 xl:px-6 py-2 lg:py-2.5 xl:py-3 rounded-full cursor-pointer text-sm lg:text-base transition-colors whitespace-nowrap">
+                    Personal Profile
+                  </button>
+                </Link>
+              )}
+
+              {profileInCircle && (
+                <Link href="/owner-profile">
+                  <button className="text-black hover:text-red-400 font-semibold px-4 lg:px-5 xl:px-6 py-2 lg:py-2.5 xl:py-3 cursor-pointer text-sm lg:text-base transition-colors whitespace-nowrap">
+                    Business Profile
+                  </button>
+                </Link>
+              )}
 
               <button onClick={handleLogout} className="flex items-center gap-2 cursor-pointer font-semibold px-3 lg:px-4 py-2 hover:text-red transition-colors" title="Logout">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -172,7 +203,7 @@ export default function Navbar({
 
             {/* Mobile Buttons*/}
             <div className="space-y-3 border-t border-gray-200 pt-4">
-              {isLoggedIn && showOwnerButton && (
+              {isLoggedIn && showOwnerButton && !hasBusinessAccount && (
                 <Link href="/owner-register" className="block">
                   <button
                     className="w-full bg-red-800 hover:bg-red-900 text-white font-semibold px-4 py-3 rounded-full cursor-pointer transition-colors"
@@ -182,34 +213,65 @@ export default function Navbar({
                   </button>
                 </Link>
               )}
-              <Link href="/owner-profile" className="block">
-                <button
-                  className={`w-full flex items-center justify-center gap-2 cursor-pointer font-semibold px-4 py-3 rounded-full transition-colors ${
-                    profileInCircle
-                      ? "bg-red-800 hover:bg-red-900 text-white"
-                      : "border border-gray-300 hover:border-red hover:text-red"
-                  }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <svg width="20" height="19" viewBox="0 0 19 19" fill="none">
-                    <path
-                      d="M15.8333 16.625V15.0417C15.8333 14.2018 15.4997 13.3964 14.9058 12.8025C14.3119 12.2086 13.5065 11.875 12.6666 11.875H6.33329C5.49344 11.875 4.68799 12.2086 4.09412 12.8025C3.50026 13.3964 3.16663 14.2018 3.16663 15.0417V16.625"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M9.50004 8.70833C11.2489 8.70833 12.6667 7.29057 12.6667 5.54167C12.6667 3.79276 11.2489 2.375 9.50004 2.375C7.75114 2.375 6.33337 3.79276 6.33337 5.54167C6.33337 7.29057 7.75114 8.70833 9.50004 8.70833Z"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  Profile
-                </button>
-              </Link>
+              {isLoggedIn && hasBusinessAccount && !profileInCircle && (
+                <Link href="/owner-dashboard" className="block">
+                  <button
+                    className="w-full bg-red-800 hover:bg-red-900 text-white font-semibold px-4 py-3 rounded-full cursor-pointer transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Business Profile
+                  </button>
+                </Link>
+              )}
+              {!profileInCircle && (
+                <Link href="/profile" className="block">
+                  <button
+                    className="w-full flex items-center justify-center gap-2 cursor-pointer font-semibold px-4 py-3 rounded-full border border-gray-300 hover:border-red hover:text-red transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <svg width="20" height="19" viewBox="0 0 19 19" fill="none">
+                      <path
+                        d="M15.8333 16.625V15.0417C15.8333 14.2018 15.4997 13.3964 14.9058 12.8025C14.3119 12.2086 13.5065 11.875 12.6666 11.875H6.33329C5.49344 11.875 4.68799 12.2086 4.09412 12.8025C3.50026 13.3964 3.16663 14.2018 3.16663 15.0417V16.625"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M9.50004 8.70833C11.2489 8.70833 12.6667 7.29057 12.6667 5.54167C12.6667 3.79276 11.2489 2.375 9.50004 2.375C7.75114 2.375 6.33337 3.79276 6.33337 5.54167C6.33337 7.29057 7.75114 8.70833 9.50004 8.70833Z"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    Profile
+                  </button>
+                </Link>
+              )}
+
+              {profileInCircle && (
+                <Link href="/homepage" className="block">
+                  <button
+                    className="w-full bg-red-800 hover:bg-red-900 text-white font-semibold px-4 py-3 rounded-full cursor-pointer transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Personal Profile
+                  </button>
+                </Link>
+              )}
+
+              {profileInCircle && (
+                <Link href="/owner-profile" className="block">
+                  <button
+                    className="w-full text-black hover:text-red-400 font-semibold px-4 py-3 cursor-pointer transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Business Profile
+                  </button>
+                </Link>
+              )}
+
               {isLoggedIn ? (
                 <button
                   onClick={() => {
