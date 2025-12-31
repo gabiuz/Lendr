@@ -274,50 +274,42 @@ export default function OwnerProfile() {
           {/* Customer Ratings */}
           <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
             <div className="flex justify-between items-start mb-6">
-              <h3 className="text-sm text-gray-600">Customer Ratings</h3>
+              <h3 className="text-lg md:text-xl font-semibold text-black">Customer Ratings</h3>
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5 text-yellow-400">
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
-                      className="w-4 h-4 fill-current"
+                      className={`w-5 h-5 ${i === 4 ? 'fill-current opacity-50' : 'fill-current'}`}
                       viewBox="0 0 24 24"
                     >
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
                   ))}
                 </div>
-                <span className="text-2xl font-bold">4.9</span>
+                <span className="text-3xl md:text-4xl font-bold text-black">4.9</span>
               </div>
             </div>
             <div className="h-48 relative">
+              {/* TODO: Replace with real data from backend */}
+              {/* This is placeholder data - the path coordinates should be dynamically generated based on actual monthly rating data */}
               <svg
                 className="w-full h-full"
                 viewBox="0 0 400 150"
                 preserveAspectRatio="none"
               >
-                <defs>
-                  <linearGradient
-                    id="gradient"
-                    x1="0%"
-                    y1="0%"
-                    x2="0%"
-                    y2="100%"
-                  >
-                    <stop offset="0%" stopColor="#1e40af" stopOpacity="0.3" />
-                    <stop offset="100%" stopColor="#1e40af" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
+                {/* Solid blue fill - will be filled with actual rating trend data */}
                 <path
-                  d="M 0 100 Q 50 80, 100 70 T 200 50 T 300 55 T 400 45"
-                  fill="url(#gradient)"
+                  d="M 0 150 L 0 100 Q 50 80, 100 70 T 200 50 T 300 55 L 400 45 L 400 150 Z"
+                  fill="#1e40af"
                   stroke="none"
                 />
+                {/* Blue line - curve will be based on real rating values */}
                 <path
                   d="M 0 100 Q 50 80, 100 70 T 200 50 T 300 55 T 400 45"
                   fill="none"
                   stroke="#1e40af"
-                  strokeWidth="3"
+                  strokeWidth="2"
                 />
               </svg>
             </div>
