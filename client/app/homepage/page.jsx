@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 import Search from "../components/Search";
 import Categories from "../components/Categories";
@@ -12,14 +13,15 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Homepage() {
+  const router = useRouter();
   const categories = [
-    { id: "allItems", icon: "car", label: "All Items" },
-    { id: "vehicles", icon: "car", label: "Vehicles" },
-    { id: "devices", icon: "computer", label: "Devices & Electronics" },
-    { id: "clothing", icon: "pin", label: "Clothing & Apparel" },
-    { id: "tools", icon: "tools", label: "Tools & Equipment" },
-    { id: "furniture", icon: "bed", label: "Furniture & Home" },
-    { id: "party", icon: "party", label: "Party & Events" },
+    { id: "allItems", icon: "car", label: "All Items", code: "" },
+    { id: "vehicles", icon: "car", label: "Vehicles", code: "V" },
+    { id: "devices", icon: "computer", label: "Devices & Electronics", code: "DE" },
+    { id: "clothing", icon: "pin", label: "Clothing & Apparel", code: "CA" },
+    { id: "tools", icon: "tools", label: "Tools & Equipment", code: "TE" },
+    { id: "furniture", icon: "bed", label: "Furniture & Home", code: "FH" },
+    { id: "party", icon: "party", label: "Party & Events", code: "PE" },
   ];
 
   const testimonials = [
@@ -72,6 +74,7 @@ export default function Homepage() {
 
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   const nextTestimonial = () => {
     setDirection(1);
@@ -96,6 +99,8 @@ export default function Homepage() {
       opacity: 0,
     },
   };
+
+  
 
   return (
     <div className="min-h-screen w-full bg-white">
@@ -131,6 +136,23 @@ export default function Homepage() {
               key={category.id}
               icon={category.icon}
               label={category.label}
+              isSelected={selectedCategory?.id === category.id}
+              onSelect={() => {
+                // Toggle selection: deselect if same category clicked
+                if (selectedCategory?.id === category.id) {
+                  // deselect -> go back to homepage anchor
+                  setSelectedCategory(null);
+                  router.push('/#categories');
+                } else {
+                  // select new category -> navigate to product results (show ALL products)
+                  setSelectedCategory(category);
+                  const params = new URLSearchParams();
+                  // Always set the category param; for "All Items" this will be an empty string
+                  params.set('category', category.code ?? '');
+                  const qs = params.toString();
+                  router.push(`/product-result${qs ? '?' + qs : ''}`);
+                }
+              }}
             ></Categories>
           ))}
         </div>

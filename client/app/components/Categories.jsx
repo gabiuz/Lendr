@@ -100,7 +100,7 @@ export const icons = {
 // Category.jsx - Simple Category Component
 import { useRouter } from 'next/navigation';
 
-export default function Categories({ icon, label }) {
+export default function Categories({ icon, label, isSelected, onSelect }) {
   const iconData = icons[icon];
   const router = useRouter();
 
@@ -120,16 +120,37 @@ export default function Categories({ icon, label }) {
   };
 
   const handleClick = () => {
-    const code = mapLabelToCode(label);
-    const params = new URLSearchParams();
-    if (code) params.set('category', code);
-    router.push(`/product-result?${params.toString()}`);
+    // Call the onSelect callback if provided (for homepage selection)
+    if (onSelect) {
+      onSelect();
+    } else {
+      // Navigate to product results if onSelect is not provided
+      const code = mapLabelToCode(label);
+      const params = new URLSearchParams();
+      if (code) params.set('category', code);
+      router.push(`/product-result?${params.toString()}`);
+    }
   };
 
   return (
-    <button className="cursor-pointer" onClick={handleClick}>
-      <div className="flex items-center gap-2.5 text-black rounded-3xl border border-light-gray w-fit py-2 pr-5 pl-2">
-        <div className="border border-red-50 bg-red-50 rounded-full py-2 px-2">
+    <button 
+      className={`cursor-pointer transition-all ${
+        isSelected 
+          ? 'bg-red-50 border-red' 
+          : 'hover:border-red hover:bg-gray-50'
+      }`} 
+      onClick={handleClick}
+    >
+      <div className={`flex items-center gap-2.5 text-black rounded-3xl border ${
+        isSelected 
+          ? 'border-red bg-red-50' 
+          : 'border-light-gray'
+      } w-fit py-2 pr-5 pl-2`}>
+        <div className={`border rounded-full py-2 px-2 ${
+          isSelected 
+            ? 'border-red bg-red-100' 
+            : 'border-red-50 bg-red-50'
+        }`}>
           <svg
             width={iconData.width}
             height={iconData.height}
@@ -147,7 +168,7 @@ export default function Categories({ icon, label }) {
             ))}
           </svg>
         </div>
-        <span>{label}</span>
+        <span className={isSelected ? 'font-bold text-red' : ''}>{label}</span>
       </div>
     </button>
   );

@@ -99,13 +99,10 @@ export default function OwnerRegister() {
             <div className="red-line mx-auto mb-8"></div>
             <div className="flex flex-col justify-center items-center lg:mb-8 lg:items-start">
               <h1 className="text-2xl font-bold text-black mt-0 mb-1 w-fit text-center lg:text-5xl">
-                Create an Account<span className="m-0 p-0 text-red">.</span>
+                Create a Business Account<span className="m-0 p-0 text-red">.</span>
               </h1>
               <p className="text-sm text-black mb-6 lg:text-base">
-                Already have an Owner Account?
-                <Link href="/owner-login" className="font-bold">
-                  <span> Log in</span>
-                </Link>
+                Fill up the following:
               </p>
             </div>
             <div className="business-info flex flex-col gap-4 mb-4 lg:flex-row">

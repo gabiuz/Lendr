@@ -5,13 +5,25 @@ import { useRouter } from "next/navigation";
 import { useSearchParams } from 'next/navigation';
 import Navbar from "../components/Navbar";
 import Search from "../components/Search";
+import Categories from "../components/Categories";
 import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
 
 export default function ProductResult() {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const router = useRouter();
+
+  const categories = [
+    { id: "allItems", icon: "car", label: "All Items", code: "" },
+    { id: "vehicles", icon: "car", label: "Vehicles", code: "V" },
+    { id: "devices", icon: "computer", label: "Devices & Electronics", code: "DE" },
+    { id: "clothing", icon: "pin", label: "Clothing & Apparel", code: "CA" },
+    { id: "tools", icon: "tools", label: "Tools & Equipment", code: "TE" },
+    { id: "furniture", icon: "bed", label: "Furniture & Home", code: "FH" },
+    { id: "party", icon: "party", label: "Party & Events", code: "PE" },
+  ];
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -19,8 +31,20 @@ export default function ProductResult() {
       const oid = localStorage.getItem("owner_id");
       if (!cid && !oid) router.push("/register");
     }
+    // Set selected category based on URL parameter
+    const categoryParam = searchParams.get('category');
+    if (categoryParam === null) {
+      // No category param -> treat as All Items by default
+      setSelectedCategory(categories[0]);
+    } else if (categoryParam === '') {
+      // explicit empty category -> All Items
+      setSelectedCategory(categories[0]);
+    } else {
+      const found = categories.find(cat => cat.code === categoryParam);
+      if (found) setSelectedCategory(found);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchParams]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -30,16 +54,27 @@ export default function ProductResult() {
         const params = new URLSearchParams();
         const q = searchParams.get('q');
         const location = searchParams.get('location');
+        const category = searchParams.get('category');
         const startDate = searchParams.get('startDate');
         const endDate = searchParams.get('endDate');
         if (q) params.set('q', q);
         if (location) params.set('location', location);
+        // Include category param even if it's an empty string (represents All Items)
+        if (category !== null) params.set('category', category);
         if (startDate) params.set('startDate', startDate);
         if (endDate) params.set('endDate', endDate);
 
         const res = await fetch(`/api/search?${params.toString()}`);
         const data = await res.json();
-        if (data.success) setProducts(data.products || []);
+        if (data.success) {
+          let results = data.products || [];
+          // If category parameter is absent or present, show results but cap display to 15 maximum
+          // (treat empty string as All Items). The homepage preview (6 items) remains handled on the homepage.
+          if (results.length > 15) {
+            results = results.slice(0, 15);
+          }
+          setProducts(results);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -83,6 +118,37 @@ export default function ProductResult() {
               </svg>
             </button>
           </div>
+        </div>
+      </div>
+      {/* Categories filter section */}
+      <div className="category-container bg-white py-8 md:py-12 lg:py-16">
+        <h2 className="flex text-black font-bold text-xl md:text-2xl lg:text-3xl pb-6 md:pb-8 justify-center px-4">
+          Filter By Category
+        </h2>
+        <div className="flex flex-wrap justify-center gap-3 md:gap-4 lg:gap-5 categories-container px-4">
+          {categories.map((category) => (
+            <Categories
+              key={category.id}
+              icon={category.icon}
+              label={category.label}
+              isSelected={selectedCategory?.id === category.id}
+              onSelect={() => {
+                // toggle: if same category clicked, deselect and go back to homepage #categories
+                if (selectedCategory?.id === category.id) {
+                  setSelectedCategory(null);
+                  router.push('/#categories');
+                } else {
+                  // select new category -> stay on product-result with category filter
+                  setSelectedCategory(category);
+                  const params = new URLSearchParams(searchParams);
+                  // Always set category param (empty string for All Items)
+                  params.set('category', category.code ?? '');
+                  const qs = params.toString();
+                  router.push(`/product-result${qs ? '?' + qs : ''}`);
+                }
+              }}
+            />
+          ))}
         </div>
       </div>
       <div className="Products mx-36">

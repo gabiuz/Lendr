@@ -62,9 +62,12 @@ export default function ProductDescription() {
                 strokeWidth="0.666667"
               />
             </svg>
-            <Link href="/product-result" className="text-sm">
-              Products
-            </Link>
+              <Link
+                href={`/product-result${searchParams.get('category') !== null ? '?category=' + encodeURIComponent(searchParams.get('category')) : ''}`}
+                className="text-sm"
+              >
+                Products
+              </Link>
             <svg
               width="16"
               height="16"
