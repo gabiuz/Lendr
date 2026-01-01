@@ -50,6 +50,7 @@ export default function OwnerProfile() {
     <div className="min-h-screen bg-white">
       <Navbar
         links={[
+<<<<<<< HEAD
           {
             href: "/owner-dashboard",
             label: "Home",
@@ -66,6 +67,13 @@ export default function OwnerProfile() {
             href: "/payments",
             label: "Payments",
           },
+=======
+          { href: "/", label: "Home" },
+          { href: "/browse-rentals", label: "Browse Rentals" },
+          { href: "/owner-booking", label: "Bookings" },
+          { href: "/payments", label: "Payments" },
+          { href: "/about", label: "About Us" },
+>>>>>>> 1456c81 (created owner-booking page)
         ]}
         showOwnerButton={false}
         profileInCircle={true}

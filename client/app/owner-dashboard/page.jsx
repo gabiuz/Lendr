@@ -33,7 +33,7 @@ export default function OwnerDashboard() {
             label: "Browse Rentals",
           },
           {
-            href: "/bookings",
+            href: "/owner-booking",
             label: "Bookings",
           },
           {
