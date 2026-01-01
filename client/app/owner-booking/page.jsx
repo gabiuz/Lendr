@@ -47,7 +47,7 @@ export default function OwnerBooking() {
           { href: "/", label: "Home" },
           { href: "/browse-rentals", label: "Browse Rentals" },
           { href: "/owner-booking", label: "Bookings" },
-          { href: "/payments", label: "Payments" },
+          { href: "/owner-payments", label: "Payments" },
           { href: "/about", label: "About Us" },
         ]}
         showOwnerButton={false}

@@ -54,7 +54,7 @@ export default function OwnerLogin() {
                 Welcome, Owner<span className="m-0 p-0 text-red">.</span>
               </h1>
               <p className="text-sm text-black mb-6 lg:text-base">
-                Don't have an owner account? <Link href="/owner-register" className="font-bold"> <span> Sign Up</span> </Link>
+                Don&apos;t have an owner account? <Link href="/owner-register" className="font-bold"> <span> Sign Up</span> </Link>
               </p>
             </div>
             <div className="email-password flex flex-col gap-4 mb-4 lg:flex-col">
