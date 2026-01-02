@@ -100,7 +100,7 @@ export default function AddProduct() {
         </div>
 
         {/* Form Container */}
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        <form id="add-product-form" onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Left Side - Form Fields */}
           <div className="lg:col-span-2 space-y-6">
             {/* General Information */}
@@ -195,7 +195,7 @@ export default function AddProduct() {
                       name="condition"
                       value={formData.condition}
                       onChange={handleInputChange}
-                      className="outline-none text-sm md:text-base appearance-none bg-white cursor-pointer text-gray-900"
+                      className="outline-none text-sm md:text-base appearance-none bg-white cursor-pointer text-gray-900 pr-8"
                       required
                     >
                       <option value="new">New</option>
@@ -214,7 +214,7 @@ export default function AddProduct() {
               </div>
 
               {/* Category */}
-              <div className="lg:col-span-1 py-4 md:py-6">
+              <div className="lg:col-span-1 lg:py-4 md:lg:py-6">
                 <div className="flex flex-col border-2 border-gray-200 rounded-xl px-4 md:px-6 py-2 md:py-3 relative">
                   <label htmlFor="category" className="text-sm text-gray-700 mb-1">
                     Category <span className="text-red-600">*</span>
@@ -242,23 +242,6 @@ export default function AddProduct() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4">
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="cursor-pointer px-6 py-2.5 md:py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm md:text-base"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="cursor-pointer px-6 py-2.5 md:py-3 bg-zinc-300 hover:bg-red-600 text-white rounded-lg font-medium transition-colors text-sm md:text-base"
-              >
-                Add Product
-              </button>
             </div>
           </div>
 
@@ -390,6 +373,24 @@ export default function AddProduct() {
             </div>
           </div>
         </form>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 mt-6">
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="cursor-pointer px-6 py-2.5 md:py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm md:text-base"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="add-product-form"
+            className="cursor-pointer px-6 py-2.5 md:py-3 bg-zinc-300 hover:bg-red-600 text-white rounded-lg font-medium transition-colors text-sm md:text-base"
+          >
+            Add Product
+          </button>
+        </div>
       </div>
     </div>
   );
