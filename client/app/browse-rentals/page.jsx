@@ -70,8 +70,9 @@ export default function BrowseRentals() {
         links={[
           { href: "/", label: "Home" },
           { href: "/browse-rentals", label: "Browse Rentals" },
-          { href: "/bookings", label: "Bookings" },
-          { href: "/payments", label: "Payments" },
+          { href: "/owner-booking", label: "Bookings" },
+          { href: "/owner-payments", label: "Payments" },
+          { href: "/about-us", label: "About Us" },
         ]}
         showOwnerButton={false}
         profileInCircle={true}

@@ -32,6 +32,10 @@ export default function OwnerPayments() {
             href: "/owner-payments",
             label: "Payments",
           },
+          {
+            href: "/about-us",
+            label: "About Us",
+          }
         ]}
         showOwnerButton={false}
         profileInCircle={true}

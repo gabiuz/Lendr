@@ -25,7 +25,7 @@ export default function OwnerDashboard() {
       <Navbar
         links={[
           {
-            href: "/owner-dashboard",
+            href: "/owner-homepage",
             label: "Home",
           },
           {
@@ -37,9 +37,13 @@ export default function OwnerDashboard() {
             label: "Bookings",
           },
           {
-            href: "/payments",
+            href: "/owner-payments",
             label: "Payments",
           },
+          {
+            href: "/about-us",
+            label: "About Us",
+          }
         ]}
         showOwnerButton={false}
         profileInCircle={true}
