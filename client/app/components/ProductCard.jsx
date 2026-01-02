@@ -1,7 +1,25 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function ProductCard({ product = null, showButton = false }) {
+  const router = useRouter();
+
+  const handleProductClick = (e) => {
+    if (showButton) {
+      e.preventDefault();
+      const customerId = localStorage.getItem("customer_id");
+      const ownerId = localStorage.getItem("owner_id");
+      
+      if (!customerId && !ownerId) {
+        router.push("/register");
+      } else {
+        router.push(`/product-description?product_id=${product ? product.product_id : ''}`);
+      }
+    }
+  };
+
   return (
     <>
       <div className="cursor-pointer hover:shadow-2xl transition-shadow rounded-xl outline outline-offset-1 outline-zinc-300 inline-flex flex-col justify-start items-start">
@@ -50,11 +68,12 @@ export default function ProductCard({ product = null, showButton = false }) {
             </div>
           </div>
           {showButton && (
-            <Link href={`/product-description?product_id=${product ? product.product_id : ''}`} className="w-full">
-              <button className="w-full bg-red-600 hover:bg-red-700 rounded-xl px-6 py-2.5  text-white text-base font-semibold transition-colors duration-200">
-                View Item
-              </button>
-            </Link>
+            <button 
+              onClick={handleProductClick}
+              className="w-full bg-red-600 hover:bg-red-700 rounded-xl px-6 py-2.5 text-white text-base font-semibold transition-colors duration-200"
+            >
+              View Item
+            </button>
           )}
         </div>
       </div>

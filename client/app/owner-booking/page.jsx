@@ -44,11 +44,10 @@ export default function OwnerBooking() {
     <div className="min-h-screen bg-white">
       <Navbar
         links={[
-          { href: "/", label: "Home" },
+          { href: "/owner-dashboard", label: "Home" },
           { href: "/browse-rentals", label: "Browse Rentals" },
           { href: "/owner-booking", label: "Bookings" },
-          { href: "/owner-payments", label: "Payments" },
-          { href: "/about", label: "About Us" },
+          { href: "/payments", label: "Payments" },
         ]}
         showOwnerButton={false}
         profileInCircle={true}

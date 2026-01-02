@@ -13,7 +13,7 @@ const formFields = {
       placeholder: "What are you looking for?",
     },
     {
-      label: "location",
+      label: "Location",
       type: "text",
       id: "location",
       placeholder: "What are you looking for?",
@@ -28,7 +28,7 @@ const formFields = {
   ],
 };
 
-export default function Search({ formId = 'searchForm' }) {
+export default function Search({ formId = 'searchForm', buttonAlign = 'center' }) {
   const router = useRouter();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -161,7 +161,11 @@ export default function Search({ formId = 'searchForm' }) {
           <p className="text-red-600 text-sm font-medium px-2">{dateError}</p>
         </div>
       )}
-      <button type="submit" className="cursor-pointer mx-auto">
+      <button
+        type="submit"
+        aria-label="Search"
+        className={buttonAlign === 'right' ? 'cursor-pointer ml-3 self-stretch flex items-center' : 'cursor-pointer mx-auto'}
+      >
         <svg
           width="66"
           height="66"
