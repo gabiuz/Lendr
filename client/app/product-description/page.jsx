@@ -475,8 +475,8 @@ export default function ProductDescription() {
           </div>
         </div>
           <Booking isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
-          <Footer />
         </div>
+        <Footer />
       </>
   );
 }
