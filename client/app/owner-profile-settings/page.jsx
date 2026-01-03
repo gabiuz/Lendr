@@ -8,7 +8,7 @@ import Button from "../components/Button";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-export default function Profile() {
+export default function OwnerProfileSettings() {
   const router = useRouter();
   const [profile, setProfile] = useState(null);
   const [editing, setEditing] = useState(false);
@@ -19,9 +19,12 @@ export default function Profile() {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
+    // TODO: Change to use owner_id from localStorage instead of customer_id
     const id = localStorage.getItem("customer_id");
     if (!id) return;
     setHasAccount(true);
+    // TODO: Update API endpoint to fetch owner profile data
+    // Should be something like /api/owner-profile or /api/profile with owner flag
     fetch(`/api/profile?customer_id=${id}`)
       .then((r) => r.json())
       .then((data) => {
@@ -42,12 +45,15 @@ export default function Profile() {
 
   async function saveChanges() {
     if (!profile) return;
+    // TODO: Add validation for required business fields (business_name, email, phone_number)
     setLoading(true);
     try {
+      // TODO: Change to use owner_id instead of customer_id
       const id = localStorage.getItem("customer_id");
       const payload = { customer_id: id, ...profile };
       if (previewSrc && previewSrc !== profile.user_profile_picture)
         payload.user_profile_picture = previewSrc;
+      // TODO: Update API endpoint to save owner profile data
       const res = await fetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -61,6 +67,7 @@ export default function Profile() {
           setOriginalProfile(data.profile);
           setPreviewSrc(data.profile.user_profile_picture || null);
         }
+        // TODO: Replace alert with toast notification
         alert("Profile updated");
       } else {
         alert(data.error || "Update failed");
@@ -89,16 +96,12 @@ export default function Profile() {
     reader.readAsDataURL(f);
   }
 
+  // TODO: Verify these field keys match the database schema for owner profiles
+  // May need to use different keys like owner_business_name, owner_name, etc.
   const formFields = {
-    name: [
-      { key: "first_name", label: "First Name", placeholder: "First Name" },
-      { key: "middle_name", label: "Middle Name", placeholder: "Middle Name" },
-      { key: "last_name", label: "Last Name", placeholder: "Last Name" },
-    ],
-    sex: [
-      { id: "male", value: "male", label: "Male" },
-      { id: "female", value: "female", label: "Female" },
-      { id: "other", value: "other", label: "Prefer Not to Say" },
+    businessInfo: [
+      { key: "business_name", label: "Business Name", placeholder: "Motorcad" },
+      { key: "name", label: "Name", placeholder: "Jadia" },
     ],
     emailAndPhone: [
       {
@@ -111,13 +114,9 @@ export default function Profile() {
         key: "phone_number",
         label: "Phone Number",
         type: "tel",
-        placeholder: "+63",
+        placeholder: "09123456789",
       },
     ],
-    address: [
-      { key: "address", label: "Address", placeholder: "123 st. Metro Manila" },
-    ],
-    birthday: [{ key: "birthday", label: "Birthday", type: "date" }],
   };
 
   return (
@@ -133,6 +132,7 @@ export default function Profile() {
               if (!hasAccount) return;
               if (editing) {
                 setProfile(originalProfile);
+                setPreviewSrc(originalProfile?.user_profile_picture || null);
                 setEditing(false);
               } else {
                 setEditing(true);
@@ -164,8 +164,6 @@ export default function Profile() {
           <div className="flex flex-col items-center lg:items-start gap-4">
             <div className="rounded-4xl w-48 h-48 md:w-60 md:h-60 lg:w-72 lg:h-72 xl:w-80 xl:h-80 overflow-hidden bg-gray-100">
               {previewSrc ? (
-                // previewSrc may be a data URL
-                // use regular img to support data URLs
                 <img
                   src={previewSrc}
                   alt="profile photo"
@@ -218,8 +216,8 @@ export default function Profile() {
           </div>
 
           <div className="flex-1 mt-4 lg:mt-0">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              {formFields.name.map((f) => (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {formFields.businessInfo.map((f) => (
                 <Input
                   key={f.key}
                   label={f.label}
@@ -236,49 +234,6 @@ export default function Profile() {
                   containerClassName="w-full"
                 />
               ))}
-            </div>
-
-            <div className="mt-4">
-              <label className="text-black mb-1.5 block">Sex</label>
-              <div className="flex gap-6 items-center">
-                {formFields.sex.map((s) => (
-                  <RadioButtons
-                    key={s.id}
-                    id={s.id}
-                    name="gender"
-                    value={s.value}
-                    label={s.label}
-                    checked={
-                      !!profile &&
-                      (profile.gender || "").toLowerCase() === s.value
-                    }
-                    onChange={() =>
-                      setProfile((p) =>
-                        p ? { ...p, gender: s.value } : { gender: s.value },
-                      )
-                    }
-                    disabled={!editing}
-                  />
-                ))}
-
-                {formFields.birthday.map((b) => (
-                  <Input
-                    key={b.key}
-                    label={b.label}
-                    type={b.type}
-                    value={profile ? profile[b.key] || "" : ""}
-                    onChange={(e) =>
-                      setProfile((p) =>
-                        p
-                          ? { ...p, [b.key]: e.target.value }
-                          : { [b.key]: e.target.value },
-                      )
-                    }
-                    readOnly={!editing}
-                    containerClassName="w-full lg:ml-6"
-                  />
-                ))}
-              </div>
             </div>
 
             <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -304,19 +259,38 @@ export default function Profile() {
 
             <div className="mt-4">
               <Input
-                label="Address"
-                placeholder={formFields.address[0].placeholder}
-                value={profile ? profile.address || "" : ""}
+                label="Business Description"
+                placeholder="Type your product description here..."
+                value={profile ? profile.business_description || "" : ""}
                 onChange={(e) =>
                   setProfile((p) =>
                     p
-                      ? { ...p, address: e.target.value }
-                      : { address: e.target.value },
+                      ? { ...p, business_description: e.target.value }
+                      : { business_description: e.target.value },
                   )
                 }
                 readOnly={!editing}
                 containerClassName="w-full"
               />
+            </div>
+
+            <div className="mt-4">
+              <label className="text-black mb-1.5 block">Bank Details</label>
+              {/* TODO: Make bank details interactive - allow adding/removing payment methods */}
+              {/* TODO: Store bank details in profile state and save to database */}
+              {/* TODO: Add modal or collapsible section to input actual bank account numbers */}
+              {/* Current implementation is static - needs to be dynamic */}
+              <div className="flex gap-3">
+                <div className="px-4 py-2 border rounded-lg flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                    G
+                  </div>
+                  <span>GCash</span>
+                </div>
+                <div className="px-4 py-2 border rounded-lg flex items-center gap-2">
+                  <span className="font-bold text-blue-700">VISA</span>
+                </div>
+              </div>
             </div>
 
             {editing && (
@@ -329,7 +303,7 @@ export default function Profile() {
                   className="text-white bg-light-gray flex-1 lg:flex-0 hover:bg-red hover:border-red font-semibold border-2 border-light-gray px-6 py-2.5 rounded-[11px]"
                   disabled={loading}
                 >
-                  {loading ? "Saving..." : "Save"}
+                  {loading ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             )}
@@ -345,6 +319,8 @@ export default function Profile() {
               You are not logged in. Please log in or create an account to view
               and edit your profile.
             </p>
+            {/* TODO: Update these routes to redirect to owner-specific login/registration */}
+            {/* May need /owner-login and /owner-register routes */}
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => router.push("/login")}
