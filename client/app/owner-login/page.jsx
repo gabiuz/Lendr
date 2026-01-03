@@ -28,7 +28,7 @@ export default function OwnerLogin() {
       const data = await res.json();
       if (data.success && data.owner_id) {
         if (typeof window !== "undefined") localStorage.setItem("owner_id", String(data.owner_id));
-        router.push("/owner-dashboard");
+        router.push("/owner-homepage");
         return;
       }
       alert(data.message || "Invalid credentials");

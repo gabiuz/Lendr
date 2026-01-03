@@ -75,7 +75,7 @@ export default function OwnerRegister() {
       const data = await res.json();
       if (data.success) {
         localStorage.setItem('owner_id', data.owner_id);
-        router.push('/owner-dashboard');
+        router.push('/owner-homepage');
       } else {
         console.error(data.error);
         alert('Registration failed');

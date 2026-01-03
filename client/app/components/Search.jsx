@@ -16,7 +16,7 @@ const formFields = {
       label: "Location",
       type: "text",
       id: "location",
-      placeholder: "What are you looking for?",
+      placeholder: "What location?",
     },
     {
       label: "Start Date",

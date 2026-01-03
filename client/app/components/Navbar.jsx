@@ -81,7 +81,7 @@ export default function Navbar({
           )}
 
           {isLoggedIn && hasBusinessAccount && !profileInCircle && (
-            <Link href="/owner-dashboard">
+            <Link href="/owner-homepage">
               <button className="bg-red-800 hover:bg-red-900 text-white font-semibold px-4 lg:px-5 xl:px-6 py-2 lg:py-2.5 xl:py-3 rounded-full cursor-pointer text-sm lg:text-base transition-colors whitespace-nowrap">
                 Business Profile
               </button>
@@ -214,7 +214,7 @@ export default function Navbar({
                 </Link>
               )}
               {isLoggedIn && hasBusinessAccount && !profileInCircle && (
-                <Link href="/owner-dashboard" className="block">
+                <Link href="/owner-homepage" className="block">
                   <button
                     className="w-full bg-red-800 hover:bg-red-900 text-white font-semibold px-4 py-3 rounded-full cursor-pointer transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}

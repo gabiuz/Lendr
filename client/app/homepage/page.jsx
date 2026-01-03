@@ -9,7 +9,7 @@ import ProductCard from "../components/ProductCard";
 import InfoCard from "../components/Infocard";
 import Footer from "../components/Footer";
 import TestimonialCard, { quoteIcon } from "../components/TestimonialCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Homepage() {
@@ -75,6 +75,80 @@ export default function Homepage() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [direction, setDirection] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [nearbyProducts, setNearbyProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchNearbyProducts = async () => {
+      try {
+        const customerId = typeof window !== 'undefined' ? localStorage.getItem('customer_id') : null;
+        let userCity = null;
+        
+        if (customerId) {
+          // Fetch user's profile to get their city
+          const profileRes = await fetch(`/api/profile?customer_id=${customerId}`);
+          const profileData = await profileRes.json();
+          
+          if (profileData.success && profileData.customer) {
+            const userAddress = profileData.customer.address;
+            // Extract city from address (assuming format like "City, Province")
+            userCity = userAddress.split(',')[0].trim();
+          }
+        } else {
+          // If not logged in, try to get user's city from browser geolocation
+          if (navigator.geolocation) {
+            try {
+              const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+              });
+              const { latitude, longitude } = position.coords;
+              
+              // Use a reverse geocoding service or local fallback
+              // For now, we'll try to get city from coordinates using a free service
+              const geoRes = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+              );
+              const geoData = await geoRes.json();
+              
+              // Extract city from the address components
+              if (geoData.address) {
+                userCity = geoData.address.city || 
+                          geoData.address.town || 
+                          geoData.address.village || 
+                          geoData.address.county ||
+                          null;
+              }
+            } catch (geoError) {
+              console.log('Geolocation not available, showing generic products');
+            }
+          }
+        }
+        
+        // Fetch products based on user's city if available
+        if (userCity) {
+          const searchRes = await fetch(`/api/search?location=${encodeURIComponent(userCity)}`);
+          const searchData = await searchRes.json();
+          
+          if (searchData.success && searchData.products && searchData.products.length > 0) {
+            setNearbyProducts(searchData.products.slice(0, 6));
+            return;
+          }
+        }
+        
+        // Fallback: fetch 6 most recent products if no city found or search returned empty
+        const searchRes = await fetch('/api/search');
+        const searchData = await searchRes.json();
+        
+        if (searchData.success && searchData.products) {
+          setNearbyProducts(searchData.products.slice(0, 6));
+        }
+      } catch (error) {
+        console.error('Error fetching nearby products:', error);
+        // Keep products empty, showing placeholder cards
+      }
+    };
+
+    fetchNearbyProducts();
+  }, []);
 
   const nextTestimonial = () => {
     setDirection(1);
@@ -167,12 +241,20 @@ export default function Homepage() {
         className="productCard-container mx-4 md:mx-8 lg:mx-20 xl:mx-36 bg-white grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-20 md:mb-28 lg:mb-[150px]"
         id="browse"
       >
-        <ProductCard></ProductCard>
-        <ProductCard></ProductCard>
-        <ProductCard></ProductCard>
-        <ProductCard></ProductCard>
-        <ProductCard></ProductCard>
-        <ProductCard></ProductCard>
+        {nearbyProducts.length > 0 ? (
+          nearbyProducts.map((product) => (
+            <ProductCard key={product.product_id} product={product} showButton={true} />
+          ))
+        ) : (
+          <>
+            <ProductCard></ProductCard>
+            <ProductCard></ProductCard>
+            <ProductCard></ProductCard>
+            <ProductCard></ProductCard>
+            <ProductCard></ProductCard>
+            <ProductCard></ProductCard>
+          </>
+        )}
       </div>
       <div className="info-card-container flex flex-col lg:flex-row bg-zinc-800 justify-center items-center gap-8 md:gap-12 lg:gap-36 px-4 md:px-8 lg:px-20 xl:px-36 py-10 md:py-12 lg:py-14">
         <div className="text text-white text-center lg:text-left">

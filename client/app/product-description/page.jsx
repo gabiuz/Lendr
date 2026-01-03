@@ -42,7 +42,9 @@ export default function ProductDescription() {
   }, [productId]);
   
     return (
-      <div className="product-desc-container text-black mt-20 md:mt-24 lg:mt-36 mb-8 md:mb-12 lg:mb-16 mx-4 md:mx-8 lg:mx-20 xl:mx-36 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-6">
+      <>
+        <Navbar />
+        <div className="product-desc-container text-black pt-20 md:pt-24 lg:pt-28 mb-8 md:mb-12 lg:mb-16 mx-4 md:mx-8 lg:mx-20 xl:mx-36 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-6">
         <div className="flex flex-col gap-6">
           <div className="breadcrumbs flex items-center gap-2 ">
             <Link href="/homepage" className="text-sm">
@@ -475,5 +477,6 @@ export default function ProductDescription() {
           <Booking isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
           <Footer />
         </div>
+      </>
   );
 }

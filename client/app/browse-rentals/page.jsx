@@ -68,7 +68,7 @@ export default function BrowseRentals() {
     <div className="min-h-screen bg-white">
       <Navbar
         links={[
-          { href: "/", label: "Home" },
+          { href: "/owner-homepage", label: "Home" },
           { href: "/browse-rentals", label: "Browse Rentals" },
           { href: "/owner-booking", label: "Bookings" },
           { href: "/owner-payments", label: "Payments" },

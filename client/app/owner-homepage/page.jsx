@@ -20,6 +20,26 @@ export default function OwnerDashboard() {
 
     return () => clearInterval(interval);
   }, [tips.length]);
+  const [stats, setStats] = useState({ products: 0, activeRentals: 0, totalEarnings: 0, avgRating: null });
+
+  useEffect(() => {
+    const ownerId = typeof window !== 'undefined' ? localStorage.getItem('owner_id') : null;
+    if (!ownerId) return;
+
+    async function loadStats() {
+      try {
+        const res = await fetch(`/api/owner-stats?owner_id=${encodeURIComponent(ownerId)}`);
+        const data = await res.json();
+        if (data.success) {
+          setStats(data.stats);
+        }
+      } catch (err) {
+        console.error('Failed to load owner stats', err);
+      }
+    }
+
+    loadStats();
+  }, []);
   return (
     <div className="min-h-screen w-full bg-white">
       <Navbar
@@ -86,7 +106,7 @@ export default function OwnerDashboard() {
                 </svg>
               </div>
               <div className="flex flex-col items-center gap-2.5">
-                <h3 className="text-3xl font-bold text-black">10</h3>
+                <h3 className="text-3xl font-bold text-black">{stats.products}</h3>
                 <p className="text-gray-600 font-medium">Products</p>
               </div>
             </div>
@@ -108,7 +128,7 @@ export default function OwnerDashboard() {
                 </svg>
               </div>
               <div className="flex flex-col items-center gap-2.5">
-                <h3 className="text-3xl font-bold text-black">5</h3>
+                <h3 className="text-3xl font-bold text-black">{stats.activeRentals}</h3>
                 <p className="text-gray-600 font-medium">Active Rentals</p>
               </div>
             </div>
@@ -130,7 +150,7 @@ export default function OwnerDashboard() {
                 </svg>
               </div>
               <div className="flex flex-col items-center gap-2.5">
-                <h3 className="text-3xl font-bold text-black">₱8,450</h3>
+                <h3 className="text-3xl font-bold text-black">{typeof stats.totalEarnings === 'number' ? `₱${Number(stats.totalEarnings).toLocaleString()}` : '₱0'}</h3>
                 <p className="text-gray-600 font-medium">Total Earnings</p>
               </div>
             </div>
@@ -152,7 +172,7 @@ export default function OwnerDashboard() {
                 </svg>
               </div>
               <div className="flex flex-col items-center gap-2.5">
-                <h3 className="text-3xl font-bold text-black">4.8</h3>
+                <h3 className="text-3xl font-bold text-black">{stats.avgRating !== null ? stats.avgRating : '—'}</h3>
                 <p className="text-gray-600 font-medium">Average Rating</p>
               </div>
             </div>

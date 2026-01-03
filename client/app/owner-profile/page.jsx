@@ -50,7 +50,7 @@ export default function OwnerProfile() {
     <div className="min-h-screen bg-white">
       <Navbar
         links={[
-          { href: "/owner-dashboard", label: "Home" },
+          { href: "/owner-homepage", label: "Home" },
           { href: "/browse-rentals", label: "Browse Rentals" },
           { href: "/owner-booking", label: "Bookings" },
           { href: "/payments", label: "Payments" },
