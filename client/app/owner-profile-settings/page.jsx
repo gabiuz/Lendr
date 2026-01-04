@@ -80,6 +80,43 @@ export default function OwnerProfileSettings() {
     }
   }
 
+  /**
+   * Deletes the owner's profile after confirmation.
+   * NOTE: This requires a DELETE endpoint at /api/profile on the backend.
+   * The endpoint should accept a JSON body with customer_id and return
+   * { success: true/false, error?: string }
+   * TODO: Update to use owner_id instead of customer_id when owner authentication is implemented
+   */
+  async function deleteProfile() {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your profile? This action cannot be undone."
+    );
+    if (!confirmDelete) return;
+
+    setLoading(true);
+    try {
+      const id = localStorage.getItem("owner_id");
+      const res = await fetch("/api/profile", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ owner_id: id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.removeItem("owner_id");
+        alert("Profile deleted successfully");
+        router.push("/login");
+      } else {
+        alert(data.error || "Delete failed");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Delete error");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function handleFileChange(e) {
     const f = e.target.files && e.target.files[0];
     if (!f) return;
@@ -408,12 +445,22 @@ export default function OwnerProfileSettings() {
                 <button
                   onClick={(e) => {
                     e.preventDefault();
+                    deleteProfile();
+                  }}
+                  className="text-red bg-white flex-1 lg:w-48 lg:flex-0 hover:bg-red hover:text-white font-semibold border-2 border-red px-6 py-2.5 rounded-[11px]"
+                  disabled={loading}
+                >
+                  {loading ? "Deleting..." : "Delete"}
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
                     saveChanges();
                   }}
                   className="text-white bg-light-gray flex-1 lg:flex-0 hover:bg-red hover:border-red font-semibold border-2 border-light-gray px-6 py-2.5 rounded-[11px]"
                   disabled={loading}
                 >
-                  {loading ? "Saving..." : "Save Changes"}
+                  {loading ? "Saving..." : "Save"}
                 </button>
               </div>
             )}
