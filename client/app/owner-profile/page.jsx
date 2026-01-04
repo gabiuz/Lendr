@@ -1,10 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 export default function OwnerProfile() {
+  const router = useRouter();
   const [ownerData, setOwnerData] = useState(null);
   const [customerData, setCustomerData] = useState(null);
   const [profileStats, setProfileStats] = useState(null);
@@ -69,10 +71,30 @@ export default function OwnerProfile() {
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-12 mt-16 md:mt-20 lg:mt-24">
         {/* Profile Header Card */}
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6 md:p-8 mb-8">
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6 md:p-8 mb-8 relative">
+          {/* Edit Button - Top Right */}
+          <button 
+            onClick={() => router.push('/owner-profile-settings')}
+            className="cursor-pointer absolute top-4 right-4 bg-black text-white p-2 rounded-full hover:bg-gray-800"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+              />
+            </svg>
+          </button>
+
           <div className="flex flex-col md:flex-row gap-6 md:gap-8">
             {/* Profile Image */}
-            <div className="shrink-0 relative">
+            <div className="shrink-0">
               <div className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-full overflow-hidden bg-gray-200">
                 <Image
                   src="/pictures/sample-profile-photo.jpg"
@@ -82,21 +104,6 @@ export default function OwnerProfile() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <button className="absolute bottom-0 right-0 bg-black text-white p-2 rounded-full hover:bg-gray-800">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                  />
-                </svg>
-              </button>
             </div>
 
             {/* Profile Info */}
