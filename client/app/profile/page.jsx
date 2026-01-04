@@ -73,6 +73,42 @@ export default function Profile() {
     }
   }
 
+  /**
+   * Deletes the user's profile after confirmation.
+   * NOTE: This requires a DELETE endpoint at /api/profile on the backend.
+   * The endpoint should accept a JSON body with customer_id and return
+   * { success: true/false, error?: string }
+   */
+  async function deleteProfile() {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your profile? This action cannot be undone."
+    );
+    if (!confirmDelete) return;
+
+    setLoading(true);
+    try {
+      const id = localStorage.getItem("customer_id");
+      const res = await fetch("/api/profile", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customer_id: id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.removeItem("customer_id");
+        alert("Profile deleted successfully");
+        router.push("/login");
+      } else {
+        alert(data.error || "Delete failed");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Delete error");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function handleFileChange(e) {
     const f = e.target.files && e.target.files[0];
     if (!f) return;
@@ -321,6 +357,16 @@ export default function Profile() {
 
             {editing && (
               <div className="button-container flex flex-col justify-end gap-3 px-0 pb-6 mt-6 lg:flex-row lg:justify-end lg:items-center">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    deleteProfile();
+                  }}
+                  className="text-red bg-white flex-1 lg:w-48 lg:flex-0 hover:bg-red hover:text-white font-semibold border-2 border-red px-6 py-2.5 rounded-[11px]"
+                  disabled={loading}
+                >
+                  {loading ? "Deleting..." : "Delete"}
+                </button>
                 <button
                   onClick={(e) => {
                     e.preventDefault();
