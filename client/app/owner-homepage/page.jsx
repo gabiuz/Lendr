@@ -1,9 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 export default function OwnerDashboard() {
+  const router = useRouter();
   const [activeTipIndex, setActiveTipIndex] = useState(0);
   const [rentals, setRentals] = useState([]);
 
@@ -91,7 +93,7 @@ export default function OwnerDashboard() {
           <p className="text-white font-medium text-sm md:text-base xl:text-xl max-w-2xl">
             List your unused items and start earning safely and conveniently.
           </p>
-          <button className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 md:px-8 md:py-4 rounded-full cursor-pointer text-sm md:text-base xl:text-lg transition-colors whitespace-nowrap">
+          <button onClick={() => router.push('/add-products')} className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 md:px-8 md:py-4 rounded-full cursor-pointer text-sm md:text-base xl:text-lg transition-colors whitespace-nowrap">
             + Add your first product
           </button>
         </div>
