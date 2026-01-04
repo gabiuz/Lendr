@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 
 export default function OwnerDashboard() {
   const [activeTipIndex, setActiveTipIndex] = useState(0);
+  const [rentals, setRentals] = useState([]);
 
   const tips = [
     "Listing with clear photos and detailed descriptions get 3x more bookings!",
@@ -38,7 +39,20 @@ export default function OwnerDashboard() {
       }
     }
 
+    async function loadRentals() {
+      try {
+        const res = await fetch(`/api/owner-rentals?owner_id=${encodeURIComponent(ownerId)}`);
+        const data = await res.json();
+        if (data.success) {
+          setRentals(data.rentals);
+        }
+      } catch (err) {
+        console.error('Failed to load rentals', err);
+      }
+    }
+
     loadStats();
+    loadRentals();
   }, []);
   return (
     <div className="min-h-screen w-full bg-white">
@@ -208,39 +222,31 @@ export default function OwnerDashboard() {
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b border-gray-200 hover:bg-gray-200 transition-colors">
-                  <td className="py-4 px-4 text-center text-sky-800">Toyota Vios</td>
-                  <td className="py-4 px-4 text-center text-gray-800">Kenneth Morales</td>
-                  <td className="py-4 px-4 text-center text-gray-800">Oct 10 - 12</td>
-                  <td className="py-4 px-4 text-center text-gray-800">₱3,000</td>
-                  <td className="py-4 px-4 text-center">
-                    <span className=" text-red-600 px-3 py-1 rounded-full text-sm font-medium">
-                      Ongoing
-                    </span>
-                  </td>
-                </tr>
-                <tr className="border-b border-gray-200 hover:bg-gray-200 transition-colors">
-                  <td className="py-4 px-4 text-center text-sky-800">Power Drill</td>
-                  <td className="py-4 px-4 text-center text-gray-800">Ali Gatmaitan</td>
-                  <td className="py-4 px-4 text-center text-gray-800">Oct 10 - 12</td>
-                  <td className="py-4 px-4 text-center text-gray-800">₱199</td>
-                  <td className="py-4 px-4 text-center">
-                    <span className="text-red-600 px-3 py-1 rounded-full text-sm font-medium">
-                      Pending
-                    </span>
-                  </td>
-                </tr>
-                <tr className="hover:bg-gray-200 transition-colors">
-                  <td className="py-4 px-4 text-center text-sky-800">Nikon D5600</td>
-                  <td className="py-4 px-4 text-center text-gray-800">Jay Roland</td>
-                  <td className="py-4 px-4 text-center text-gray-800">Oct 10 - 12</td>
-                  <td className="py-4 px-4 text-center text-gray-800">₱99</td>
-                  <td className="py-4 px-4 text-center">
-                    <span className="text-red-600 px-3 py-1 rounded-full text-sm font-medium">
-                      Pending
-                    </span>
-                  </td>
-                </tr>
+                {rentals.length > 0 ? (
+                  rentals.map((rental) => (
+                    <tr key={rental.rental_id} className="border-b border-gray-200 hover:bg-gray-200 transition-colors">
+                      <td className="py-4 px-4 text-center text-sky-800">{rental.product_name}</td>
+                      <td className="py-4 px-4 text-center text-gray-800">{rental.first_name} {rental.last_name}</td>
+                      <td className="py-4 px-4 text-center text-gray-800">
+                        {new Date(rental.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(rental.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </td>
+                      <td className="py-4 px-4 text-center text-gray-800">₱{Number(rental.total_amount).toLocaleString()}</td>
+                      <td className="py-4 px-4 text-center">
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          rental.status === 'Ongoing' ? 'text-red-600' : 'text-orange-600'
+                        }`}>
+                          {rental.status === 'To ship' ? 'Pending' : rental.status === 'Shipped' ? 'Ongoing' : rental.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="py-8 px-4 text-center text-gray-600">
+                      No ongoing rentals at the moment.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
             <div className=" bg-zinc-800 view-rentals-btn w-full flex justify-center mt-4 hover:bg-zinc-700 transition-colors">

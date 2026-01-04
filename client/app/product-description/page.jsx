@@ -91,7 +91,7 @@ export default function ProductDescription() {
           </div>
           <div className="price">
             <h2 className="text-base font-bold">
-              <span className="text-sky-800">{product ? product.product_rate : ''}</span>/day
+              <span className="text-sky-800">₱{product ? product.product_rate : ''}</span>/day
             </h2>
           </div>
           <div className="product-description font-medium text-base">

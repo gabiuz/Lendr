@@ -7,6 +7,7 @@ import Footer from "../components/Footer";
 export default function OwnerProfile() {
   const [ownerData, setOwnerData] = useState(null);
   const [customerData, setCustomerData] = useState(null);
+  const [profileStats, setProfileStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,6 +36,13 @@ export default function OwnerProfile() {
               setCustomerData(customerResult.profile);
             }
           }
+        }
+
+        // Fetch profile stats
+        const statsRes = await fetch(`/api/owner-profile-stats?owner_id=${owner_id}`);
+        const statsResult = await statsRes.json();
+        if (statsResult.success) {
+          setProfileStats(statsResult.stats);
         }
       } catch (error) {
         console.error('Error fetching owner data:', error);
@@ -98,14 +106,14 @@ export default function OwnerProfile() {
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
-                      className="w-4 h-4 fill-current"
+                      className={`w-4 h-4 ${i < Math.floor(profileStats?.customerRating ?? 0) ? 'fill-current' : 'fill-current opacity-30'}`}
                       viewBox="0 0 24 24"
                     >
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
                   ))}
                 </div>
-                <span className="text-sm font-semibold">4.9</span>
+                <span className="text-sm font-semibold">{profileStats?.customerRating ?? '—'}</span>
               </div>
 
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-black mb-1">
@@ -185,7 +193,7 @@ export default function OwnerProfile() {
                 </div>
                 <div className="text-left">
                   <p className="text-2xl md:text-3xl lg:text-2xl xl:text-3xl font-bold text-black">
-                    10
+                    {profileStats?.products ?? '0'}
                   </p>
                   <p className="text-sm md:text-base lg:text-sm text-gray-600">Products</p>
                 </div>
@@ -211,7 +219,9 @@ export default function OwnerProfile() {
                   </svg>
                 </div>
                 <div className="text-left">
-                  <p className="text-2xl md:text-3xl lg:text-2xl xl:text-3xl font-bold text-black">5</p>
+                  <p className="text-2xl md:text-3xl lg:text-2xl xl:text-3xl font-bold text-black">
+                    {profileStats?.activeRentals ?? '0'}
+                  </p>
                   <p className="text-sm md:text-base lg:text-sm text-gray-600">Rentals</p>
                 </div>
               </div>
@@ -222,40 +232,48 @@ export default function OwnerProfile() {
         {/* Analytics Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8">
           {/* Top Earning Product */}
-          {/* TODO: Replace with real data from backend - product name and earnings */}
           <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-4 md:p-6">
             <h3 className="text-xs md:text-sm text-gray-600 mb-2">Top Earning Product</h3>
             <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-black mb-3 md:mb-4">
-              Toyota Vios
+              {profileStats?.topEarningProduct?.name || 'No data'}
             </h2>
             <div className="text-right">
               <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-black">
-                ₱12,500
+                ₱{profileStats?.topEarningProduct?.earnings ? Number(profileStats.topEarningProduct.earnings).toLocaleString() : '0'}
               </p>
               <p className="text-sm md:text-base text-gray-600">this month</p>
             </div>
           </div>
 
           {/* Monthly Revenue Chart */}
-          {/* TODO: Replace with real data from backend - monthly revenue values for bar chart */}
           <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-4 md:p-6">
             <div className="flex justify-between items-start mb-4 md:mb-6">
               <h3 className="text-xs md:text-sm text-gray-600">Monthly Revenue</h3>
               <p className="text-xl md:text-2xl lg:text-3xl font-bold text-black">
-                ₱18,854
+                ₱{profileStats?.currentMonthRevenue ? Number(profileStats.currentMonthRevenue).toLocaleString() : '0'}
               </p>
             </div>
             <div className="h-48 flex items-end justify-between gap-2">
-              {/* Placeholder bar heights - replace with actual monthly revenue data */}
-              {[40, 50, 55, 65, 70, 60, 75, 95, 70, 65, 70, 75].map(
-                (height, i) => (
+              {profileStats?.monthlyRevenue ? 
+                profileStats.monthlyRevenue.map((value, i) => {
+                  const maxValue = Math.max(...profileStats.monthlyRevenue, 1);
+                  const height = (value / maxValue) * 100;
+                  return (
+                    <div
+                      key={i}
+                      className="flex-1 bg-gray-300 hover:bg-gray-400 rounded-t transition-colors"
+                      style={{ height: `${Math.max(height, 5)}%` }}
+                      title={`₱${Number(value).toLocaleString()}`}
+                    ></div>
+                  );
+                })
+              : [40, 50, 55, 65, 70, 60, 75, 95, 70, 65, 70, 75].map((height, i) => (
                   <div
                     key={i}
                     className="flex-1 bg-gray-300 rounded-t"
                     style={{ height: `${height}%` }}
                   ></div>
-                )
-              )}
+                ))}
             </div>
             <div className="flex justify-around text-xs text-gray-500 mt-2 gap-2">
               <span>Jan</span>
@@ -274,7 +292,6 @@ export default function OwnerProfile() {
           </div>
 
           {/* Most Rented Category */}
-          {/* TODO: Replace with real data from backend - category distribution and counts */}
           <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
             <h3 className="text-sm md:text-base text-gray-600 mb-4">Most Rented Category</h3>
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8">
@@ -295,8 +312,8 @@ export default function OwnerProfile() {
                     fill="none"
                     stroke="#1e40af"
                     strokeWidth="20"
-                    strokeDasharray="251.2"
-                    strokeDashoffset="41.87"
+                    strokeDasharray={profileStats?.categoryBreakdown?.length ? `${(profileStats.mostRentedCategory?.count / profileStats.categoryBreakdown.reduce((sum, cat) => sum + (cat.product_count || 0), 0)) * 251.2}` : '251.2'}
+                    strokeDashoffset={profileStats?.categoryBreakdown?.length ? `${251.2 - ((profileStats.mostRentedCategory?.count / profileStats.categoryBreakdown.reduce((sum, cat) => sum + (cat.product_count || 0), 0)) * 251.2) / 2}` : '41.87'}
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -306,17 +323,22 @@ export default function OwnerProfile() {
               </div>
               <div>
                 <div className="bg-black text-white px-3 md:px-4 py-2 rounded-lg mb-3 md:mb-4">
-                  <p className="text-xl md:text-2xl font-bold">6 Tools</p>
+                  <p className="text-xl md:text-2xl font-bold">{profileStats?.mostRentedCategory?.count || '0'} {profileStats?.mostRentedCategory?.name || 'Items'}</p>
                 </div>
                 <div className="space-y-2 text-xs md:text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-gray-300"></span>
-                    <span>2 Vehicles</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-gray-300"></span>
-                    <span>3 Electronics</span>
-                  </div>
+                  {profileStats?.categoryBreakdown?.length ? profileStats.categoryBreakdown.map((cat, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <span className="w-3 h-3 rounded-full bg-gray-300"></span>
+                      <span>{cat.product_count} {cat.category_type}</span>
+                    </div>
+                  )) : (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-gray-300"></span>
+                        <span>No data</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -331,31 +353,27 @@ export default function OwnerProfile() {
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
-                      className={`w-5 h-5 ${i === 4 ? 'fill-current opacity-50' : 'fill-current'}`}
+                      className={`w-5 h-5 ${i < Math.floor(profileStats?.customerRating ?? 0) ? 'fill-current' : 'fill-current opacity-30'}`}
                       viewBox="0 0 24 24"
                     >
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
                   ))}
                 </div>
-                <span className="text-3xl md:text-4xl font-bold text-black">4.9</span>
+                <span className="text-3xl md:text-4xl font-bold text-black">{profileStats?.customerRating ?? '—'}</span>
               </div>
             </div>
             <div className="h-48 relative">
-              {/* TODO: Replace with real data from backend */}
-              {/* This is placeholder data - the path coordinates should be dynamically generated based on actual monthly rating data */}
               <svg
                 className="w-full h-full"
                 viewBox="0 0 400 150"
                 preserveAspectRatio="none"
               >
-                {/* Solid blue fill - will be filled with actual rating trend data */}
                 <path
                   d="M 0 150 L 0 100 Q 50 80, 100 70 T 200 50 T 300 55 L 400 45 L 400 150 Z"
                   fill="#1e40af"
                   stroke="none"
                 />
-                {/* Blue line - curve will be based on real rating values */}
                 <path
                   d="M 0 100 Q 50 80, 100 70 T 200 50 T 300 55 T 400 45"
                   fill="none"

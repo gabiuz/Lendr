@@ -11,7 +11,7 @@ export default function Navbar({
     { href: "/homepage", label: "Home" },
     { href: "#browse", label: "Browse Rentals" },
     { href: "#categories", label: "Categories" },
-    { href: "#aboutUs", label: "About Us" },
+    { href: "/homepage#aboutUs", label: "About Us" },
   ],
   showOwnerButton = true,
   profileInCircle = false,

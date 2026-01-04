@@ -14,7 +14,7 @@ export default function Register() {
   const formFields = {
     name: [
       { label: "First Name", id: "FirstName", placeholder: "First Name" },
-      { label: "Middle Name", id: "MiddleName", placeholder: "Middle Name" },
+      { label: "Middle Name", id: "MiddleName", placeholder: "Middle Name", required: false },
       { label: "Last Name", id: "LastName", placeholder: "Last Name" },
     ],
     sex: [
@@ -119,7 +119,7 @@ export default function Register() {
                   placeholder={field.placeholder}
                   name={field.id}
                   id={field.id}
-                  required={true}
+                  required={field.required !== false}
                   containerClassName="w-full lg:w-[235px]"
                 />
               ))}
