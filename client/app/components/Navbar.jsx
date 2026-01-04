@@ -61,7 +61,7 @@ export default function Navbar({
 
         {/* Desktop Nav links */}
         <div className="hidden lg:block text-black">
-          <ul className="flex gap-6 lg:gap-8 xl:gap-16 font-semibold text-sm lg:text-base xl:text-lg">
+          <ul className="whitespace-nowrap flex gap-4 lg:gap-6 xl:gap-10 font-semibold text-sm lg:text-base">
             {links.map((link, index) => (
               <li key={index} className="hover:text-red transition-colors">
                 <Link href={link.href}>{link.label}</Link>
@@ -71,10 +71,10 @@ export default function Navbar({
         </div>
 
         {/* Desktop Buttons */}
-        <div className="hidden lg:flex text-black items-center gap-3 lg:gap-4 xl:gap-6">
+        <div className="hidden lg:flex text-black items-center gap-2 lg:gap-3 xl:gap-4">
           {isLoggedIn && showOwnerButton && !hasBusinessAccount && (
             <Link href="/owner-register">
-              <button className="bg-red-800 hover:bg-red-900 text-white font-semibold px-4 lg:px-5 xl:px-6 py-2 lg:py-2.5 xl:py-3 rounded-full cursor-pointer text-sm lg:text-base transition-colors whitespace-nowrap">
+              <button className="bg-red-800 hover:bg-red-900 text-white font-semibold px-3 lg:px-4 xl:px-5 py-2 lg:py-2.5 rounded-full cursor-pointer text-xs lg:text-sm xl:text-base transition-colors whitespace-nowrap">
                 + Be a Rental Owner
               </button>
             </Link>
@@ -82,7 +82,7 @@ export default function Navbar({
 
           {isLoggedIn && hasBusinessAccount && !profileInCircle && (
             <Link href="/owner-homepage">
-              <button className="bg-red-800 hover:bg-red-900 text-white font-semibold px-4 lg:px-5 xl:px-6 py-2 lg:py-2.5 xl:py-3 rounded-full cursor-pointer text-sm lg:text-base transition-colors whitespace-nowrap">
+              <button className="bg-red-800 hover:bg-red-900 text-white font-semibold px-3 lg:px-4 xl:px-5 py-2 lg:py-2.5 rounded-full cursor-pointer text-xs lg:text-sm xl:text-base transition-colors whitespace-nowrap">
                 Business Profile
               </button>
             </Link>
@@ -107,8 +107,8 @@ export default function Navbar({
               )}
 
               {profileInCircle && (
-                <Link href="/homepage">
-                  <button className="bg-red-800 hover:bg-red-900 text-white font-semibold px-4 lg:px-5 xl:px-6 py-2 lg:py-2.5 xl:py-3 rounded-full cursor-pointer text-sm lg:text-base transition-colors whitespace-nowrap">
+                <Link href="/profile">
+                  <button className="bg-red-800 hover:bg-red-900 text-white font-semibold px-3 lg:px-4 xl:px-5 py-2 lg:py-2.5 rounded-full cursor-pointer text-xs lg:text-sm xl:text-base transition-colors whitespace-nowrap">
                     Personal Profile
                   </button>
                 </Link>
@@ -116,7 +116,7 @@ export default function Navbar({
 
               {profileInCircle && (
                 <Link href="/owner-profile">
-                  <button className="text-black hover:text-red-400 font-semibold px-4 lg:px-5 xl:px-6 py-2 lg:py-2.5 xl:py-3 cursor-pointer text-sm lg:text-base transition-colors whitespace-nowrap">
+                  <button className="text-black hover:text-red-400 font-semibold px-3 lg:px-4 xl:px-5 py-2 lg:py-2.5 cursor-pointer text-xs lg:text-sm xl:text-base transition-colors whitespace-nowrap">
                     Business Profile
                   </button>
                 </Link>
@@ -251,7 +251,7 @@ export default function Navbar({
               )}
 
               {profileInCircle && (
-                <Link href="/homepage" className="block">
+                <Link href="/profile" className="block">
                   <button
                     className="w-full bg-red-800 hover:bg-red-900 text-white font-semibold px-4 py-3 rounded-full cursor-pointer transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
