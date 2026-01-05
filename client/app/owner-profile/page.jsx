@@ -96,13 +96,16 @@ export default function OwnerProfile() {
             {/* Profile Image */}
             <div className="shrink-0">
               <div className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-full overflow-hidden bg-gray-200">
-                <Image
-                  src="/pictures/sample-profile-photo.jpg"
-                  alt="Owner Profile"
-                  width={192}
-                  height={192}
-                  className="w-full h-full object-cover"
-                />
+                {ownerData?.business_profile_picture ? (
+                  // Use regular img to support data URLs
+                  <img
+                    src={ownerData.business_profile_picture}
+                    alt="Business Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-300"></div>
+                )}
               </div>
             </div>
 
@@ -136,12 +139,9 @@ export default function OwnerProfile() {
               </p>
 
               <p className="text-sm md:text-base text-gray-700 mb-6 max-w-2xl">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                nulla pariatur.
+                {ownerData?.business_description 
+                  ? ownerData.business_description
+                  : 'No business description available yet.'}
               </p>
 
               <div className="flex flex-wrap gap-4 mb-6">

@@ -94,7 +94,7 @@ export default function OwnerDashboard() {
             List your unused items and start earning safely and conveniently.
           </p>
           <button onClick={() => router.push('/add-products')} className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 md:px-8 md:py-4 rounded-full cursor-pointer text-sm md:text-base xl:text-lg transition-colors whitespace-nowrap">
-            + Add your first product
+            {stats && stats.products > 0 ? '+ Add product' : '+ Add your first product'}
           </button>
         </div>
       </header>

@@ -36,9 +36,10 @@ CREATE TABLE rental_owner (
     contact_number CHAR(12) NOT NULL UNIQUE, 
     business_name VARCHAR(75) NOT NULL UNIQUE,
     business_address VARCHAR(150) NOT NULL,
+    business_description VARCHAR(500) DEFAULT NULL,
     postal_code CHAR(4) NOT NULL, 
     registration_date DATE DEFAULT (CURRENT_DATE()),
-    business_profile_picture LONGTEXT,
+    business_profile_picture VARCHAR(255),
 
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
     CONSTRAINT check_owner_phone
@@ -89,7 +90,12 @@ CREATE TABLE products (
 CREATE TABLE product_image (
     image_id INT PRIMARY KEY AUTO_INCREMENT,
     product_id INT NOT NULL,
-    image_path VARCHAR(255) NOT NULL,
+    image_path1 VARCHAR(255) NOT NULL,
+    image_path2 VARCHAR(255) DEFAULT NULL,
+	image_path3 VARCHAR(255) DEFAULT NULL,
+	image_path4 VARCHAR(255) DEFAULT NULL,
+	image_path5 VARCHAR(255) DEFAULT NULL,
+	image_path6 VARCHAR(255) DEFAULT NULL,
     FOREIGN KEY (product_id) REFERENCES products(product_id)
 ) AUTO_INCREMENT = 10000;
 
@@ -242,7 +248,7 @@ VALUES
 /* ============================================================
    PRODUCT IMAGES
    ============================================================ */
-INSERT INTO product_image(product_id,image_path)
+INSERT INTO product_image(product_id,image_path1)
 VALUES
 (1000,'img/motor1.jpg'),
 (1001,'img/camera1.jpg'),

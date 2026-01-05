@@ -2,13 +2,18 @@
 import Link from "next/link";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useEffect, useState } from "react";
 
 const ProductCard = ({ product }) => (
   <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow w-full h-full">
     <div className="bg-gray-200 h-48 flex items-center justify-center">
-      <svg className="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-      </svg>
+      {product.image ? (
+        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+      ) : (
+        <svg className="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+        </svg>
+      )}
     </div>
     <div className="p-4">
       <div className="flex items-start justify-between mb-2">
@@ -35,34 +40,53 @@ const ProductCard = ({ product }) => (
 );
 
 const AddProductCard = () => (
-  <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg h-full min-h-[400px] flex items-center justify-center hover:border-gray-400 transition-colors cursor-pointer">
-    <div className="text-center">
-      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-        </svg>
+  <Link href="/add-products">
+    <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg h-full min-h-[400px] flex items-center justify-center hover:border-gray-400 transition-colors cursor-pointer">
+      <div className="text-center">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+        </div>
       </div>
     </div>
-  </div>
+  </Link>
 );
 
 export default function BrowseRentals() {
-  const toolsProducts = [
-    { id: 1, name: "Power Drill", location: "Makati, Manila", description: "Ideal for all DIYs of Product - Handybuilders", price: "₱199", priceUnit: "/day", status: "Delete" },
-    { id: 2, name: "Garden Rake", location: "Taguig, Manila", description: "Lorem ipsum dolor sit - Lorem ipsum", price: "₱99", priceUnit: "/day", status: "Delete" },
-    { id: 3, name: "Screwdriver Set", location: "Makati, Manila", description: "Ideal for all DIYs of Product - Handybuilders", price: "₱67", priceUnit: "/day", status: "Delete" },
-    { id: 4, name: "Paint Brush Set", location: "Taguig, Manila", description: "Lorem ipsum dolor sit - Lorem ipsum", price: "₱50", priceUnit: "/day", status: "Delete" },
-  ];
+  const [toolsProducts, setToolsProducts] = useState([]);
+  const [electronicsProducts, setElectronicsProducts] = useState([]);
+  const [vehiclesProducts, setVehiclesProducts] = useState([]);
 
-  const electronicsProducts = [
-    { id: 5, name: "Nikon D3500", location: "Makati, Manila", description: "Ideal for all DIYs of Product - Handybuilders", price: "₱99", priceUnit: "/day", status: "Delete" },
-    { id: 6, name: "Nikon D5600", location: "Taguig, Manila", description: "Lorem ipsum dolor sit - Lorem ipsum", price: "₱99", priceUnit: "/day", status: "Delete" },
-    { id: 7, name: "Nikon D3500", location: "Makati, Manila", description: "Ideal for all DIYs of Product - Handybuilders", price: "₱99", priceUnit: "/day", status: "Delete" },
-  ];
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        // Fetch all products
+        const res = await fetch('/api/products');
+        const data = await res.json();
+        if (data.success) {
+          const products = data.products.map((p) => ({
+            id: p.product_id,
+            name: p.product_name,
+            location: p.location || '',
+            description: p.description || '',
+            price: `₱${p.product_rate}`,
+            priceUnit: '/day',
+            status: p.availability_status || 'Available',
+            image: p.image_path || null,
+            category: p.category_type || ''
+          }));
 
-  const vehiclesProducts = [
-    { id: 8, name: "Toyota Vios", location: "Makati, Manila", description: "Ideal for all DIYs of Product - Handybuilders", price: "₱3,000", priceUnit: "/day", status: "Delete" },
-  ];
+          setToolsProducts(products.filter((x) => x.category.toLowerCase().includes('tool') || x.category.toLowerCase().includes('tools') || x.category === ''));
+          setElectronicsProducts(products.filter((x) => x.category.toLowerCase().includes('elect') || x.category.toLowerCase().includes('device')));
+          setVehiclesProducts(products.filter((x) => x.category.toLowerCase().includes('vehicle')));
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchProducts();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -106,9 +130,13 @@ export default function BrowseRentals() {
               </svg>
             </button>
           </div>
-          <button className="bg-black text-white px-4 md:px-6 py-2.5 md:py-3 rounded-lg text-sm md:text-base font-medium hover:bg-gray-800 transition-colors whitespace-nowrap">
-            Add Product
-          </button>
+          <Link
+            href="/add-products"
+            className="bg-black text-white px-4 md:px-6 py-2.5 md:py-3 rounded-lg text-sm md:text-base font-medium hover:bg-gray-800 transition-colors whitespace-nowrap"
+            style={{ color: '#fff' }}
+          >
+            <span className="text-white">Add Product</span>
+          </Link>
         </div>
 
         {/* Tools Section */}

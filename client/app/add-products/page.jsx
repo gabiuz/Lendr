@@ -8,12 +8,11 @@ export default function AddProduct() {
     productName: "",
     description: "",
     pricePerDay: "",
-    location: "",
     condition: "",
     category: "",
   });
 
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState(new Array(5).fill(null));
   const [mainImage, setMainImage] = useState(null);
 
   const handleInputChange = (e) => {
@@ -24,10 +23,12 @@ export default function AddProduct() {
     }));
   };
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    // Handle image upload logic here
-    console.log(files);
+  const handleThumbnailChange = (index, file) => {
+    setImages((prev) => {
+      const copy = [...prev];
+      copy[index] = file;
+      return copy;
+    });
   };
 
   const handleCancel = () => {
@@ -36,16 +37,77 @@ export default function AddProduct() {
       productName: "",
       description: "",
       pricePerDay: "",
-      location: "",
       condition: "",
       category: "",
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
-    console.log(formData);
+    try {
+      const owner_id = localStorage.getItem('owner_id');
+      if (!owner_id) return alert('No owner_id found');
+
+      if (!mainImage) return alert('Main product image is required');
+
+      let mainImageData = await new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result);
+        reader.onerror = rej;
+        reader.readAsDataURL(mainImage);
+      });
+
+      // Convert thumbnails (optional) to data URLs
+      const thumbnailsData = [];
+      for (let i = 0; i < images.length; i++) {
+        const f = images[i];
+        if (f) {
+          // eslint-disable-next-line no-await-in-loop
+          const d = await new Promise((res, rej) => {
+            const reader = new FileReader();
+            reader.onload = () => res(reader.result);
+            reader.onerror = rej;
+            reader.readAsDataURL(f);
+          });
+          thumbnailsData.push(d);
+        }
+      }
+
+      // Map image_path1..image_path6 (image_path1 required)
+      const payload = {
+        productName: formData.productName,
+        description: formData.description,
+        pricePerDay: formData.pricePerDay,
+        condition: formData.condition,
+        category: formData.category,
+        owner_id,
+        mainImage: mainImageData,
+        thumbnails: thumbnailsData,
+        image_path1: mainImageData,
+        image_path2: thumbnailsData[0] || null,
+        image_path3: thumbnailsData[1] || null,
+        image_path4: thumbnailsData[2] || null,
+        image_path5: thumbnailsData[3] || null,
+        image_path6: thumbnailsData[4] || null,
+      };
+
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Product added');
+        // redirect to browse rentals
+        window.location.href = '/browse-rentals';
+      } else {
+        alert(data.error || 'Add product failed');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error adding product');
+    }
   };
 
   return (
@@ -168,22 +230,7 @@ export default function AddProduct() {
                     />
                   </div>
 
-                  {/* Location */}
-                  <div className="flex flex-col border-2 border-gray-200 rounded-xl px-4 md:px-6 py-2 md:py-3">
-                    <label htmlFor="location" className="text-sm text-gray-700 mb-1">
-                      Location <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="location"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      placeholder="Philippines"
-                      className="outline-none text-sm md:text-base text-gray-900"
-                      required
-                    />
-                  </div>
+
 
                   {/* Condition */}
                   <div className="flex flex-col border-2 border-gray-200 rounded-xl px-4 md:px-6 py-2 md:py-3 relative">
@@ -210,35 +257,32 @@ export default function AddProduct() {
                     </svg>
                   </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Category */}
-              <div className="lg:col-span-1 lg:py-4 md:lg:py-6">
-                <div className="flex flex-col border-2 border-gray-200 rounded-xl px-4 md:px-6 py-2 md:py-3 relative">
-                  <label htmlFor="category" className="text-sm text-gray-700 mb-1">
-                    Category <span className="text-red-600">*</span>
-                  </label>
-                  <select
-                    id="category"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    className="outline-none text-sm md:text-base appearance-none bg-white cursor-pointer text-gray-900 pr-8"
-                    required
-                  >
-                    <option value="">Categories</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="vehicles">Vehicles</option>
-                    <option value="tools">Tools</option>
-                    <option value="sports">Sports Equipment</option>
-                    <option value="party">Party Supplies</option>
-                    <option value="other">Other</option>
-                  </select>
-                  <div className="absolute right-4 md:right-6 bottom-3 md:bottom-4 pointer-events-none">
-                    <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path opacity="0.4" d="M12 18L24 30L36 18" stroke="#4B5563" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                  {/* Category (moved beside Condition) */}
+                  <div className="flex flex-col border-2 border-gray-200 rounded-xl px-4 md:px-6 py-2 md:py-3">
+                    <label htmlFor="category" className="text-sm text-gray-700 mb-1">
+                      Category <span className="text-red-600">*</span>
+                    </label>
+                    <select
+                      id="category"
+                      name="category"
+                      value={formData.category}
+                      onChange={handleInputChange}
+                      className="outline-none text-sm md:text-base appearance-none bg-white cursor-pointer text-gray-900 pr-8"
+                      required
+                    >
+                      <option value="">Categories</option>
+                      <option value="electronics">Electronics</option>
+                      <option value="vehicles">Vehicles</option>
+                      <option value="tools">Tools</option>
+                      <option value="sports">Sports Equipment</option>
+                      <option value="party">Party Supplies</option>
+                      <option value="other">Other</option>
+                    </select>
+                    <div className="absolute right-4 md:right-6 bottom-3 md:bottom-4 pointer-events-none">
+                      <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path opacity="0.4" d="M12 18L24 30L36 18" stroke="#4B5563" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -341,31 +385,46 @@ export default function AddProduct() {
                   <label
                     key={index}
                     htmlFor={`thumbnail-${index}`}
-                    className="aspect-square bg-gray-100 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-red-500 transition-colors overflow-hidden"
+                    className="aspect-square bg-gray-100 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-red-500 transition-colors overflow-hidden relative"
                   >
-                    <div className="flex items-center justify-center h-full">
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="text-gray-400"
-                      >
-                        <path
-                          d="M12 5V19M5 12H19"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                    {images[index] ? (
+                      <div className="w-full h-full">
+                        <Image
+                          src={URL.createObjectURL(images[index])}
+                          alt={`thumb-${index}`}
+                          fill
+                          className="object-cover"
                         />
-                      </svg>
-                    </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="text-gray-400"
+                        >
+                          <path
+                            d="M12 5V19M5 12H19"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                    )}
                     <input
                       type="file"
                       id={`thumbnail-${index}`}
                       accept="image/*"
                       className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files && e.target.files[0];
+                        if (f) handleThumbnailChange(index, f);
+                      }}
                     />
                   </label>
                 ))}

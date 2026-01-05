@@ -237,18 +237,20 @@ export default function Profile() {
                 >
                   Upload Photo
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPreviewSrc(null);
-                    setProfile((p) =>
-                      p ? { ...p, user_profile_picture: null } : p,
-                    );
-                  }}
-                  className="px-3 py-2 border rounded"
-                >
-                  Remove
-                </button>
+                {previewSrc && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPreviewSrc(null);
+                      setProfile((p) =>
+                        p ? { ...p, user_profile_picture: null } : p,
+                      );
+                    }}
+                    className="px-3 py-2 border rounded"
+                  >
+                    Remove
+                  </button>
+                )}
               </div>
             )}
           </div>

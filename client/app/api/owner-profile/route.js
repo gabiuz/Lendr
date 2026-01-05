@@ -39,6 +39,11 @@ export async function GET(request) {
       }
     }
 
+    // Ensure business_profile_picture is a data URL if it's stored as base64
+    if (ownerData.business_profile_picture && typeof ownerData.business_profile_picture === 'string' && !ownerData.business_profile_picture.startsWith('data:')) {
+      ownerData.business_profile_picture = `data:image/jpeg;base64,${ownerData.business_profile_picture}`;
+    }
+
     return NextResponse.json({
       success: true,
       data: ownerData,
