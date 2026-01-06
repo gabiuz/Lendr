@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '../../../source/database.js';
+import fs from 'fs';
+import path from 'path';
 
 export async function GET(request) {
   try {
@@ -39,9 +41,18 @@ export async function GET(request) {
       }
     }
     
-    // Handle business_profile_picture - if it's a string base64, add data URL prefix
-    if (ownerData.business_profile_picture && typeof ownerData.business_profile_picture === 'string' && !ownerData.business_profile_picture.startsWith('data:')) {
-      ownerData.business_profile_picture = `data:image/jpeg;base64,${ownerData.business_profile_picture}`;
+    // Normalize business_profile_picture: leave public paths and data URLs as-is,
+    // convert raw base64 (if present) to a data URL so the client can render it.
+    if (ownerData.business_profile_picture && typeof ownerData.business_profile_picture === 'string') {
+      const v = ownerData.business_profile_picture;
+      if (v.startsWith('/') || v.startsWith('http')) {
+        // assume public path or external URL — keep as-is
+      } else if (v.startsWith('data:')) {
+        // already a data URL — keep as-is
+      } else if (/^[A-Za-z0-9+/=\s]+$/.test(v) && v.length > 100) {
+        // likely a base64 blob without data: prefix — convert to data URL
+        ownerData.business_profile_picture = `data:image/jpeg;base64,${v}`;
+      }
     }
 
     return NextResponse.json({
@@ -83,15 +94,45 @@ export async function PUT(request) {
       );
     }
 
-    // Handle business_profile_picture - store as base64 string (VARCHAR compatible)
+    // Handle business_profile_picture: accept a public path, data URL, or base64.
+    // Prefer saving files to disk and storing a public path to avoid DB overflow.
     let businessProfilePictureValue = undefined;
-    if (business_profile_picture) {
-      if (business_profile_picture.startsWith('data:image')) {
-        // Extract base64 data from data URL
-        businessProfilePictureValue = business_profile_picture.split(',')[1];
-      } else if (business_profile_picture !== null && business_profile_picture !== '') {
-        // Use as is if it's already base64
-        businessProfilePictureValue = business_profile_picture;
+    if (business_profile_picture !== undefined) {
+      try {
+        // If it's a public path or external URL, store it directly
+        if (typeof business_profile_picture === 'string' && (business_profile_picture.startsWith('/') || business_profile_picture.startsWith('http'))) {
+          businessProfilePictureValue = business_profile_picture;
+        } else {
+          // Attempt to parse data URL or raw base64 and save to disk
+          let base64 = null;
+          let ext = 'jpg';
+          if (typeof business_profile_picture === 'string' && business_profile_picture.startsWith('data:')) {
+            const m = business_profile_picture.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/);
+            if (m) {
+              const mime = m[1];
+              base64 = m[2];
+              ext = mime.split('/')[1] || 'jpg';
+            } else {
+              const parts = business_profile_picture.split(',');
+              base64 = parts[1] || parts[0];
+            }
+          } else if (typeof business_profile_picture === 'string') {
+            // raw base64
+            base64 = business_profile_picture;
+          }
+
+          if (base64 && base64.length > 50) {
+            const buffer = Buffer.from(base64, 'base64');
+            const dir = path.join(process.cwd(), 'public', 'pictures', 'owners');
+            fs.mkdirSync(dir, { recursive: true });
+            const filename = `${owner_id}_${Date.now()}.${ext}`;
+            const filePath = path.join(dir, filename);
+            fs.writeFileSync(filePath, buffer);
+            businessProfilePictureValue = `/pictures/owners/${filename}`;
+          }
+        }
+      } catch (e) {
+        businessProfilePictureValue = undefined;
       }
     }
 
@@ -155,9 +196,16 @@ export async function PUT(request) {
 
     const updatedProfile = updatedRows[0];
     
-    // Handle business_profile_picture - if it's a string base64, add data URL prefix
-    if (updatedProfile.business_profile_picture && typeof updatedProfile.business_profile_picture === 'string' && !updatedProfile.business_profile_picture.startsWith('data:')) {
-      updatedProfile.business_profile_picture = `data:image/jpeg;base64,${updatedProfile.business_profile_picture}`;
+    // Normalize updated business_profile_picture similar to GET above
+    if (updatedProfile.business_profile_picture && typeof updatedProfile.business_profile_picture === 'string') {
+      const v = updatedProfile.business_profile_picture;
+      if (v.startsWith('/') || v.startsWith('http')) {
+        // keep as-is
+      } else if (v.startsWith('data:')) {
+        // keep as-is
+      } else if (/^[A-Za-z0-9+/=\s]+$/.test(v) && v.length > 100) {
+        updatedProfile.business_profile_picture = `data:image/jpeg;base64,${v}`;
+      }
     }
 
     return NextResponse.json({

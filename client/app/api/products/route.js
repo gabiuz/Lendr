@@ -15,17 +15,21 @@ export async function GET(request) {
     let rows;
     if (owner_id) {
       rows = await query({
-        query: `SELECT p.*, (SELECT image_path1 FROM product_image pi WHERE pi.product_id = p.product_id LIMIT 1) as image_path, c.category_type
+        query: `SELECT p.*, (SELECT image_path1 FROM products_image pi WHERE pi.product_id = p.product_id LIMIT 1) as image_path, c.category_type,
+                ro.business_name, ro.business_address, ro.business_profile_picture as owner_avatar
                 FROM products p
                 LEFT JOIN categories c ON p.category_code = c.category_code
+                LEFT JOIN rental_owner ro ON p.owner_id = ro.owner_id
                 WHERE p.owner_id = ?`,
         values: [owner_id],
       });
     } else {
       rows = await query({
-        query: `SELECT p.*, (SELECT image_path1 FROM product_image pi WHERE pi.product_id = p.product_id LIMIT 1) as image_path, c.category_type
+        query: `SELECT p.*, (SELECT image_path1 FROM products_image pi WHERE pi.product_id = p.product_id LIMIT 1) as image_path, c.category_type,
+                ro.business_name, ro.business_address, ro.business_profile_picture as owner_avatar
                 FROM products p
-                LEFT JOIN categories c ON p.category_code = c.category_code`,
+                LEFT JOIN categories c ON p.category_code = c.category_code
+                LEFT JOIN rental_owner ro ON p.owner_id = ro.owner_id`,
       });
     }
 
@@ -90,14 +94,14 @@ export async function POST(request) {
       savedPaths.push(publicPath);
     }
 
-    // Insert a single row into product_image with image_path1..image_path6
+    // Insert a single row into products_image with image_path1..image_path6
     const imgVals = [productId];
     for (let i = 0; i < 6; i++) {
       imgVals.push(savedPaths[i] || null);
     }
 
     await query({
-      query: 'INSERT INTO product_image (product_id, image_path1, image_path2, image_path3, image_path4, image_path5, image_path6) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      query: 'INSERT INTO products_image (product_id, image_path1, image_path2, image_path3, image_path4, image_path5, image_path6) VALUES (?, ?, ?, ?, ?, ?, ?)',
       values: imgVals,
     });
 

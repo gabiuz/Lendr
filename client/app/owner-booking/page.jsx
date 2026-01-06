@@ -2,43 +2,40 @@
 import Image from "next/image";
 import Navbar from "../components/Navbar";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function OwnerBooking() {
   const [activeFilter, setActiveFilter] = useState("All");
+  const [bookings, setBookings] = useState([]);
+  const [filteredBookings, setFilteredBookings] = useState([]);
 
-  // Placeholder booking data - TODO: Replace with real data from backend
-  const bookings = [
-    {
-      id: 401,
-      image: "/placeholder-product.jpg",
-      productName: "Toyota Vios 2016 Suburu",
-      renterName: "Juan Dela Cruz",
-      date: "Oct 10 - 12",
-      price: "₱600",
-      status: "Pending",
-    },
-    {
-      id: 401,
-      image: "/placeholder-product.jpg",
-      productName: "Toyota Vios 2016 Suburu",
-      renterName: "Juan Dela Cruz",
-      date: "Oct 10 - 12",
-      price: "₱600",
-      status: "Ongoing",
-    },
-    {
-      id: 401,
-      image: "/placeholder-product.jpg",
-      productName: "Toyota Vios 2016 Suburu",
-      renterName: "Juan Dela Cruz",
-      date: "Oct 10 - 12",
-      price: "₱600",
-      status: "Completed",
-    },
-  ];
+  const filters = ["All", "Available", "Rented", "Reserved", "Unavailable"];
 
-  const filters = ["All", "Pending", "Ongoing", "Completed", "Cancelled"];
+  useEffect(() => {
+    async function fetchBookings() {
+      try {
+        const ownerId = typeof window !== 'undefined' ? localStorage.getItem('owner_id') : null;
+        if (!ownerId) return;
+
+        const res = await fetch(`/api/owner-bookings?owner_id=${ownerId}`);
+        const data = await res.json();
+        if (data.success) {
+          setBookings(data.bookings);
+        }
+      } catch (err) {
+        console.error('Failed to load bookings:', err);
+      }
+    }
+    fetchBookings();
+  }, []);
+
+  useEffect(() => {
+    if (activeFilter === 'All') {
+      setFilteredBookings(bookings);
+    } else {
+      setFilteredBookings(bookings.filter(b => b.availability_status === activeFilter));
+    }
+  }, [activeFilter, bookings]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -52,6 +49,7 @@ export default function OwnerBooking() {
         ]}
         showOwnerButton={false}
         profileInCircle={true}
+        personalProfileHref="/homepage"
       />
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 mt-16 md:mt-20 lg:mt-24">
@@ -64,7 +62,7 @@ export default function OwnerBooking() {
               </Link>
             </li>
             <li>&gt;</li>
-            <li className="text-black font-medium">My Rentals</li>
+            <li className="text-black font-medium">Bookings / Transactions</li>
           </ol>
         </nav>
 
@@ -74,7 +72,7 @@ export default function OwnerBooking() {
             Bookings / Transactions
           </h1>
           <p className="text-sm md:text-base text-gray-600">
-            Manage your bookings, all in one place
+            Your products and their transaction status
           </p>
         </div>
 
@@ -114,7 +112,7 @@ export default function OwnerBooking() {
           ))}
         </div>
 
-        {/* Bookings Table */}
+        {/* Products Table */}
         <div className="bg-white border border-gray-200 shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -124,16 +122,19 @@ export default function OwnerBooking() {
                     Image
                   </th>
                   <th className="px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-700">
-                    ID
+                    Product ID
                   </th>
                   <th className="px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-700">
                     Product Name
                   </th>
                   <th className="px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-700">
-                    Name
+                    Customer Name
                   </th>
                   <th className="px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-700">
-                    Date
+                    Date / Duration
+                  </th>
+                  <th className="px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-700">
+                    Category
                   </th>
                   <th className="px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-700">
                     Price
@@ -147,69 +148,94 @@ export default function OwnerBooking() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {bookings.map((booking, index) => (
-                  <tr key={index} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-4">
-                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-200 rounded flex items-center justify-center mx-auto">
-                        <svg
-                          className="w-6 h-6 md:w-8 md:h-8 text-gray-400"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                {filteredBookings.length > 0 ? (
+                  filteredBookings.map((booking) => (
+                    <tr key={booking.rental_id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-4">
+                        <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-200 rounded flex items-center justify-center mx-auto overflow-hidden">
+                          {booking.image_path ? (
+                            <Image
+                              src={booking.image_path}
+                              alt={booking.product_name}
+                              width={64}
+                              height={64}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <svg
+                              className="w-6 h-6 md:w-8 md:h-8 text-gray-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-sm md:text-base text-gray-900 text-center">
+                        {booking.product_id}
+                      </td>
+                      <td className="px-4 py-4 text-center">
+                        <Link
+                          href={`/product-description?product_id=${booking.product_id}`}
+                          className="text-sm md:text-base hover:underline font-medium text-sky-800"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          {booking.product_name}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-4 text-sm md:text-base text-gray-900 text-center">
+                        {booking.first_name} {booking.last_name}
+                      </td>
+                      <td className="px-4 py-4 text-sm md:text-base text-gray-900 text-center">
+                        {new Date(booking.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(booking.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ({Math.ceil((new Date(booking.end_date) - new Date(booking.start_date)) / (1000 * 60 * 60 * 24))} days)
+                      </td>
+                      <td className="px-4 py-4 text-sm md:text-base text-gray-900 text-center">
+                        {booking.category_type || 'N/A'}
+                      </td>
+                      <td className="px-4 py-4 text-sm md:text-base font-semibold text-gray-900 text-center">
+                        ₱{booking.total_amount}
+                      </td>
+                      <td className="px-4 py-4 text-center">
+                        <span className={`text-xs md:text-sm font-semibold px-3 py-1 rounded-full ${
+                          booking.availability_status === 'Available' ? 'bg-green-100 text-green-800' :
+                          booking.availability_status === 'Rented' ? 'bg-blue-100 text-blue-800' :
+                          booking.availability_status === 'Reserved' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {booking.availability_status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4">
+                        <button className="text-red-600 hover:text-red-700 mx-auto block">
+                          <Image
+                            src="/icons/owner-booking/caret-down-duotone-light-full 1.svg"
+                            alt="Action"
+                            width={20}
+                            height={20}
+                            className="w-5 h-5"
                           />
-                        </svg>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-sm md:text-base text-gray-900 text-center">
-                      {booking.id}
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <Link
-                        href="#"
-                        className="text-sm md:text-base hover:underline font-medium text-sky-800!"
-                      >
-                        {booking.productName}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-4 text-sm md:text-base text-gray-900 text-center">
-                      {booking.renterName}
-                    </td>
-                    <td className="px-4 py-4 text-sm md:text-base text-gray-900 text-center">
-                      {booking.date}
-                    </td>
-                    <td className="px-4 py-4 text-sm md:text-base font-semibold text-gray-900 text-center">
-                      {booking.price}
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <span className="text-xs md:text-sm font-semibold text-gray-800">
-                        {booking.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <button className="text-red-600 hover:text-red-700 mx-auto block">
-                        <Image
-                          src="/icons/owner-booking/caret-down-duotone-light-full 1.svg"
-                          alt="Action"
-                          width={20}
-                          height={20}
-                          className="w-5 h-5"
-                        />
-                      </button>
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="9" className="px-4 py-8 text-center text-gray-600">
+                      No products found with this status.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
         </div>
       </div>
-
     </div>
   );
 }

@@ -54,32 +54,44 @@ const AddProductCard = () => (
 );
 
 export default function BrowseRentals() {
-  const [toolsProducts, setToolsProducts] = useState([]);
-  const [electronicsProducts, setElectronicsProducts] = useState([]);
-  const [vehiclesProducts, setVehiclesProducts] = useState([]);
+  const [categoriesProducts, setCategoriesProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeSearchQuery, setActiveSearchQuery] = useState('');
 
   useEffect(() => {
     async function fetchProducts() {
       try {
-        // Fetch all products
-        const res = await fetch('/api/products');
+        // Get owner_id from localStorage
+        const ownerId = typeof window !== 'undefined' ? localStorage.getItem('owner_id') : null;
+        if (!ownerId) {
+          console.error('No owner_id found in localStorage');
+          return;
+        }
+
+        // Fetch only this owner's products
+        const res = await fetch(`/api/products?owner_id=${ownerId}`);
         const data = await res.json();
         if (data.success) {
           const products = data.products.map((p) => ({
             id: p.product_id,
             name: p.product_name,
-            location: p.location || '',
+            location: p.business_address || '',
             description: p.description || '',
             price: `₱${p.product_rate}`,
             priceUnit: '/day',
             status: p.availability_status || 'Available',
             image: p.image_path || null,
-            category: p.category_type || ''
+            category: p.category_type || 'Uncategorized'
           }));
 
-          setToolsProducts(products.filter((x) => x.category.toLowerCase().includes('tool') || x.category.toLowerCase().includes('tools') || x.category === ''));
-          setElectronicsProducts(products.filter((x) => x.category.toLowerCase().includes('elect') || x.category.toLowerCase().includes('device')));
-          setVehiclesProducts(products.filter((x) => x.category.toLowerCase().includes('vehicle')));
+          const map = new Map();
+          for (const prod of products) {
+            const key = prod.category || 'Uncategorized';
+            if (!map.has(key)) map.set(key, []);
+            map.get(key).push(prod);
+          }
+          const groups = Array.from(map.entries()).map(([name, products]) => ({ name, products }));
+          setCategoriesProducts(groups);
         }
       } catch (err) {
         console.error(err);
@@ -100,6 +112,7 @@ export default function BrowseRentals() {
         ]}
         showOwnerButton={false}
         profileInCircle={true}
+        personalProfileHref="/homepage"
       />
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 pt-24 md:pt-32 lg:pt-40">
@@ -122,10 +135,16 @@ export default function BrowseRentals() {
             <input
               type="text"
               placeholder="Search Rentals"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-3 md:px-4 py-2.5 md:py-3 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             />
-            <button className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 bg-gray-200 p-1.5 md:p-2 rounded">
-              <svg className="w-4 h-4 md:w-5 md:h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button 
+              type="button" 
+              onClick={() => setActiveSearchQuery(searchQuery)}
+              className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 bg-gray-200 hover:bg-gray-300 p-1.5 md:p-2 rounded transition-colors"
+            >
+              <svg className="w-5 h-5 md:w-6 md:h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </button>
@@ -139,53 +158,52 @@ export default function BrowseRentals() {
           </Link>
         </div>
 
-        {/* Tools Section */}
-        <div className="mb-8 md:mb-10 lg:mb-12">
-          <h2 className="text-xl md:text-2xl font-bold text-black mb-4 md:mb-6">Tools</h2>
-          <div className="flex gap-4 md:gap-5 lg:gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-            {toolsProducts.map((product) => (
-              <div key={product.id} className="shrink-0 w-64 md:w-72 lg:w-80">
-                <ProductCard product={product} />
+        {/* Category Sections (dynamic) */}
+        {categoriesProducts.map((group) => {
+          const filteredProducts = group.products.filter(product =>
+            product.name.toLowerCase().includes(activeSearchQuery.toLowerCase()) ||
+            product.description?.toLowerCase().includes(activeSearchQuery.toLowerCase())
+          );
+          
+          // Only show categories with matching products when searching
+          if (activeSearchQuery && filteredProducts.length === 0) return null;
+          
+          return (
+            <div key={group.name} className="mb-8 md:mb-10 lg:mb-12">
+              <h2 className="text-xl md:text-2xl font-bold text-black mb-4 md:mb-6">{group.name}</h2>
+              <div className="flex gap-4 md:gap-5 lg:gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                {filteredProducts.map((product) => (
+                  <div key={product.id} className="shrink-0 w-64 md:w-72 lg:w-80">
+                    <ProductCard product={product} />
+                  </div>
+                ))}
+                <div className="shrink-0 w-64 md:w-72 lg:w-80">
+                  <AddProductCard />
+                </div>
               </div>
-            ))}
-            <div className="shrink-0 w-64 md:w-72 lg:w-80">
-              <AddProductCard />
             </div>
-          </div>
-        </div>
+          );
+        })}
 
-        {/* Electronics Section */}
-        <div className="mb-8 md:mb-10 lg:mb-12">
-          <h2 className="text-xl md:text-2xl font-bold text-black mb-4 md:mb-6">Electronics</h2>
-          <div className="flex gap-4 md:gap-5 lg:gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-            {electronicsProducts.map((product) => (
-              <div key={product.id} className="shrink-0 w-64 md:w-72 lg:w-80">
-                <ProductCard product={product} />
-              </div>
-            ))}
-            <div className="shrink-0 w-64 md:w-72 lg:w-80">
-              <AddProductCard />
-            </div>
+        {/* No products found message */}
+        {activeSearchQuery && categoriesProducts.every(group =>
+          group.products.filter(product =>
+            product.name.toLowerCase().includes(activeSearchQuery.toLowerCase()) ||
+            product.description?.toLowerCase().includes(activeSearchQuery.toLowerCase())
+          ).length === 0
+        ) && (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">No products found</p>
           </div>
-        </div>
-
-        {/* Vehicles Section */}
-        <div className="mb-8 md:mb-10 lg:mb-12">
-          <h2 className="text-xl md:text-2xl font-bold text-black mb-4 md:mb-6">Vehicles</h2>
-          <div className="flex gap-4 md:gap-5 lg:gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-            {vehiclesProducts.map((product) => (
-              <div key={product.id} className="shrink-0 w-64 md:w-72 lg:w-80">
-                <ProductCard product={product} />
-              </div>
-            ))}
-            <div className="shrink-0 w-64 md:w-72 lg:w-80">
-              <AddProductCard />
-            </div>
-          </div>
-        </div>
+        )}
       </div>
 
       <Footer />
     </div>
   );
 }
+
+
+
+
+

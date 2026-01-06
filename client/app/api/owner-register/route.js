@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '../../../source/database.js';
+import fs from 'fs';
+import path from 'path';
 
 export async function POST(request) {
   try {
@@ -93,6 +95,41 @@ export async function POST(request) {
     const owner_id = (max + 1).toString();
     const registration_date = new Date().toISOString().split('T')[0];
 
+    // If a business profile picture was provided as a data URL or base64 string,
+    // save it to disk under public/pictures/owners and store the public path in DB.
+    let businessProfilePath = null;
+    if (business_profile_picture) {
+      try {
+        let base64 = null;
+        let ext = 'jpg';
+        if (typeof business_profile_picture === 'string' && business_profile_picture.startsWith('data:')) {
+          const m = business_profile_picture.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/);
+          if (m) {
+            const mime = m[1];
+            base64 = m[2];
+            ext = mime.split('/')[1] || 'jpg';
+          } else {
+            const parts = business_profile_picture.split(',');
+            base64 = parts[1] || parts[0];
+          }
+        } else if (typeof business_profile_picture === 'string') {
+          base64 = business_profile_picture;
+        }
+
+        if (base64) {
+          const buffer = Buffer.from(base64, 'base64');
+          const dir = path.join(process.cwd(), 'public', 'pictures', 'owners');
+          fs.mkdirSync(dir, { recursive: true });
+          const filename = `${owner_id}_${Date.now()}.${ext}`;
+          const filePath = path.join(dir, filename);
+          fs.writeFileSync(filePath, buffer);
+          businessProfilePath = `/pictures/owners/${filename}`;
+        }
+      } catch (e) {
+        businessProfilePath = null;
+      }
+    }
+
     const sql = `INSERT INTO rental_owner (owner_id, customer_id, contact_email, contact_number, business_name, business_address, postal_code, registration_date, business_profile_picture)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const values = [
@@ -104,7 +141,7 @@ export async function POST(request) {
       business_address,
       postal_code || null,
       registration_date,
-      business_profile_picture || null,
+      businessProfilePath || null,
     ];
 
     let retries = 0;

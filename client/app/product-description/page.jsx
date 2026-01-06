@@ -40,6 +40,24 @@ export default function ProductDescription() {
     }
     load();
   }, [productId]);
+
+  // when product is loaded, set default selected image to the first available
+  useEffect(() => {
+    if (!product) return;
+    if (product.images && product.images.length > 0) {
+      setSelectedImage(product.images[0]);
+      return;
+    }
+    // fallback to single image fields that some APIs return
+    if (product.image_path) {
+      setSelectedImage(product.image_path);
+      return;
+    }
+    if (product.image_path1) {
+      setSelectedImage(product.image_path1);
+      return;
+    }
+  }, [product]);
   
     return (
       <>
@@ -88,6 +106,7 @@ export default function ProductDescription() {
           </div>
           <div className="title">
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold">{product ? product.product_name : 'Product'}</h1>
+            <div className="text-zinc-800 text-sm mt-2">{product ? (product.category_type || '') : ''}</div>
           </div>
           <div className="price">
             <h2 className="text-base font-bold">
@@ -470,7 +489,7 @@ export default function ProductDescription() {
               ))}
             </div>
             <div className="reviews-container w-fit">
-              <Review />
+              <Review reviews={product ? product.reviews || [] : []} />
             </div>
           </div>
         </div>

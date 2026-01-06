@@ -67,6 +67,7 @@ export default function OwnerProfile() {
         ]}
         showOwnerButton={false}
         profileInCircle={true}
+        personalProfileHref="/homepage"
       />
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-12 mt-16 md:mt-20 lg:mt-24">

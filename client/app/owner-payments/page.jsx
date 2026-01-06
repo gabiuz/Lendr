@@ -39,6 +39,7 @@ export default function OwnerPayments() {
         ]}
         showOwnerButton={false}
         profileInCircle={true}
+        personalProfileHref="/homepage"
       />
 
       {/* Main Content */}

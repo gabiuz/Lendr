@@ -83,6 +83,7 @@ export default function OwnerDashboard() {
         ]}
         showOwnerButton={false}
         profileInCircle={true}
+        personalProfileHref="/homepage"
       />
       {/* image hero section */}
       <header className="bg-[url('/owner-dashboard-image.jpg')] bg-cover bg-center h-[500px] md:h-[600px] xl:h-[766px]">
@@ -252,7 +253,7 @@ export default function OwnerDashboard() {
               </tbody>
             </table>
             <div className=" bg-zinc-800 view-rentals-btn w-full flex justify-center mt-4 hover:bg-zinc-700 transition-colors">
-              <button className="text-white font-bold px-6 py-3 rounded-lg ">
+              <button onClick={() => router.push("/owner-booking")} className="text-white font-bold px-6 py-3 rounded-lg ">
                 View all rentals
               </button>
             </div>
@@ -285,3 +286,4 @@ export default function OwnerDashboard() {
     </div>
   );
 }
+

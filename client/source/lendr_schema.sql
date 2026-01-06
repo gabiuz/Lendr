@@ -85,18 +85,19 @@ CREATE TABLE products (
 ) AUTO_INCREMENT = 1000;
 
 /* ============================================================
-   PRODUCT IMAGE TABLE
+   PRODUCTS IMAGE TABLE
+   (renamed to hold product photos)
    ============================================================ */
-CREATE TABLE product_image (
-    image_id INT PRIMARY KEY AUTO_INCREMENT,
-    product_id INT NOT NULL,
-    image_path1 VARCHAR(255) NOT NULL,
-    image_path2 VARCHAR(255) DEFAULT NULL,
-	image_path3 VARCHAR(255) DEFAULT NULL,
-	image_path4 VARCHAR(255) DEFAULT NULL,
-	image_path5 VARCHAR(255) DEFAULT NULL,
-	image_path6 VARCHAR(255) DEFAULT NULL,
-    FOREIGN KEY (product_id) REFERENCES products(product_id)
+CREATE TABLE products_image (
+   image_id INT PRIMARY KEY AUTO_INCREMENT,
+   product_id INT NOT NULL,
+   image_path1 VARCHAR(255) NOT NULL,
+   image_path2 VARCHAR(255) DEFAULT NULL,
+   image_path3 VARCHAR(255) DEFAULT NULL,
+   image_path4 VARCHAR(255) DEFAULT NULL,
+   image_path5 VARCHAR(255) DEFAULT NULL,
+   image_path6 VARCHAR(255) DEFAULT NULL,
+   FOREIGN KEY (product_id) REFERENCES products(product_id)
 ) AUTO_INCREMENT = 10000;
 
 /* ============================================================
@@ -230,71 +231,6 @@ VALUES
 ('Party & Events','Event supplies');
 
 /* ============================================================
-   PRODUCTS
+   NOTE: Sample product/rental/payment/review seed data removed.
+   Products and photos should be created via the application.
    ============================================================ */
-INSERT INTO products(owner_id,category_code,product_name,description,product_rate,availability_status)
-VALUES
-(10,100,'Honda Click 125i','Motorcycle for daily use',500,'Available'),
-(11,101,'Canon DSLR','Photography camera',800,'Available'),
-(12,102,'Tuxedo Set','Formal wear',300,'Available'),
-(13,103,'Electric Drill','Drill machine',250,'Available'),
-(14,104,'Wooden Table','Dining table',600,'Available'),
-(15,105,'Event Tent','Outdoor tent',700,'Available'),
-(16,100,'Yamaha Mio','Scooter',550,'Available'),
-(17,101,'Gaming Laptop','High performance laptop',1500,'Available'),
-(18,104,'Office Chair','Ergonomic chair',450,'Available'),
-(19,105,'Party Lights','LED lights',350,'Available');
-
-/* ============================================================
-   PRODUCT IMAGES
-   ============================================================ */
-INSERT INTO product_image(product_id,image_path1)
-VALUES
-(1000,'img/motor1.jpg'),
-(1001,'img/camera1.jpg'),
-(1002,'img/tux1.jpg'),
-(1003,'img/drill1.jpg'),
-(1004,'img/table1.jpg'),
-(1005,'img/tent1.jpg'),
-(1006,'img/mio1.jpg'),
-(1007,'img/laptop1.jpg'),
-(1008,'img/chair1.jpg'),
-(1009,'img/lights1.jpg');
-
-/* ============================================================
-   RENTALS
-   ============================================================ */
-INSERT INTO rentals(product_id,customer_id,start_date,end_date,total_amount,status)
-VALUES
-(1000,1,'2025-01-01','2025-01-03',1500,'Completed'),
-(1001,2,'2025-01-05','2025-01-06',800,'Completed'),
-(1002,3,'2025-01-10','2025-01-11',300,'Completed'),
-(1003,4,'2025-01-12','2025-01-13',250,'Shipped'),
-(1004,5,'2025-01-15','2025-01-16',600,'To ship'),
-(1005,6,'2025-01-17','2025-01-18',700,'Completed'),
-(1006,7,'2025-01-20','2025-01-23',1650,'Completed'),
-(1007,8,'2025-01-25','2025-01-30',9000,'Completed'),
-(1008,9,'2025-02-01','2025-02-02',450,'To ship'),
-(1009,10,'2025-02-03','2025-02-04',350,'Completed');
-
-/* ============================================================
-   PAYMENTS
-   ============================================================ */
-INSERT INTO payments(rental_id,payment_date,payment_method,amount_paid,payment_status)
-VALUES
-(1100,'2025-01-03','Cash',1500,'Paid'),
-(1101,'2025-01-06','E-Wallet',800,'Paid'),
-(1102,'2025-01-11','Cash',300,'Paid'),
-(1103,'2025-01-13','E-Wallet',250,'Pending'),
-(1104,'2025-01-16','Cash',600,'Paid'),
-(1105,'2025-01-18','E-Wallet',700,'Paid');
-
-/* ============================================================
-   REVIEWS
-   ============================================================ */
-INSERT INTO reviews(product_id,customer_id,rating,comment)
-VALUES
-(1000,1,4.5,'Great motorcycle'),
-(1001,2,4.8,'Camera works perfectly'),
-(1007,8,4.9,'Laptop is excellent'),
-(1008,9,4.2,'Chair is comfortable');

@@ -39,9 +39,18 @@ export async function GET(request) {
       }
     }
 
-    // Ensure business_profile_picture is a data URL if it's stored as base64
-    if (ownerData.business_profile_picture && typeof ownerData.business_profile_picture === 'string' && !ownerData.business_profile_picture.startsWith('data:')) {
-      ownerData.business_profile_picture = `data:image/jpeg;base64,${ownerData.business_profile_picture}`;
+    // Normalize business_profile_picture: keep public paths and data URLs as-is,
+    // convert raw base64 strings (without data: prefix) to a data URL for rendering.
+    if (ownerData.business_profile_picture && typeof ownerData.business_profile_picture === 'string') {
+      const v = ownerData.business_profile_picture;
+      if (v.startsWith('/') || v.startsWith('http')) {
+        // public path or external URL — leave as-is
+      } else if (v.startsWith('data:')) {
+        // already a data URL — leave as-is
+      } else if (/^[A-Za-z0-9+/=\s]+$/.test(v) && v.length > 50) {
+        // likely base64 without data: prefix — convert to data URL
+        ownerData.business_profile_picture = `data:image/jpeg;base64,${v}`;
+      }
     }
 
     return NextResponse.json({

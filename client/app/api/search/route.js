@@ -10,8 +10,12 @@ export async function GET(request) {
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
 
-    // Base select joining owner info
-    let sql = `SELECT p.*, ro.business_name, ro.business_address FROM products p LEFT JOIN rental_owner ro ON p.owner_id = ro.owner_id`;
+        // Base select joining owner info and include primary image and category type
+        let sql = `SELECT p.*, ro.business_name, ro.business_address, ro.business_profile_picture as owner_avatar, c.category_type,
+            (SELECT image_path1 FROM products_image pi WHERE pi.product_id = p.product_id LIMIT 1) as image_path
+          FROM products p
+          LEFT JOIN rental_owner ro ON p.owner_id = ro.owner_id
+          LEFT JOIN categories c ON p.category_code = c.category_code`;
     const where = [];
     const values = [];
 

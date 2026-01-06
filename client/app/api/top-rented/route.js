@@ -5,9 +5,12 @@ export async function GET(request) {
   try {
     // Return top rented products (by rental count), include owner info
     const sql = `
-      SELECT p.*, ro.business_name, ro.business_address, IFNULL(rc.cnt,0) AS rental_count
+      SELECT p.*, ro.business_name, ro.business_address, ro.business_profile_picture as owner_avatar, IFNULL(rc.cnt,0) AS rental_count,
+             c.category_type,
+             (SELECT image_path1 FROM products_image pi WHERE pi.product_id = p.product_id LIMIT 1) as image_path
       FROM products p
       LEFT JOIN rental_owner ro ON p.owner_id = ro.owner_id
+      LEFT JOIN categories c ON p.category_code = c.category_code
       LEFT JOIN (
         SELECT product_id, COUNT(*) AS cnt FROM rentals GROUP BY product_id
       ) rc ON rc.product_id = p.product_id

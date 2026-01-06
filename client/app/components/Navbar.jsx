@@ -15,6 +15,7 @@ export default function Navbar({
   ],
   showOwnerButton = true,
   profileInCircle = false,
+  personalProfileHref = "/profile",
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -107,7 +108,7 @@ export default function Navbar({
               )}
 
               {profileInCircle && (
-                <Link href="/profile">
+                <Link href={personalProfileHref}>
                   <button className="bg-red-800 hover:bg-red-900 text-white font-semibold px-3 lg:px-4 xl:px-5 py-2 lg:py-2.5 rounded-full cursor-pointer text-xs lg:text-sm xl:text-base transition-colors whitespace-nowrap">
                     Personal Profile
                   </button>
@@ -251,7 +252,7 @@ export default function Navbar({
               )}
 
               {profileInCircle && (
-                <Link href="/profile" className="block">
+                <Link href={personalProfileHref} className="block">
                   <button
                     className="w-full bg-red-800 hover:bg-red-900 text-white font-semibold px-4 py-3 rounded-full cursor-pointer transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}

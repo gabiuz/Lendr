@@ -16,12 +16,12 @@ export default function Homepage() {
   const router = useRouter();
   const categories = [
     { id: "allItems", icon: "car", label: "All Items", code: "" },
-    { id: "vehicles", icon: "car", label: "Vehicles", code: "V" },
-    { id: "devices", icon: "computer", label: "Devices & Electronics", code: "DE" },
-    { id: "clothing", icon: "pin", label: "Clothing & Apparel", code: "CA" },
-    { id: "tools", icon: "tools", label: "Tools & Equipment", code: "TE" },
-    { id: "furniture", icon: "bed", label: "Furniture & Home", code: "FH" },
-    { id: "party", icon: "party", label: "Party & Events", code: "PE" },
+    { id: "vehicles", icon: "car", label: "Vehicles", code: "100" },
+    { id: "devices", icon: "computer", label: "Devices & Electronics", code: "101" },
+    { id: "clothing", icon: "pin", label: "Clothing & Apparel", code: "102" },
+    { id: "tools", icon: "tools", label: "Tools & Equipment", code: "103" },
+    { id: "furniture", icon: "bed", label: "Furniture & Home", code: "104" },
+    { id: "party", icon: "party", label: "Party & Events", code: "105" },
   ];
 
   const testimonials = [
