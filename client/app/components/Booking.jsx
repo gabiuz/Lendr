@@ -3,7 +3,15 @@
 import Image from "next/image";
 import { useState } from "react";
 
-export default function Booking({ isOpen = false, onClose = () => {}, pricePerDay = 950 }) {
+export default function Booking({ 
+  isOpen = false, 
+  onClose = () => {}, 
+  pricePerDay = 950,
+  productName = "Product Name",
+  businessName = "Rental Owner Name",
+  ownerName = "Rental Owner",
+  ownerAvatar = "/pictures/sample-pfp-productCard.png"
+}) {
   const [selectedDates, setSelectedDates] = useState({
     start: null,
     end: null,
@@ -189,7 +197,7 @@ export default function Booking({ isOpen = false, onClose = () => {}, pricePerDa
             className="bg-white rounded-2xl shadow-2xl w-full md:w-fit md:max-w-3xl lg:max-w-4xl xl:max-w-7xl mx-auto overflow-hidden animate-slideUp max-h-[90vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="modal-container py-4 px-4 md:py-2 md:px-2 lg:py-16 xl:py-24 lg:px-12 xl:px-20 overflow-y-auto md:overflow-y-hidden">
+            <div className="modal-container py-4 px-4 md:py-2 md:px-2 lg:py-16 xl:py-24 lg:px-12 xl:px-20 overflow-y-auto">
               <div className="red-line mx-auto"></div>
               <div className="modal-header flex justify-between items-center">
                 <h1 className="text-xl md:text-base lg:text-3xl xl:text-4xl font-extrabold w-full mt-2 md:mt-1 lg:mt-6 xl:mt-10 flex justify-center">
@@ -200,22 +208,22 @@ export default function Booking({ isOpen = false, onClose = () => {}, pricePerDa
                 <div className="calendar-column w-full flex flex-col gap-3 md:gap-1 lg:gap-5 xl:gap-6">
                   {/* Booking Details */}
                   <div className="product-info mb-1 md:mb-0.5 lg:mb-2.5 xl:mb-3">
-                    <h3 className="text-xl md:text-base lg:text-3xl xl:text-4xl font-bold mb-1 md:mb-0">Canon EOS 90D</h3>
+                    <h3 className="text-xl md:text-base lg:text-3xl xl:text-4xl font-bold mb-1 md:mb-0">{productName}</h3>
                   </div>
                   <div className="inline-flex justify-start items-center gap-2 mb-2 md:gap-1 md:mb-1 lg:mb-4">
                     <Image
                       width={32}
                       height={32}
                       className="rounded-full md:w-6 md:h-6"
-                      src="/pictures/sample-pfp-productCard.png"
+                      src={ownerAvatar}
                       alt="profile photo image"
                     />
                     <div className="w-40 md:w-32 lg:w-52 inline-flex flex-col justify-start items-start">
                       <div className="self-stretch justify-start text-black text-sm md:text-[10px] lg:text-base font-semibold leading-5 md:leading-3">
-                        Rental Owner Name
+                        {businessName}
                       </div>
                       <div className="self-stretch justify-start text-zinc-800 text-xs md:text-[8px] lg:text-sm font-normal leading-4 md:leading-3">
-                        Rental Owner
+                        <span className="font-semibold">Rental Owner:</span>&nbsp;{ownerName}
                       </div>
                     </div>
                   </div>
@@ -301,17 +309,6 @@ export default function Booking({ isOpen = false, onClose = () => {}, pricePerDa
                           <input
                             type="radio"
                             name="paymentMethod"
-                            value="gcash"
-                            checked={paymentMethod === "gcash"}
-                            onChange={(e) => setPaymentMethod(e.target.value)}
-                            className="w-4 h-4 cursor-pointer"
-                          />
-                          <span className="text-sm md:text-[10px] lg:text-base font-normal">GCash</span>
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="paymentMethod"
                             value="cash"
                             checked={paymentMethod === "cash"}
                             onChange={(e) => setPaymentMethod(e.target.value)}
@@ -319,12 +316,23 @@ export default function Booking({ isOpen = false, onClose = () => {}, pricePerDa
                           />
                           <span className="text-sm md:text-[10px] lg:text-base font-normal">Cash</span>
                         </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="gcash"
+                            checked={paymentMethod === "gcash"}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                            className="w-4 h-4 cursor-pointer"
+                          />
+                          <span className="text-sm md:text-[10px] lg:text-base font-normal">GCash</span>
+                        </label>
                       </div>
                     </div>
-                    <div className="delivery-container flex items-center justify-between gap-2 md:gap-2 lg:gap-3">
-                      <h2 className="font-extrabold text-sm md:text-[10px] lg:text-base">Delivery Options:</h2>
-                      <div className="delivery flex gap-2 md:gap-1 lg:gap-2.5">
-                        <label className="flex items-center gap-2 cursor-pointer">
+                    <div className="delivery-container flex items-center gap-2 md:gap-2 lg:gap-3">
+                      <h2 className="font-extrabold text-sm md:text-[10px] lg:text-base mr-3 whitespace-nowrap">Delivery Options:</h2>
+                      <div className="delivery flex gap-4 md:gap-4 lg:gap-6 items-center flex-nowrap">
+                        <label className="flex items-center gap-2 cursor-pointer whitespace-nowrap">
                           <input
                             type="radio"
                             name="deliveryOption"
@@ -335,7 +343,7 @@ export default function Booking({ isOpen = false, onClose = () => {}, pricePerDa
                           />
                           <span className="text-sm md:text-[10px] lg:text-base font-normal">Pick up</span>
                         </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
+                        <label className="flex items-center gap-2 cursor-pointer whitespace-nowrap">
                           <input
                             type="radio"
                             name="deliveryOption"
@@ -351,18 +359,35 @@ export default function Booking({ isOpen = false, onClose = () => {}, pricePerDa
                     
                     {/* Total Price */}
                     <div className="total-container border border-gray-200 w-fit rounded-xl p-3 md:p-2 lg:p-4">
-                      <div className="flex justify-between items-center">
-                        <h2 className="font-extrabold text-sm md:text-[10px] lg:text-base">Total:</h2>
-                        <p className="font-normal text-sm md:text-[10px] lg:text-base">
-                          ₱{selectedDates.start && selectedDates.end
-                            ? (Math.ceil((selectedDates.end - selectedDates.start) / (1000 * 60 * 60 * 24)) + 1) * pricePerDay
-                            : 0}
-                        </p>
-                      </div>
                       {selectedDates.start && selectedDates.end && (
-                        <p className="text-xs md:text-[8px] lg:text-xs text-gray-600 text-right mt-1 md:mt-0.5 lg:mt-1">
-                          {Math.ceil((selectedDates.end - selectedDates.start) / (1000 * 60 * 60 * 24)) + 1} day(s) × ₱{pricePerDay}/day
-                        </p>
+                        <>
+                          <div className="flex justify-between items-center gap-4 mb-2">
+                            <h3 className="font-semibold text-xs md:text-[9px] lg:text-sm text-gray-600">Rate per day:</h3>
+                            <p className="font-normal text-sm md:text-[10px] lg:text-base">
+                              ₱{pricePerDay}
+                            </p>
+                          </div>
+                          <div className="flex justify-between items-center gap-4 mb-2">
+                            <h3 className="font-semibold text-xs md:text-[9px] lg:text-sm text-gray-600">Number of days:</h3>
+                            <p className="font-normal text-sm md:text-[10px] lg:text-base">
+                              {Math.ceil((selectedDates.end - selectedDates.start) / (1000 * 60 * 60 * 24)) + 1}
+                            </p>
+                          </div>
+                          <div className="border-t border-gray-200 pt-2 flex justify-between items-center">
+                            <h2 className="font-extrabold text-sm md:text-[10px] lg:text-base">Total:</h2>
+                            <p className="font-extrabold text-sm md:text-[10px] lg:text-base text-red-600">
+                              ₱{(Math.ceil((selectedDates.end - selectedDates.start) / (1000 * 60 * 60 * 24)) + 1) * pricePerDay}
+                            </p>
+                          </div>
+                        </>
+                      )}
+                      {(!selectedDates.start || !selectedDates.end) && (
+                        <div className="flex justify-between items-center">
+                          <h2 className="font-extrabold text-sm md:text-[10px] lg:text-base">Total:</h2>
+                          <p className="font-normal text-sm md:text-[10px] lg:text-base">
+                            ₱0
+                          </p>
+                        </div>
                       )}
                     </div>
                     </div>

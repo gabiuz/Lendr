@@ -63,11 +63,22 @@ export default function Navbar({
         {/* Desktop Nav links */}
         <div className="hidden lg:block text-black">
           <ul className="whitespace-nowrap flex gap-4 lg:gap-6 xl:gap-10 font-semibold text-sm lg:text-base">
-            {links.map((link, index) => (
-              <li key={index} className="hover:text-red transition-colors">
-                <Link href={link.href}>{link.label}</Link>
-              </li>
-            ))}
+            {links.map((link, index) => {
+              // Hide "About Us" only for owners when viewing owner routes
+              if (
+                link.label === "About Us" &&
+                hasBusinessAccount &&
+                pathname &&
+                pathname.startsWith("/owner")
+              ) {
+                return null;
+              }
+              return (
+                <li key={index} className="hover:text-red transition-colors">
+                  <Link href={link.href}>{link.label}</Link>
+                </li>
+              );
+            })}
           </ul>
         </div>
 
@@ -189,17 +200,28 @@ export default function Navbar({
           <div className="px-4 py-4 space-y-4">
             {/* Mobile Nav Links */}
             <ul className="space-y-3 text-black font-semibold">
-              {links.map((link, index) => (
-                <li key={index}>
-                  <Link
-                    href={link.href}
-                    className="block py-2 hover:text-red transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              {links.map((link, index) => {
+                  // Hide "About Us" only for owners when viewing owner routes
+                  if (
+                    link.label === "About Us" &&
+                    hasBusinessAccount &&
+                    pathname &&
+                    pathname.startsWith("/owner")
+                  ) {
+                    return null;
+                  }
+                return (
+                  <li key={index}>
+                    <Link
+                      href={link.href}
+                      className="block py-2 hover:text-red transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
 
             {/* Mobile Buttons*/}

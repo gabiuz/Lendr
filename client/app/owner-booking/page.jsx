@@ -18,9 +18,18 @@ export default function OwnerBooking() {
         if (!ownerId) return;
 
         const res = await fetch(`/api/owner-bookings?owner_id=${ownerId}`);
-        const data = await res.json();
-        if (data.success) {
-          setBookings(data.bookings);
+        try {
+          const ct = res.headers.get("content-type") || "";
+          if (res.ok && ct.includes("application/json")) {
+            const data = await res.json();
+            if (data.success) setBookings(data.bookings);
+            else console.error("API returned success=false for owner-bookings", data);
+          } else {
+            const text = await res.text();
+            console.error("Unexpected API response for /api/owner-bookings:", res.status, text);
+          }
+        } catch (err) {
+          console.error('Failed to parse /api/owner-bookings response:', err);
         }
       } catch (err) {
         console.error('Failed to load bookings:', err);
@@ -52,7 +61,7 @@ export default function OwnerBooking() {
         personalProfileHref="/homepage"
       />
 
-      <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 mt-16 md:mt-20 lg:mt-24">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 mt-16 md:mt-20 lg:mt-24 min-h-screen flex flex-col">
         {/* Breadcrumb */}
         <nav className="mb-4 md:mb-6">
           <ol className="flex items-center gap-2 text-sm text-gray-600">
@@ -113,8 +122,8 @@ export default function OwnerBooking() {
         </div>
 
         {/* Products Table */}
-        <div className="bg-white border border-gray-200 shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
+        <div className="bg-white border border-gray-200 shadow-lg overflow-hidden flex-1 overflow-y-auto">
+          <div className="overflow-x-auto h-full">
             <table className="w-full">
               <thead className="bg-gray-50 border-b-2 border-gray-300">
                 <tr>

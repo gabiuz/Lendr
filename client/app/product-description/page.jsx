@@ -32,8 +32,19 @@ export default function ProductDescription() {
       if (!productId) return;
       try {
         const res = await fetch(`/api/product?product_id=${productId}`);
-        const data = await res.json();
-        if (data.success) setProduct(data.product);
+        try {
+          const ct = res.headers.get("content-type") || "";
+          if (res.ok && ct.includes("application/json")) {
+            const data = await res.json();
+            if (data.success) setProduct(data.product);
+            else console.error("API returned success=false", data);
+          } else {
+            const text = await res.text();
+            console.error("Unexpected API response for /api/product:", res.status, text);
+          }
+        } catch (err) {
+          console.error("Failed to parse /api/product response:", err);
+        }
       } catch (e) {
         console.error(e);
       }
@@ -59,6 +70,25 @@ export default function ProductDescription() {
     }
   }, [product]);
   
+  // compute safe display names for booking modal
+  const productDisplayName = product ? (product.product_name || product.productName || 'Product') : 'Product';
+  const businessDisplayName = product ? (product.business_name || product.businessName || product.owner_business || '') : '';
+  let ownerFullName = 'Rental Owner';
+  if (product) {
+    if (product.owner_name) ownerFullName = product.owner_name;
+    else if (product.ownerName) ownerFullName = product.ownerName;
+    else {
+      const parts = [];
+      if (product.owner_first_name) parts.push(product.owner_first_name);
+      if (product.owner_last_name) parts.push(product.owner_last_name);
+      if (parts.length === 0) {
+        if (product.first_name) parts.push(product.first_name);
+        if (product.last_name) parts.push(product.last_name);
+      }
+      if (parts.length) ownerFullName = parts.join(' ');
+    }
+  }
+
     return (
       <>
         <Navbar />
@@ -493,7 +523,15 @@ export default function ProductDescription() {
             </div>
           </div>
         </div>
-          <Booking isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
+          <Booking 
+            isOpen={isBookingOpen} 
+            onClose={() => setIsBookingOpen(false)}
+            pricePerDay={product ? parseFloat(product.product_rate) || 950 : 950}
+            productName={productDisplayName}
+            businessName={businessDisplayName || 'Rental Owner Name'}
+            ownerName={ownerFullName}
+            ownerAvatar={product && (product.owner_avatar || product.ownerAvatar) ? (product.owner_avatar || product.ownerAvatar) : '/pictures/sample-pfp-productCard.png'}
+          />
         </div>
         <Footer />
       </>

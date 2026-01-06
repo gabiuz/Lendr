@@ -10,9 +10,11 @@ export async function GET(request) {
     // fetch product and include image paths from products_image and category
     const rows = await query({
       query: `SELECT p.*, ro.business_name, ro.business_address, ro.business_profile_picture as owner_avatar, c.category_type,
+                cust.first_name as owner_first_name, cust.last_name as owner_last_name,
                 pi.image_path1, pi.image_path2, pi.image_path3, pi.image_path4, pi.image_path5, pi.image_path6
               FROM products p
               LEFT JOIN rental_owner ro ON p.owner_id = ro.owner_id
+              LEFT JOIN customer cust ON ro.customer_id = cust.customer_id
               LEFT JOIN categories c ON p.category_code = c.category_code
               LEFT JOIN products_image pi ON pi.product_id = p.product_id
               WHERE p.product_id = ? LIMIT 1`,
