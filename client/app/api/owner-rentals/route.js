@@ -1,4 +1,4 @@
-import { query } from '@/source/database';
+import { query } from '@/source/database.js';
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);

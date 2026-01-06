@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { query } from '../../../source/database.js';
+import { query } from '@/source/database.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -48,13 +48,31 @@ export async function POST(request) {
     if (!owner_id) return NextResponse.json({ success: false, error: 'missing owner_id' }, { status: 400 });
     if (!productName || !pricePerDay) return NextResponse.json({ success: false, error: 'missing required fields' }, { status: 400 });
 
-    // map category string to category_code
+    // map category string to category_code (accept either a code or a friendly keyword)
     let categoryCode = null;
     if (category) {
-      // try to find matching category by type
       const catRows = await query({ query: 'SELECT category_code, category_type FROM categories' });
-      const found = catRows.find((c) => c.category_type.toLowerCase().includes(category.toLowerCase()));
-      if (found) categoryCode = found.category_code;
+      const normalized = String(category).toLowerCase().trim();
+
+      // if category looks like a numeric code, try exact match
+      const asNum = Number(normalized);
+      if (!Number.isNaN(asNum)) {
+        const byCode = catRows.find((c) => Number(c.category_code) === asNum);
+        if (byCode) categoryCode = byCode.category_code;
+      }
+
+      // otherwise try matching by type text (case-insensitive, partial match both ways)
+      if (!categoryCode) {
+        const found = catRows.find((c) => {
+          const type = (c.category_type || '').toLowerCase();
+          return (
+            type === normalized ||
+            type.includes(normalized) ||
+            normalized.includes(type.split(' ')[0])
+          );
+        });
+        if (found) categoryCode = found.category_code;
+      }
     }
 
     // Insert product

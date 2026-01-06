@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { query } from '../../../source/database.js';
+import { query } from '@/source/database.js';
 import fs from 'fs/promises';
 import path from 'path';
 

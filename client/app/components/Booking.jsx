@@ -10,7 +10,9 @@ export default function Booking({
   productName = "Product Name",
   businessName = "Rental Owner Name",
   ownerName = "Rental Owner",
-  ownerAvatar = "/pictures/sample-pfp-productCard.png"
+  ownerAvatar = "/pictures/sample-pfp-productCard.png",
+  productId = null,
+  customerId = null
 }) {
   const [selectedDates, setSelectedDates] = useState({
     start: null,
@@ -19,6 +21,8 @@ export default function Booking({
   const [monthOffset, setMonthOffset] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [deliveryOption, setDeliveryOption] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   // Get current month and next month based on offset
   const today = new Date();
@@ -395,6 +399,12 @@ export default function Booking({
                 </div>
               </div>
               
+              {submitError && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+                  {submitError}
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="flex justify-end gap-3 md:gap-2 lg:gap-3 mt-6 md:mt-4 lg:mt-6">
                 <button
@@ -404,26 +414,57 @@ export default function Booking({
                   Cancel
                 </button>
                 <button
-                  onClick={() => {
-                    // Handle confirm booking logic here
-                    console.log("Booking confirmed:", {
-                      dates: selectedDates,
-                      payment: paymentMethod,
-                      delivery: deliveryOption,
-                      total: selectedDates.start && selectedDates.end
-                        ? (Math.ceil((selectedDates.end - selectedDates.start) / (1000 * 60 * 60 * 24)) + 1) * pricePerDay
-                        : 0
-                    });
-                    onClose();
+                  onClick={async () => {
+                    if (!productId || !customerId || !selectedDates.start || !selectedDates.end) {
+                      setSubmitError('Missing required booking information');
+                      return;
+                    }
+
+                    setIsSubmitting(true);
+                    setSubmitError('');
+
+                    try {
+                      const totalDays = Math.ceil((selectedDates.end - selectedDates.start) / (1000 * 60 * 60 * 24)) + 1;
+                      const totalAmount = totalDays * pricePerDay;
+
+                      const res = await fetch('/api/create-booking', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          customer_id: customerId,
+                          product_id: productId,
+                          start_date: selectedDates.start.toISOString().split('T')[0],
+                          end_date: selectedDates.end.toISOString().split('T')[0],
+                          total_amount: totalAmount,
+                          payment_method: paymentMethod,
+                          delivery_option: deliveryOption,
+                        }),
+                      });
+
+                      const data = await res.json();
+                      if (data.success) {
+                        console.log('Booking confirmed:', data);
+                        // Show success message briefly before closing
+                        alert('Booking confirmed successfully!');
+                        onClose();
+                      } else {
+                        setSubmitError(data.error || 'Failed to confirm booking');
+                      }
+                    } catch (err) {
+                      console.error('Booking error:', err);
+                      setSubmitError(err.message || 'An error occurred while booking');
+                    } finally {
+                      setIsSubmitting(false);
+                    }
                   }}
-                  disabled={!selectedDates.start || !selectedDates.end || !paymentMethod || !deliveryOption}
+                  disabled={!selectedDates.start || !selectedDates.end || !paymentMethod || !deliveryOption || isSubmitting}
                   className={`px-6 md:px-4 lg:px-6 py-2.5 md:py-2 lg:py-2.5 rounded-lg text-sm md:text-xs lg:text-sm font-semibold transition-all cursor-pointer ${
-                    selectedDates.start && selectedDates.end && paymentMethod && deliveryOption
+                    selectedDates.start && selectedDates.end && paymentMethod && deliveryOption && !isSubmitting
                       ? "bg-red-600 hover:bg-red-700 text-white hover:shadow-md"
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
                 >
-                  Confirm Booking
+                  {isSubmitting ? 'Confirming...' : 'Confirm Booking'}
                 </button>
               </div>
             </div>

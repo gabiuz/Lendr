@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { query } from '../../../source/database.js';
+import { query } from '@/source/database.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -92,7 +92,9 @@ export async function POST(request) {
       const n = digits ? parseInt(digits, 10) : NaN;
       if (!isNaN(n) && n > max) max = n;
     }
-    const owner_id = (max + 1).toString();
+    // Ensure owner_id sequence starts at 10
+    const numericOwnerId = Math.max(max + 1, 10);
+    const owner_id = numericOwnerId;
     const registration_date = new Date().toISOString().split('T')[0];
 
     // If a business profile picture was provided as a data URL or base64 string,

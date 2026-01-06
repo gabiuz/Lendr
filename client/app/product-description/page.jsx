@@ -19,6 +19,13 @@ export default function ProductDescription() {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState('/pictures/product-img-placeholder/Row.png');
   const [product, setProduct] = useState(null);
+  const [customerId, setCustomerId] = useState(null);
+
+  useEffect(() => {
+    const id = typeof window !== 'undefined' ? localStorage.getItem('customer_id') : null;
+    setCustomerId(id);
+  }, []);
+
   const thumbnailImages = (product && product.images && product.images.length)
     ? product.images
     : [
@@ -531,6 +538,8 @@ export default function ProductDescription() {
             businessName={businessDisplayName || 'Rental Owner Name'}
             ownerName={ownerFullName}
             ownerAvatar={product && (product.owner_avatar || product.ownerAvatar) ? (product.owner_avatar || product.ownerAvatar) : '/pictures/sample-pfp-productCard.png'}
+            productId={productId}
+            customerId={customerId}
           />
         </div>
         <Footer />

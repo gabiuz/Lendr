@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { query } from '../../../source/database.js';
+import { query } from '@/source/database.js';
 
 export async function GET(request) {
   try {

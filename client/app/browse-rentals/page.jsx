@@ -108,7 +108,6 @@ export default function BrowseRentals() {
           { href: "/browse-rentals", label: "Browse Rentals" },
           { href: "/owner-booking", label: "Bookings" },
           { href: "/owner-payments", label: "Payments" },
-          { href: "/about-us", label: "About Us" },
         ]}
         showOwnerButton={false}
         profileInCircle={true}

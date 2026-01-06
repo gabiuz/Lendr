@@ -7,7 +7,7 @@ USE lendr;
    ============================================================ */
 CREATE TABLE customer (
     customer_id INT PRIMARY KEY AUTO_INCREMENT,
-    owner_id INT UNIQUE DEFAULT NULL, -- Link to owner profile (Optional)
+    owner_id INT UNIQUE DEFAULT NULL, 
     first_name VARCHAR(50) DEFAULT NULL,
     middle_name VARCHAR(50) DEFAULT NULL,
     last_name VARCHAR(50) DEFAULT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE customer (
    ============================================================ */
 CREATE TABLE rental_owner (
     owner_id INT PRIMARY KEY AUTO_INCREMENT, 
-    customer_id INT UNIQUE NOT NULL, -- The base user account
+    customer_id INT UNIQUE NOT NULL, 
     contact_email VARCHAR(50) UNIQUE,
     contact_number CHAR(12) NOT NULL UNIQUE, 
     business_name VARCHAR(75) NOT NULL UNIQUE,
@@ -46,13 +46,13 @@ CREATE TABLE rental_owner (
         CHECK (contact_number REGEXP '^639[0-9]{9}$')
 ) AUTO_INCREMENT = 10;
 
--- Now that rental_owner exists, we link the customer's owner_id back to it
+-- Link customer back to owner
 ALTER TABLE customer 
 ADD CONSTRAINT fk_customer_is_owner 
 FOREIGN KEY (owner_id) REFERENCES rental_owner(owner_id);
 
 /* ============================================================
-   CATEGORIES TABLE
+   3. CATEGORIES TABLE
    ============================================================ */
 CREATE TABLE categories (
     category_code INT PRIMARY KEY AUTO_INCREMENT,
@@ -65,7 +65,7 @@ CREATE TABLE categories (
 ) AUTO_INCREMENT = 100;
 
 /* ============================================================
-   PRODUCTS TABLE
+   4. PRODUCTS TABLE
    ============================================================ */
 CREATE TABLE products (
     product_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -85,8 +85,7 @@ CREATE TABLE products (
 ) AUTO_INCREMENT = 1000;
 
 /* ============================================================
-   PRODUCTS IMAGE TABLE
-   (renamed to hold product photos)
+   5. PRODUCTS IMAGE TABLE
    ============================================================ */
 CREATE TABLE products_image (
    image_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -101,7 +100,7 @@ CREATE TABLE products_image (
 ) AUTO_INCREMENT = 10000;
 
 /* ============================================================
-   RENTALS TABLE
+   6. RENTALS TABLE
    ============================================================ */
 CREATE TABLE rentals (
     rental_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -120,19 +119,19 @@ CREATE TABLE rentals (
 ) AUTO_INCREMENT = 1100;
 
 /* ============================================================
-   PAYMENTS TABLE
+   7. PAYMENTS TABLE
    ============================================================ */
 CREATE TABLE payments (
     payment_id INT PRIMARY KEY AUTO_INCREMENT,
-    rental_id INT,
+    rental_id INT NOT NULL,
     payment_date DATE NOT NULL,
     payment_method VARCHAR(15) NOT NULL,
-    CONSTRAINT check_paymentMethod CHECK (payment_method IN ('Cash','E-Wallet')),
     amount_paid DECIMAL(10, 2) NOT NULL,
     payment_status VARCHAR(10) NOT NULL,
-    CONSTRAINT check_paymentStatus 
-        CHECK (payment_status IN ('Paid','Pending','Refunded','Failed')),
-    FOREIGN KEY (rental_id) REFERENCES rentals(rental_id)
+    
+    FOREIGN KEY (rental_id) REFERENCES rentals(rental_id),
+    CONSTRAINT check_paymentMethod CHECK (payment_method IN ('Cash', 'Gcash')),
+    CONSTRAINT check_paymentStatus CHECK (payment_status IN ('Paid', 'Pending', 'Refunded', 'Failed'))
 ) AUTO_INCREMENT = 1500;
 
 /* ============================================================
@@ -151,7 +150,7 @@ CREATE TABLE reviews (
 ) AUTO_INCREMENT = 2000;
 
 /* ============================================================
-   TRIGGER: BUSINESS RULE FOR REVIEWS
+   TRIGGERS
    ============================================================ */
 DELIMITER //
 CREATE TRIGGER before_review_insert
@@ -164,7 +163,7 @@ BEGIN
     FROM rentals
     WHERE customer_id = NEW.customer_id 
       AND product_id = NEW.product_id 
-      AND end_date < CURRENT_DATE();
+      AND status = 'Completed'; -- Modified to ensure logical "Completed" status
 
     IF rental_count = 0 THEN
         SIGNAL SQLSTATE '45000'
@@ -173,64 +172,3 @@ BEGIN
 END; //
 DELIMITER ;
 
-/* ============================================================
-   INSERT SAMPLE DATA (PASSWORDS HASHED VIA SHA2)
-   ============================================================ */
-
-INSERT INTO customer(first_name,middle_name,last_name,gender,birthday,email,phone_number,address,account_password)
-VALUES
-('John','April','Doe','Male','1999-03-03','john@gmail.com','639123456780','100 Banana St., Manila City', SHA2('password123',256)),
-('Jane','Bearni','Smith','Female','2000-07-12','jane@gmail.com','639123456781','25 Mango Road, Caloocan City', SHA2('janePass!',256)),
-('Mark','Cathy','Lee','Male','1998-02-21','mark@gmail.com','639123456782','15 Coconut Ave., Quezon City', SHA2('mark_secure',256)),
-('Anna','Dela Cruz','Reyes','Female','1999-04-11','anna@gmail.com','639123456783','88 Papaya St., Pasig City', SHA2('annapass',256)),
-('Luke','Emilia','Flores','Male','2001-09-15','luke@gmail.com','639123456784','12 Guava Lane, Makati City', SHA2('luke_1234',256)),
-('Ella','Florence','Ramirez','Female','2002-01-17','ella@gmail.com','639123456785','75 Durian Drive, Pasay City', SHA2('ella_pw',256)),
-('Carl','Georgean','Lopez','Male','1997-06-20','carl@gmail.com','639123456786','42 Lanzones St., Taguig City', SHA2('carl_pass',256)),
-('Faith','Hindura','Castro','Female','2000-12-25','faith@gmail.com','639123456787','90 Melon Road, Bulacan', SHA2('faithpw',256)),
-('Neil','Itura','Torres','Male','1998-11-09','neil@gmail.com','639123456788','67 Rambutan St., Laguna', SHA2('neilsecure',256)),
-('Rose','Janelyn','Santos','Female','2001-08-08','rose@gmail.com','639123456789','30 Pineapple Ave., Cavite', SHA2('rosepass',256));
-
-/* ============================================================
-   RENTAL OWNERS
-   ============================================================ */
-INSERT INTO rental_owner(customer_id,contact_email,contact_number,business_name,business_address,postal_code)
-VALUES
-(1,'carlos@biz.com','639999999990','Dizon Rentals','120 Apple St., Manila City','1000'),
-(2,'maria@biz.com','639999999991','Lopez Events','55 Orange Ave., Quezon City','1100'),
-(3,'kevin@biz.com','639999999992','Reyes Motors','77 Grapes Road, Pasig City','1600'),
-(4,'ella@biz.com','639999999993','Cruz Tech','90 Lemon Drive, Makati City','1200'),
-(5,'tony@biz.com','639999999994','TG Tools','18 Cherry St., Taguig City','1630'),
-(6,'rina@biz.com','639999999995','Santos Furnitures','230 Peach Lane, Pasay City','1300'),
-(7,'jomar@biz.com','639999999996','Flores Apparel','15 Kiwi St., Caloocan City','1420'),
-(8,'bea@biz.com','639999999997','Lim Electronics','300 Avocado Road, Mandaluyong City','1550'),
-(9,'albert@biz.com','639999999998','Go Rentals','80 Lychee St., San Juan City','1500'),
-(10,'sofia@biz.com','639999999999','Tan Events','40 Watermelon Ave., Marikina City','1800');
-
--- Update customer owner_id links
-UPDATE customer SET owner_id = 10 WHERE customer_id = 1;
-UPDATE customer SET owner_id = 11 WHERE customer_id = 2;
-UPDATE customer SET owner_id = 12 WHERE customer_id = 3;
-UPDATE customer SET owner_id = 13 WHERE customer_id = 4;
-UPDATE customer SET owner_id = 14 WHERE customer_id = 5;
-UPDATE customer SET owner_id = 15 WHERE customer_id = 6;
-UPDATE customer SET owner_id = 16 WHERE customer_id = 7;
-UPDATE customer SET owner_id = 17 WHERE customer_id = 8;
-UPDATE customer SET owner_id = 18 WHERE customer_id = 9;
-UPDATE customer SET owner_id = 19 WHERE customer_id = 10;
-
-/* ============================================================
-   CATEGORIES
-   ============================================================ */
-INSERT INTO categories(category_type,category_description)
-VALUES
-('Vehicles','Cars, motorcycles, and other vehicles'),
-('Devices & Electronics','Phones, laptops, gadgets'),
-('Clothing & Apparel','Wearable items'),
-('Tools & Equipment','Hardware tools'),
-('Furniture & Home','Home and living items'),
-('Party & Events','Event supplies');
-
-/* ============================================================
-   NOTE: Sample product/rental/payment/review seed data removed.
-   Products and photos should be created via the application.
-   ============================================================ */
