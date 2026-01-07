@@ -23,13 +23,13 @@ export async function GET(request) {
       values: [owner_id],
     });
 
-    // Top earning product (this month)
+    // Top earning product (this month) - only count completed rentals
     const topEarningRows = await query({
       query: `
         SELECT p.product_id, p.product_name, SUM(r.total_amount) AS earnings
         FROM rentals r
         JOIN products p ON r.product_id = p.product_id
-        WHERE p.owner_id = ? AND MONTH(r.payment_id) = MONTH(NOW()) AND YEAR(r.payment_id) = YEAR(NOW())
+        WHERE p.owner_id = ? AND r.status = "Completed" AND MONTH(r.end_date) = MONTH(NOW()) AND YEAR(r.end_date) = YEAR(NOW())
         GROUP BY p.product_id
         ORDER BY earnings DESC
         LIMIT 1
@@ -37,33 +37,33 @@ export async function GET(request) {
       values: [owner_id],
     });
 
-    // Monthly revenue (all months, current year)
+    // Monthly revenue (all months, current year) - only count completed rentals
     const monthlyRevenueRows = await query({
       query: `
         SELECT 
-          MONTH(r.payment_id) AS month,
+          MONTH(r.end_date) AS month,
           SUM(r.total_amount) AS total
         FROM rentals r
         JOIN products p ON r.product_id = p.product_id
-        WHERE p.owner_id = ? AND YEAR(r.payment_id) = YEAR(NOW())
-        GROUP BY MONTH(r.payment_id)
+        WHERE p.owner_id = ? AND r.status = "Completed" AND YEAR(r.end_date) = YEAR(NOW())
+        GROUP BY MONTH(r.end_date)
         ORDER BY month ASC
       `,
       values: [owner_id],
     });
 
-    // Total monthly revenue (current month)
+    // Total monthly revenue (current month) - only count completed rentals
     const currentMonthRevenueRows = await query({
       query: `
         SELECT SUM(r.total_amount) AS total
         FROM rentals r
         JOIN products p ON r.product_id = p.product_id
-        WHERE p.owner_id = ? AND MONTH(r.payment_id) = MONTH(NOW()) AND YEAR(r.payment_id) = YEAR(NOW())
+        WHERE p.owner_id = ? AND r.status = "Completed" AND MONTH(r.end_date) = MONTH(NOW()) AND YEAR(r.end_date) = YEAR(NOW())
       `,
       values: [owner_id],
     });
 
-    // Most rented category
+    // Most rented category - count completed rentals per category
     const mostRentedCategoryRows = await query({
       query: `
         SELECT 
@@ -73,7 +73,7 @@ export async function GET(request) {
         FROM rentals r
         JOIN products p ON r.product_id = p.product_id
         JOIN categories c ON p.category_code = c.category_code
-        WHERE p.owner_id = ?
+        WHERE p.owner_id = ? AND r.status = "Completed"
         GROUP BY c.category_code
         ORDER BY rental_count DESC
         LIMIT 1
@@ -81,15 +81,16 @@ export async function GET(request) {
       values: [owner_id],
     });
 
-    // All category breakdown
+    // All category breakdown - count rental count per category, not product count
     const categoryBreakdownRows = await query({
       query: `
         SELECT 
           c.category_type,
-          COUNT(p.product_id) AS product_count
-        FROM products p
+          COUNT(r.rental_id) AS product_count
+        FROM rentals r
+        JOIN products p ON r.product_id = p.product_id
         JOIN categories c ON p.category_code = c.category_code
-        WHERE p.owner_id = ?
+        WHERE p.owner_id = ? AND r.status = "Completed"
         GROUP BY c.category_type
       `,
       values: [owner_id],

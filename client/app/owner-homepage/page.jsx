@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { startRentalStatusScheduler } from "@/source/rentalStatusScheduler";
 
 export default function OwnerDashboard() {
   const router = useRouter();
@@ -23,6 +24,14 @@ export default function OwnerDashboard() {
 
     return () => clearInterval(interval);
   }, [tips.length]);
+
+  // Initialize rental status scheduler on component mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      startRentalStatusScheduler();
+    }
+  }, []);
+
   const [stats, setStats] = useState({ products: 0, activeRentals: 0, totalEarnings: 0, avgRating: null });
 
   useEffect(() => {
@@ -53,8 +62,18 @@ export default function OwnerDashboard() {
       }
     }
 
+    // Load data immediately
     loadStats();
     loadRentals();
+
+    // Set up interval to refresh data every 30 seconds to reflect real-time updates
+    const statsInterval = setInterval(loadStats, 30000);
+    const rentalsInterval = setInterval(loadRentals, 30000);
+
+    return () => {
+      clearInterval(statsInterval);
+      clearInterval(rentalsInterval);
+    };
   }, []);
   return (
     <div className="min-h-screen w-full bg-white">

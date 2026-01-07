@@ -54,13 +54,15 @@ export default function ProductCard({ product = null, showButton = false }) {
             {product ? product.description : 'Description of Product - Placeholders'}
           </div>
           <div className="inline-flex justify-start items-center gap-3.5 mt-auto">
-            <img
-              width={54}
-              height={54}
-              className="rounded-full w-14 h-14 object-cover flex-shrink-0"
-              src={product && product.owner_avatar ? product.owner_avatar : '/pictures/sample-pfp-productCard.png'}
-              alt="profile photo image"
-            />
+            {product && product.owner_avatar && (
+              <img
+                width={54}
+                height={54}
+                className="rounded-full w-14 h-14 object-cover flex-shrink-0"
+                src={product.owner_avatar}
+                alt="profile photo image"
+              />
+            )}
             <div className="flex-1 inline-flex flex-col justify-start items-start min-w-0">
               <div className="self-stretch justify-start text-black text-xl font-semibold font-['Montserrat'] leading-6 truncate">
                 {product ? (product.business_name || 'Rental Owner Name') : 'Rental Owner Name'}

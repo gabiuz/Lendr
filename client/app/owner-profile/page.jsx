@@ -77,7 +77,13 @@ export default function OwnerProfile() {
       }
     }
 
+    // Load data immediately
     fetchOwnerData();
+
+    // Set up interval to refresh profile stats every 30 seconds to reflect real-time updates
+    const statsInterval = setInterval(fetchOwnerData, 30000);
+
+    return () => clearInterval(statsInterval);
   }, []);
 
   return (

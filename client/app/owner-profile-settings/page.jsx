@@ -177,6 +177,7 @@ export default function OwnerProfileSettings() {
         ]}
         showOwnerButton={false}
         profileInCircle={true}
+        personalProfileHref="/homepage"
       />
       {hasAccount && (
         <div className="text-black flex justify-between px-4 py-8 lg:px-36 lg:pt-36 mb-4">

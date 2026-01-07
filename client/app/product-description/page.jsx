@@ -153,13 +153,15 @@ export default function ProductDescription() {
             <p>{product ? product.description : 'Product details will appear here.'}</p>
           </div>
           <div className="owner-container flex items-center gap-3.5">
-            <img
-              src={product && product.owner_avatar ? product.owner_avatar : '/pictures/sample-pfp-productCard.png'}
-              alt="Owner-profile-picture"
-              width={54}
-              height={54}
-              className="rounded-full w-14 h-14"
-            />
+            {product && product.owner_avatar && (
+              <img
+                src={product.owner_avatar}
+                alt="Owner-profile-picture"
+                width={54}
+                height={54}
+                className="rounded-full w-14 h-14"
+              />
+            )}
             <div>
               <p className="font-bold">{product ? (product.business_name || 'Rental Owner Name') : 'Rental Owner Name'}</p>
               <p className="text-zinc-800 text-base font-normal font-['Montserrat'] leading-6">
