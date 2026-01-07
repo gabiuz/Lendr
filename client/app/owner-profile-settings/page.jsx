@@ -96,7 +96,8 @@ export default function OwnerProfileSettings() {
       if (data.success) {
         localStorage.removeItem("owner_id");
         alert("Profile deleted successfully");
-        router.push("/owner-login");
+        // Redirect to personal account homepage
+        router.push("/homepage");
       } else {
         alert(data.error || "Delete failed");
       }

@@ -165,3 +165,112 @@ export async function PUT(request) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
+
+export async function DELETE(request) {
+  try {
+    const body = await request.json();
+    let { customer_id } = body;
+
+    if (!customer_id) {
+      return NextResponse.json(
+        { success: false, error: 'missing customer_id' },
+        { status: 400 }
+      );
+    }
+
+    if (typeof customer_id === 'string' && /\D/.test(customer_id)) {
+      const digits = customer_id.replace(/\D/g, '');
+      if (!digits) {
+        return NextResponse.json(
+          { success: false, error: 'invalid customer_id' },
+          { status: 400 }
+        );
+      }
+      customer_id = digits;
+    }
+
+    // Get the owner_id associated with this customer (if they have a business profile)
+    const ownerRows = await query({
+      query: 'SELECT owner_id FROM rental_owner WHERE customer_id = ?',
+      values: [customer_id],
+    });
+
+    const owner_id = ownerRows.length > 0 ? ownerRows[0].owner_id : null;
+
+    // If user has a business profile, delete all business records
+    if (owner_id) {
+      // Get all products owned by this owner
+      const products = await query({
+        query: 'SELECT product_id FROM products WHERE owner_id = ?',
+        values: [owner_id],
+      });
+
+      const productIds = products.map(p => p.product_id);
+
+      // Delete business records (cascade deletion in order to avoid foreign key constraints)
+      
+      // 1. Delete payments associated with rentals of this owner's products
+      if (productIds.length > 0) {
+        const placeholders = productIds.map(() => '?').join(',');
+        await query({
+          query: `DELETE FROM payments WHERE rental_id IN 
+                  (SELECT rental_id FROM rentals WHERE product_id IN (${placeholders}))`,
+          values: productIds,
+        });
+
+        // 2. Delete reviews associated with this owner's products
+        await query({
+          query: `DELETE FROM reviews WHERE product_id IN (${placeholders})`,
+          values: productIds,
+        });
+
+        // 3. Delete rentals associated with this owner's products
+        await query({
+          query: `DELETE FROM rentals WHERE product_id IN (${placeholders})`,
+          values: productIds,
+        });
+
+        // 4. Delete product images associated with this owner's products
+        await query({
+          query: `DELETE FROM products_image WHERE product_id IN (${placeholders})`,
+          values: productIds,
+        });
+
+        // 5. Delete the products themselves
+        await query({
+          query: `DELETE FROM products WHERE owner_id = ?`,
+          values: [owner_id],
+        });
+      }
+
+      // 6. Unlink the customer from the owner profile before deletion
+      await query({
+        query: 'UPDATE customer SET owner_id = NULL WHERE owner_id = ?',
+        values: [owner_id],
+      });
+
+      // 7. Delete owner profile
+      await query({
+        query: 'DELETE FROM rental_owner WHERE owner_id = ?',
+        values: [owner_id],
+      });
+    }
+
+    // 8. Delete the customer account
+    await query({
+      query: 'DELETE FROM customer WHERE customer_id = ?',
+      values: [customer_id],
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Customer account and all associated records have been deleted successfully.',
+    });
+  } catch (error) {
+    console.error('Error deleting customer profile:', error);
+    return NextResponse.json(
+      { success: false, error: error.message || 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

@@ -81,7 +81,7 @@ export default function Profile() {
    */
   async function deleteProfile() {
     const confirmDelete = window.confirm(
-      "Are you sure you want to delete your profile? This action cannot be undone."
+      "Are you sure you want to delete your profile? This action cannot be undone. All your personal and business records will be permanently deleted."
     );
     if (!confirmDelete) return;
 
@@ -96,8 +96,9 @@ export default function Profile() {
       const data = await res.json();
       if (data.success) {
         localStorage.removeItem("customer_id");
+        localStorage.removeItem("owner_id");
         alert("Profile deleted successfully");
-        router.push("/login");
+        router.push("/homepage");
       } else {
         alert(data.error || "Delete failed");
       }

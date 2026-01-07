@@ -233,7 +233,65 @@ export async function DELETE(request) {
       );
     }
 
-    // Delete owner profile
+    // Get the customer_id associated with this owner
+    const ownerRows = await query({
+      query: 'SELECT customer_id FROM rental_owner WHERE owner_id = ?',
+      values: [owner_id],
+    });
+
+    const customer_id = ownerRows.length > 0 ? ownerRows[0].customer_id : null;
+
+    // Get all products owned by this owner
+    const products = await query({
+      query: 'SELECT product_id FROM products WHERE owner_id = ?',
+      values: [owner_id],
+    });
+
+    const productIds = products.map(p => p.product_id);
+
+    // Delete business records (cascade deletion in order to avoid foreign key constraints)
+    
+    // 1. Delete payments associated with rentals of this owner's products
+    if (productIds.length > 0) {
+      const placeholders = productIds.map(() => '?').join(',');
+      await query({
+        query: `DELETE FROM payments WHERE rental_id IN 
+                (SELECT rental_id FROM rentals WHERE product_id IN (${placeholders}))`,
+        values: productIds,
+      });
+
+      // 2. Delete reviews associated with this owner's products
+      await query({
+        query: `DELETE FROM reviews WHERE product_id IN (${placeholders})`,
+        values: productIds,
+      });
+
+      // 3. Delete rentals associated with this owner's products
+      await query({
+        query: `DELETE FROM rentals WHERE product_id IN (${placeholders})`,
+        values: productIds,
+      });
+
+      // 4. Delete product images associated with this owner's products
+      await query({
+        query: `DELETE FROM products_image WHERE product_id IN (${placeholders})`,
+        values: productIds,
+      });
+
+      // 5. Delete the products themselves
+      await query({
+        query: `DELETE FROM products WHERE owner_id = ?`,
+        values: [owner_id],
+      });
+    }
+
+    // 6. Unlink the customer account from the owner profile before deletion
+    await query({
+      query: 'UPDATE customer SET owner_id = NULL WHERE owner_id = ?',
+      values: [owner_id],
+    });
+
+    // 7. Delete owner profile (but NOT the customer account)
     await query({
       query: 'DELETE FROM rental_owner WHERE owner_id = ?',
       values: [owner_id],
@@ -241,7 +299,7 @@ export async function DELETE(request) {
 
     return NextResponse.json({
       success: true,
-      message: 'Profile deleted successfully',
+      message: 'Owner profile and all associated business records deleted successfully. Personal account has been preserved.',
     });
   } catch (error) {
     console.error('Error deleting owner profile:', error);
