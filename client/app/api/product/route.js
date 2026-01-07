@@ -59,6 +59,23 @@ export async function GET(request) {
 
     prod.reviews = reviews;
 
+    // fetch rentals for this product to show booked dates
+    const rentalRows = await query({
+      query: `SELECT rental_id, start_date, end_date
+              FROM rentals
+              WHERE product_id = ? AND status IN ('To ship', 'Shipped', 'Completed')
+              ORDER BY start_date ASC`,
+      values: [product_id],
+    });
+
+    const rentals = (rentalRows || []).map((r) => ({
+      rental_id: r.rental_id,
+      start_date: r.start_date,
+      end_date: r.end_date,
+    }));
+
+    prod.rentals = rentals;
+
     return NextResponse.json({ success: true, product: prod });
   } catch (err) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

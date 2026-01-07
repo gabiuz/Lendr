@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Booking({ 
   isOpen = false, 
@@ -22,6 +22,43 @@ export default function Booking({
   const [deliveryOption, setDeliveryOption] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [bookedDates, setBookedDates] = useState([]);
+
+  // Fetch booked dates when modal opens
+  useEffect(() => {
+    if (isOpen && productId) {
+      fetchBookedDates();
+    }
+  }, [isOpen, productId]);
+
+  const fetchBookedDates = async () => {
+    try {
+      const res = await fetch(`/api/product?product_id=${productId}`);
+      const data = await res.json();
+      
+      if (data.success && data.product && data.product.rentals) {
+        // Create an array of booked dates
+        const booked = [];
+        data.product.rentals.forEach(rental => {
+          const startDate = new Date(rental.start_date);
+          const endDate = new Date(rental.end_date);
+          
+          // Add all dates between start and end (inclusive)
+          for (let d = new Date(startDate); d <= endDate; d = new Date(d.getTime() + 86400000)) {
+            booked.push(d.toDateString());
+          }
+        });
+        setBookedDates(booked);
+      }
+    } catch (error) {
+      console.error('Error fetching booked dates:', error);
+    }
+  };
+
+  // Check if date is booked
+  const isDateBooked = (date) => {
+    return bookedDates.includes(date.toDateString());
+  };
 
   // Get current month and next month based on offset
   const today = new Date();
@@ -58,8 +95,21 @@ export default function Booking({
       // Start new selection
       setSelectedDates({ start: date, end: null });
     } else if (date > selectedDates.start) {
-      // Set end date
-      setSelectedDates({ ...selectedDates, end: date });
+      // Check if any date in the range is booked
+      let hasBookedDate = false;
+      for (let d = new Date(selectedDates.start); d <= date; d = new Date(d.getTime() + 86400000)) {
+        if (isDateBooked(d)) {
+          hasBookedDate = true;
+          break;
+        }
+      }
+      
+      if (!hasBookedDate) {
+        // Set end date only if no booked dates in range
+        setSelectedDates({ ...selectedDates, end: date });
+      } else {
+        alert('Cannot book this range - some dates are already booked by other customers.');
+      }
     } else {
       // If clicking before start date, reset
       setSelectedDates({ start: date, end: null });
@@ -101,25 +151,25 @@ export default function Booking({
       const isToday = date.toDateString() === today.toDateString();
       const isPast =
         date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const isBooked = isDateBooked(date);
       const inRange = isDateInRange(date);
       const isStart = isStartDate(date);
       const isEnd = isEndDate(date);
+      const isDisabled = isPast || isBooked;
 
       days.push(
         <button
           key={day}
-          onClick={() => !isPast && handleDateClick(date)}
-          disabled={isPast}
+          onClick={() => !isDisabled && handleDateClick(date)}
+          disabled={isDisabled}
           className={`h-8 md:h-5 lg:h-8 px-2 md:px-1 lg:px-3 py-2 md:py-1 lg:py-3 flex items-center justify-center rounded-lg text-sm md:text-[9px] lg:text-sm font-normal transition-all
-            ${
-              isPast
-                ? "text-gray-300 cursor-not-allowed"
-                : "cursor-pointer hover:bg-red-100"
-            }
-            ${isToday && !inRange ? "border border-red-600" : ""}
-            ${inRange ? "bg-red-600 text-white" : "text-gray-800"}
-            ${isStart || isEnd ? "bg-red-700 font-bold" : ""}
+            ${isToday && !inRange && !isDisabled ? "border border-red-600" : ""}
+            ${inRange && !isDisabled ? "bg-red-600 text-white" : ""}
+            ${isStart && !isDisabled ? "bg-red-700 font-bold" : ""}
+            ${isEnd && !isDisabled ? "bg-red-700 font-bold" : ""}
+            ${isDisabled ? "bg-gray-100 text-gray-300 cursor-not-allowed" : "text-gray-800 cursor-pointer hover:bg-red-100"}
           `}
+          title={isBooked ? "Date already booked" : isPast ? "Past date" : ""}
         >
           {day}
         </button>
@@ -253,28 +303,6 @@ export default function Booking({
                           )}
                         </p>
                       )}
-                      {/* Action Buttons */}
-                      <button
-                        onClick={onClose}
-                        className="cursor-pointer px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-colors"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={() => {
-                          // Handle apply/booking logic here
-                          console.log("Selected dates:", selectedDates);
-                          onClose();
-                        }}
-                        disabled={!selectedDates.start || !selectedDates.end}
-                        className={`cursor-pointer px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                          selectedDates.start && selectedDates.end
-                            ? "bg-red-600 hover:bg-red-700 text-white hover:shadow-md"
-                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        }`}
-                      >
-                        Apply
-                      </button>
                     </div>
                   </div>
                 </div>
