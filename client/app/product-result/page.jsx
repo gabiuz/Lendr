@@ -133,6 +133,10 @@ export default function ProductResult() {
         <div className="productCard-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-[150px]">
           {loading ? (
             <p>Loading...</p>
+          ) : products.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-600">No products found. Only products added by owners are displayed here.</p>
+            </div>
           ) : (
             products.map((p) => <ProductCard key={p.product_id} product={p} showButton={true} />)
           )}

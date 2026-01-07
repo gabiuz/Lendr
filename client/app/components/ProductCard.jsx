@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -23,10 +22,8 @@ export default function ProductCard({ product = null, showButton = false }) {
   return (
     <>
       <div className="cursor-pointer hover:shadow-2xl transition-shadow rounded-xl outline outline-offset-1 outline-zinc-300 flex flex-col justify-start items-start w-full h-full">
-        <div className="w-full h-64 relative rounded-tl-xl rounded-tr-xl overflow-hidden bg-gray-200 flex items-center justify-center">
-          <Image
-            width={519}
-            height={327}
+          <div className="w-full h-64 relative rounded-tl-xl rounded-tr-xl overflow-hidden bg-gray-200 flex items-center justify-center">
+          <img
             className="w-full h-full object-cover"
             src={
               product
@@ -57,7 +54,7 @@ export default function ProductCard({ product = null, showButton = false }) {
             {product ? product.description : 'Description of Product - Placeholders'}
           </div>
           <div className="inline-flex justify-start items-center gap-3.5 mt-auto">
-            <Image
+            <img
               width={54}
               height={54}
               className="rounded-full w-14 h-14 object-cover flex-shrink-0"

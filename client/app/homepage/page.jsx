@@ -231,14 +231,9 @@ export default function Homepage() {
             <ProductCard key={product.product_id} product={product} showButton={true} />
           ))
         ) : (
-          <>
-            <ProductCard></ProductCard>
-            <ProductCard></ProductCard>
-            <ProductCard></ProductCard>
-            <ProductCard></ProductCard>
-            <ProductCard></ProductCard>
-            <ProductCard></ProductCard>
-          </>
+          <div className="col-span-full text-center py-12">
+            <p className="text-gray-600">No products available yet. Check back later or add your own listing.</p>
+          </div>
         )}
       </div>
       <div className="info-card-container flex flex-col lg:flex-row bg-zinc-800 justify-center items-center gap-8 md:gap-12 lg:gap-36 px-4 md:px-8 lg:px-20 xl:px-36 py-10 md:py-12 lg:py-14">

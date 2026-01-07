@@ -1,4 +1,3 @@
-import Image from "next/image";
 
 export default function Review({ reviews = [] }) {
     return (
@@ -12,7 +11,7 @@ export default function Review({ reviews = [] }) {
                         <div key={r.review_id} className="p-3 bg-white rounded-lg border border-zinc-300 flex flex-col gap-2">
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-2.5">
-                                    <Image width={40} height={40} className="w-10 h-10 rounded-full" src={r.customer?.avatar || '/pictures/sample-pfp-productCard.png'} alt={r.customer?.name || 'Reviewer'} />
+                                    <img width={40} height={40} className="w-10 h-10 rounded-full" src={r.customer?.avatar || '/pictures/sample-pfp-productCard.png'} alt={r.customer?.name || 'Reviewer'} />
                                     <div className="flex flex-col">
                                         <div className="text-black text-base font-semibold">{r.customer?.name || 'Anonymous'}</div>
                                         <div className="text-zinc-600 text-xs">{r.created_at}</div>

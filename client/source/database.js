@@ -17,7 +17,7 @@ function getPool() {
     pool = mysql.createPool({
       host: "localhost",
       user: "root",
-      password: "!", // Add your own password here
+      password: "Den100105!", // Add your own password here
       database: "lendr",
       waitForConnections: true,
       connectionLimit: 10,

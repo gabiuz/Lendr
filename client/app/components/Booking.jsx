@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 
 export default function Booking({ 
@@ -215,7 +214,7 @@ export default function Booking({
                     <h3 className="text-xl md:text-base lg:text-3xl xl:text-4xl font-bold mb-1 md:mb-0">{productName}</h3>
                   </div>
                   <div className="inline-flex justify-start items-center gap-2 mb-2 md:gap-1 md:mb-1 lg:mb-4">
-                    <Image
+                    <img
                       width={32}
                       height={32}
                       className="rounded-full md:w-6 md:h-6"

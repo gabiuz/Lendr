@@ -1,6 +1,5 @@
 "use client";
-import { useState } from "react";
-import Image from "next/image";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 
 export default function AddProduct() {
@@ -14,6 +13,23 @@ export default function AddProduct() {
 
   const [images, setImages] = useState(new Array(5).fill(null));
   const [mainImage, setMainImage] = useState(null);
+  const [mainImageUrl, setMainImageUrl] = useState(null);
+  const [thumbnailUrls, setThumbnailUrls] = useState(new Array(5).fill(null));
+
+  useEffect(() => {
+    if (mainImage) {
+      const url = URL.createObjectURL(mainImage);
+      setMainImageUrl(url);
+      return () => URL.revokeObjectURL(url);
+    }
+    setMainImageUrl(null);
+  }, [mainImage]);
+
+  useEffect(() => {
+    const urls = images.map((img) => (img ? URL.createObjectURL(img) : null));
+    setThumbnailUrls(urls);
+    return () => urls.forEach((url) => url && URL.revokeObjectURL(url));
+  }, [images]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -333,12 +349,11 @@ export default function AddProduct() {
                   className="block w-full aspect-square bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-red-500 transition-colors overflow-hidden"
                 >
                   {mainImage ? (
-                    <div className="relative w-full h-full">
-                      <Image
-                        src={URL.createObjectURL(mainImage)}
+                    <div className="w-full h-full">
+                      <img
+                        src={mainImageUrl}
                         alt="Product"
-                        fill
-                        className="object-cover"
+                        className="w-full h-full object-cover"
                       />
                     </div>
                   ) : (
@@ -389,11 +404,10 @@ export default function AddProduct() {
                   >
                     {images[index] ? (
                       <div className="w-full h-full">
-                        <Image
-                          src={URL.createObjectURL(images[index])}
+                        <img
+                          src={thumbnailUrls[index]}
                           alt={`thumb-${index}`}
-                          fill
-                          className="object-cover"
+                          className="w-full h-full object-cover"
                         />
                       </div>
                     ) : (

@@ -45,6 +45,30 @@ export default function OwnerProfile() {
         const statsResult = await statsRes.json();
         if (statsResult.success) {
           setProfileStats(statsResult.stats);
+        } else {
+          // Fallback: fetch products and rentals separately if stats API fails
+          try {
+            const prodsRes = await fetch(`/api/products?owner_id=${owner_id}`);
+            const prodsJson = await prodsRes.json();
+            const prods = prodsJson.success ? (prodsJson.products || []) : [];
+
+            const rentalsRes = await fetch(`/api/owner-rentals?owner_id=${owner_id}`);
+            const rentalsJson = await rentalsRes.json();
+            const rentals = rentalsJson.success ? (rentalsJson.rentals || []) : [];
+
+            setProfileStats({
+              products: prods.length,
+              activeRentals: rentals.length,
+              topEarningProduct: { name: 'No data', earnings: 0 },
+              currentMonthRevenue: 0,
+              monthlyRevenue: Array(12).fill(0),
+              mostRentedCategory: { name: 'N/A', count: 0 },
+              categoryBreakdown: [],
+              customerRating: null,
+            });
+          } catch (e) {
+            console.error('Fallback stats fetch failed:', e);
+          }
         }
       } catch (error) {
         console.error('Error fetching owner data:', error);

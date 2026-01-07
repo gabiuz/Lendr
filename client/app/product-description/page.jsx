@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Navbar from "../components/Navbar";
-import Image from "next/image";
 import Footer from "../components/Footer";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
@@ -154,7 +153,7 @@ export default function ProductDescription() {
             <p>{product ? product.description : 'Product details will appear here.'}</p>
           </div>
           <div className="owner-container flex items-center gap-3.5">
-            <Image
+            <img
               src={product && product.owner_avatar ? product.owner_avatar : '/pictures/sample-pfp-productCard.png'}
               alt="Owner-profile-picture"
               width={54}
@@ -496,9 +495,7 @@ export default function ProductDescription() {
         <div className="flex flex-col gap-6">
           <div className="image-gallery-container flex flex-col gap-4">
             <div className="main-image-container rounded-xl overflow-hidden">
-              <Image
-                width={791}
-                height={677}
+              <img
                 alt="product image"
                 src={selectedImage}
                 className="w-full object-cover transition-opacity duration-300"
@@ -515,9 +512,7 @@ export default function ProductDescription() {
                       : "border-gray-300 hover:border-red-500 hover:shadow-md"
                   }`}
                 >
-                  <Image
-                    width={150}
-                    height={128}
+                  <img
                     alt={`thumbnail ${index + 1}`}
                     src={image}
                     className="w-full h-full object-cover"
