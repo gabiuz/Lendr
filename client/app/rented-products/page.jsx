@@ -224,7 +224,7 @@ export default function RentedProduct() {
                   <div className="lg:col-span-2">
                     <div className="flex flex-col md:flex-row gap-4">
                       {/* Product Image */}
-                      <div className="w-full md:w-48 h-48 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                      <div className="w-full md:w-48 h-48 rounded-lg overflow-hidden bg-gray-100 shrink-0">
                         <img
                           src={rental.image_path}
                           alt={rental.product_name}

@@ -10,6 +10,7 @@ export default function Navbar({
   links = [
     { href: "/homepage", label: "Home" },
     { href: "#browse", label: "Browse Rentals" },
+    { href: "/rented-products", label: "My Rentals" },
     { href: "#categories", label: "Categories" },
     { href: "/homepage#aboutUs", label: "About Us" },
   ],
