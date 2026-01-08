@@ -166,7 +166,7 @@ export default function Homepage() {
       <Navbar />
 
       <header
-        className="min-h-[650px] md:min-h-[600px] xl:min-h-[750px] bg-[url('/homepage-bg-image.jpg')] bg-opacity bg-cover bg-center"
+        className="min-h-[650px] md:min-h-[600px] xl:min-h-[750px] bg-[url('/Hero.png')] bg-opacity bg-cover bg-center"
         id="home"
       >
         <div className="flex flex-col items-center gap-4 md:gap-6 pt-24 md:pt-40 text-center px-4">
