@@ -21,7 +21,7 @@ export default function Footer() {
         <div className="footer-links w-full lg:w-auto">
           <ul className="flex flex-col gap-2 md:gap-2.5 lg:gap-3">
             <li>
-              <span className="text-red-800 text-sm md:text-15 lg:text-base font-bold">
+              <span className="whitespace-nowrap text-red-800 text-sm md:text-15 lg:text-base font-bold">
                 Quick Links
               </span>
             </li>
