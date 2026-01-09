@@ -195,14 +195,8 @@ export default function RentedProduct() {
               No Rentals Yet
             </h2>
             <p className="text-gray-600 mb-6">
-              You haven't rented any products yet. Start exploring!
+              You haven't rented any products yet.
             </p>
-            <button
-              onClick={() => router.push("/browse-rentals")}
-              className="px-6 py-3 bg-red text-white rounded-lg hover:bg-red-700 font-semibold transition-colors"
-            >
-              Browse Products
-            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6">

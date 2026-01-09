@@ -65,8 +65,12 @@ export default function ProductResult() {
         const data = await res.json();
         if (data.success) {
           let results = data.products || [];
+          // Exclude products that belong to the logged-in owner's business (if any)
+          const ownerId = typeof window !== 'undefined' ? localStorage.getItem('owner_id') : null;
+          if (ownerId) {
+            results = results.filter(p => String(p.owner_id) !== String(ownerId));
+          }
           // If category parameter is absent or present, show results but cap display to 15 maximum
-          // (treat empty string as All Items). The homepage preview (6 items) remains handled on the homepage.
           if (results.length > 15) {
             results = results.slice(0, 15);
           }

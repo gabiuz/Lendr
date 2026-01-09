@@ -31,9 +31,6 @@ const ProductCard = ({ product }) => (
           <span className="text-xl font-bold text-black">{product.price}</span>
           <span className="text-sm text-gray-500">{product.priceUnit}</span>
         </div>
-        <button className="text-red-600 font-medium text-sm hover:text-red-700">
-          {product.status}
-        </button>
       </div>
     </div>
   </div>

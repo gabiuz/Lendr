@@ -213,14 +213,22 @@ export default function OwnerBooking() {
                         ₱{booking.total_amount}
                       </td>
                       <td className="px-4 py-4 text-center">
-                        <span className={`text-xs md:text-sm font-semibold px-3 py-1 rounded-full ${
-                          booking.availability_status === 'Available' ? 'bg-green-100 text-green-800' :
-                          booking.availability_status === 'Rented' ? 'bg-blue-100 text-blue-800' :
-                          booking.availability_status === 'Reserved' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {booking.availability_status}
-                        </span>
+                        {(() => {
+                          const startDate = new Date(booking.start_date);
+                          const today = new Date();
+                          const isReserved = startDate > today;
+                          const status = isReserved ? 'Reserved' : booking.availability_status;
+                          return (
+                            <span className={`text-xs md:text-sm font-semibold px-3 py-1 rounded-full ${
+                              status === 'Available' ? 'bg-green-100 text-green-800' :
+                              status === 'Rented' ? 'bg-blue-100 text-blue-800' :
+                              status === 'Reserved' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-red-100 text-red-800'
+                            }`}>
+                              {status}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td className="px-4 py-4 flex items-center justify-center gap-2">
 

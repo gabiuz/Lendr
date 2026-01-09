@@ -101,22 +101,36 @@ export default function Homepage() {
 
           // Fetch products based on user's city if available
           if (userCity) {
-            const searchRes = await fetch(`/api/search?location=${encodeURIComponent(userCity)}`);
-            const searchData = await searchRes.json();
+              const searchRes = await fetch(`/api/search?location=${encodeURIComponent(userCity)}`);
+              const searchData = await searchRes.json();
 
-            if (searchData.success && searchData.products && searchData.products.length > 0) {
-              setNearbyProducts(searchData.products.slice(0, 6));
-              return;
+              if (searchData.success && searchData.products && searchData.products.length > 0) {
+                const ownerId = typeof window !== 'undefined' ? localStorage.getItem('owner_id') : null;
+                const filtered = ownerId
+                  ? searchData.products.filter(p => String(p.owner_id) !== String(ownerId))
+                  : searchData.products;
+
+                if (filtered.length > 0) {
+                  setNearbyProducts(filtered.slice(0, 6));
+                  return;
+                }
+              }
             }
-          }
         }
 
         // If not logged in or no city/products found, fetch top-rented products
         const topRes = await fetch('/api/top-rented');
         const topData = await topRes.json();
         if (topData.success && topData.products) {
-          setNearbyProducts(topData.products.slice(0, 6));
-          return;
+          const ownerId = typeof window !== 'undefined' ? localStorage.getItem('owner_id') : null;
+          const filteredTop = ownerId
+            ? topData.products.filter(p => String(p.owner_id) !== String(ownerId))
+            : topData.products;
+
+          if (filteredTop.length > 0) {
+            setNearbyProducts(filteredTop.slice(0, 6));
+            return;
+          }
         }
 
         // Last fallback: fetch 6 most recent products
@@ -124,7 +138,12 @@ export default function Homepage() {
         const searchData = await searchRes.json();
 
         if (searchData.success && searchData.products) {
-          setNearbyProducts(searchData.products.slice(0, 6));
+          const ownerId = typeof window !== 'undefined' ? localStorage.getItem('owner_id') : null;
+          const filteredAll = ownerId
+            ? searchData.products.filter(p => String(p.owner_id) !== String(ownerId))
+            : searchData.products;
+
+          setNearbyProducts(filteredAll.slice(0, 6));
         }
       } catch (error) {
         console.error('Error fetching products for browse:', error);
