@@ -9,7 +9,7 @@ export default function OwnerBooking() {
   const [bookings, setBookings] = useState([]);
   const [filteredBookings, setFilteredBookings] = useState([]);
 
-  const filters = ["All", "Available", "Rented", "Reserved", "Unavailable", "Completed"];
+  const filters = ["All", "Available", "Rented", "Reserved", "Unavailable"];
 
   // fetchBookings is used on mount and after state changes
   async function fetchBookings() {
@@ -43,36 +43,10 @@ export default function OwnerBooking() {
   useEffect(() => {
     if (activeFilter === 'All') {
       setFilteredBookings(bookings);
-    } else if (activeFilter === 'Completed') {
-      setFilteredBookings(bookings.filter(b => (b.rental_status === 'Completed' || b.status === 'Completed')));
     } else {
       setFilteredBookings(bookings.filter(b => b.availability_status === activeFilter));
     }
   }, [activeFilter, bookings]);
-
-  async function markCompleted(rentalId, productId) {
-    const confirmComplete = window.confirm('Mark this transaction as completed? This will set the rental status to Completed and mark the product Available.');
-    if (!confirmComplete) return;
-
-    try {
-      const ownerId = typeof window !== 'undefined' ? localStorage.getItem('owner_id') : null;
-      const res = await fetch('/api/mark-rental-completed', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rental_id: rentalId, product_id: productId, owner_id: ownerId })
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert('Transaction marked as Completed');
-        fetchBookings();
-      } else {
-        alert(data.error || 'Failed to mark completed');
-      }
-    } catch (err) {
-      console.error('Error marking completed:', err);
-      alert('Error marking completed');
-    }
-  }
 
   return (
     <div className="min-h-screen bg-white">
