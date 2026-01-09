@@ -8,6 +8,7 @@ export default function OwnerBooking() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [bookings, setBookings] = useState([]);
   const [filteredBookings, setFilteredBookings] = useState([]);
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   const filters = ["All", "Available", "Rented", "Reserved", "Unavailable"];
 
@@ -48,6 +49,23 @@ export default function OwnerBooking() {
     }
   }, [activeFilter, bookings]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (openDropdown && !event.target.closest('.dropdown-container')) {
+        setOpenDropdown(null);
+      }
+    };
+
+    if (openDropdown) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [openDropdown]);
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar
@@ -56,7 +74,6 @@ export default function OwnerBooking() {
           { href: "/browse-rentals", label: "Browse Rentals" },
           { href: "/owner-booking", label: "Bookings" },
           { href: "/owner-payments", label: "Payments" },
-          { href: "/about-us", label: "About Us" },
         ]}
         showOwnerButton={false}
         profileInCircle={true}
@@ -230,18 +247,190 @@ export default function OwnerBooking() {
                           );
                         })()}
                       </td>
-                      <td className="px-4 py-4 flex items-center justify-center gap-2">
+                      <td className="px-4 py-4 relative dropdown-container">
+                        <div className="flex items-center justify-center">
+                          <button 
+                            onClick={() => setOpenDropdown(openDropdown === booking.rental_id ? null : booking.rental_id)}
+                            className="text-red-600 hover:text-red-700 mx-auto block"
+                          >
+                            <Image
+                              src="/icons/owner-booking/caret-down-duotone-light-full 1.svg"
+                              alt="Action"
+                              width={20}
+                              height={20}
+                              className="w-5 h-5"
+                            />
+                          </button>
+                        </div>
 
+                        {/* Dropdown Menu */}
+                        {openDropdown === booking.rental_id && (
+                          <div className="absolute right-4 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 min-w-[280px]">
+                            {/* For Pending Status - Show Approve/Decline */}
+                            {booking.availability_status === 'Reserved' && (
+                              <div className="p-6">
+                                <div className="space-y-4">
+                                  <div className="grid grid-cols-3 gap-3 text-xs text-gray-700 border-b pb-4">
+                                    <div>
+                                      <div className="font-medium text-gray-500">Oct 10, 2025</div>
+                                      <div className="font-semibold">₱600</div>
+                                    </div>
+                                    <div>
+                                      <div className="font-medium text-gray-500">Oct 11, 2025</div>
+                                      <div className="font-semibold">₱600</div>
+                                    </div>
+                                    <div>
+                                      <div className="font-medium text-gray-500">Oct 12, 2025</div>
+                                      <div className="font-semibold">₱600</div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="flex justify-between text-sm border-b pb-3">
+                                    <span className="text-gray-600">Sub Total</span>
+                                    <span className="font-semibold">₱1,800</span>
+                                  </div>
+                                  
+                                  <div className="flex justify-between text-sm border-b pb-3">
+                                    <span className="text-gray-600">Delivery Fee</span>
+                                    <span className="font-semibold text-green-600">Free</span>
+                                  </div>
+                                  
+                                  <div className="flex justify-between text-base font-bold">
+                                    <span>Total</span>
+                                    <span className="text-blue-600">₱1,800</span>
+                                  </div>
+                                  
+                                  <div className="flex gap-3 pt-2">
+                                    <button className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+                                      Decline
+                                    </button>
+                                    <button className="flex-1 px-4 py-2 text-sm font-medium text-white bg-gray-300 rounded-md cursor-not-allowed">
+                                      Approve
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
 
-                        <button className="text-red-600 hover:text-red-700 mx-auto block">
-                          <Image
-                            src="/icons/owner-booking/caret-down-duotone-light-full 1.svg"
-                            alt="Action"
-                            width={20}
-                            height={20}
-                            className="w-5 h-5"
-                          />
-                        </button>
+                            {/* For Ongoing Status - Show Status Tracker with some completed */}
+                            {booking.availability_status === 'Rented' && (
+                              <div className="p-6">
+                                <div className="space-y-4">
+                                  {/* Status Tracker */}
+                                  <div className="relative pl-8">
+                                    {/* Shipping - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Shipping</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Out for Delivery - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Out for Delivery</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Delivered - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-gray-300"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Delivered</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Return Shipped - Pending */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-white border-4 border-gray-300 shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-gray-300"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Return Shipped</div>
+                                        <div className="text-xs text-gray-400 font-medium">Pending</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Return Received - Pending */}
+                                    <div className="relative">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-white border-4 border-gray-300 shadow-md"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Return Received</div>
+                                        <div className="text-xs text-gray-400 font-medium">Pending</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* For Available/Completed Status - Show All Completed */}
+                            {(booking.availability_status === 'Available' || booking.availability_status === 'Unavailable') && (
+                              <div className="p-6">
+                                <div className="space-y-4">
+                                  {/* Status Tracker - All Completed */}
+                                  <div className="relative pl-8">
+                                    {/* Shipping - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Shipping</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Out for Delivery - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Out for Delivery</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Delivered - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Delivered</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Return Shipped - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Return Shipped</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Return Received - Completed */}
+                                    <div className="relative">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Return Received</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))
