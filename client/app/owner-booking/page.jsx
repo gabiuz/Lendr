@@ -9,42 +9,70 @@ export default function OwnerBooking() {
   const [bookings, setBookings] = useState([]);
   const [filteredBookings, setFilteredBookings] = useState([]);
 
-  const filters = ["All", "Available", "Rented", "Reserved", "Unavailable"];
+  const filters = ["All", "Available", "Rented", "Reserved", "Unavailable", "Completed"];
 
-  useEffect(() => {
-    async function fetchBookings() {
+  // fetchBookings is used on mount and after state changes
+  async function fetchBookings() {
+    try {
+      const ownerId = typeof window !== 'undefined' ? localStorage.getItem('owner_id') : null;
+      if (!ownerId) return;
+
+      const res = await fetch(`/api/owner-bookings?owner_id=${ownerId}`);
       try {
-        const ownerId = typeof window !== 'undefined' ? localStorage.getItem('owner_id') : null;
-        if (!ownerId) return;
-
-        const res = await fetch(`/api/owner-bookings?owner_id=${ownerId}`);
-        try {
-          const ct = res.headers.get("content-type") || "";
-          if (res.ok && ct.includes("application/json")) {
-            const data = await res.json();
-            if (data.success) setBookings(data.bookings);
-            else console.error("API returned success=false for owner-bookings", data);
-          } else {
-            const text = await res.text();
-            console.error("Unexpected API response for /api/owner-bookings:", res.status, text);
-          }
-        } catch (err) {
-          console.error('Failed to parse /api/owner-bookings response:', err);
+        const ct = res.headers.get("content-type") || "";
+        if (res.ok && ct.includes("application/json")) {
+          const data = await res.json();
+          if (data.success) setBookings(data.bookings);
+          else console.error("API returned success=false for owner-bookings", data);
+        } else {
+          const text = await res.text();
+          console.error("Unexpected API response for /api/owner-bookings:", res.status, text);
         }
       } catch (err) {
-        console.error('Failed to load bookings:', err);
+        console.error('Failed to parse /api/owner-bookings response:', err);
       }
+    } catch (err) {
+      console.error('Failed to load bookings:', err);
     }
+  }
+
+  useEffect(() => {
     fetchBookings();
   }, []);
 
   useEffect(() => {
     if (activeFilter === 'All') {
       setFilteredBookings(bookings);
+    } else if (activeFilter === 'Completed') {
+      setFilteredBookings(bookings.filter(b => (b.rental_status === 'Completed' || b.status === 'Completed')));
     } else {
       setFilteredBookings(bookings.filter(b => b.availability_status === activeFilter));
     }
   }, [activeFilter, bookings]);
+
+  async function markCompleted(rentalId, productId) {
+    const confirmComplete = window.confirm('Mark this transaction as completed? This will set the rental status to Completed and mark the product Available.');
+    if (!confirmComplete) return;
+
+    try {
+      const ownerId = typeof window !== 'undefined' ? localStorage.getItem('owner_id') : null;
+      const res = await fetch('/api/mark-rental-completed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rental_id: rentalId, product_id: productId, owner_id: ownerId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Transaction marked as Completed');
+        fetchBookings();
+      } else {
+        alert(data.error || 'Failed to mark completed');
+      }
+    } catch (err) {
+      console.error('Error marking completed:', err);
+      alert('Error marking completed');
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -220,7 +248,9 @@ export default function OwnerBooking() {
                           {booking.availability_status}
                         </span>
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-4 flex items-center justify-center gap-2">
+
+
                         <button className="text-red-600 hover:text-red-700 mx-auto block">
                           <Image
                             src="/icons/owner-booking/caret-down-duotone-light-full 1.svg"

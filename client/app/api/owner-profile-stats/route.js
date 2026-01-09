@@ -107,11 +107,35 @@ export async function GET(request) {
       values: [owner_id],
     });
 
+    // Monthly ratings (all months, current year)
+    const monthlyRatingsRows = await query({
+      query: `
+        SELECT 
+          MONTH(rv.created_at) AS month,
+          AVG(rv.rating) AS avg_rating
+        FROM reviews rv
+        JOIN products p ON rv.product_id = p.product_id
+        WHERE p.owner_id = ? AND YEAR(rv.created_at) = YEAR(NOW())
+        GROUP BY MONTH(rv.created_at)
+        ORDER BY month ASC
+      `,
+      values: [owner_id],
+    });
+
     // Build monthly revenue array (12 months)
     const monthlyRevenue = Array(12).fill(0);
     monthlyRevenueRows.forEach(row => {
       monthlyRevenue[row.month - 1] = Number(row.total || 0);
     });
+
+    // Build monthly ratings array (12 months)
+    const monthlyRatings = Array(12).fill(null);
+    monthlyRatingsRows.forEach(row => {
+      monthlyRatings[row.month - 1] = Number(Number(row.avg_rating || 0).toFixed(1));
+    });
+
+    // Filter out null values and keep only months with data, or fill with 0s if we want all 12 months
+    const monthlyRatingsForChart = monthlyRatings.map(rating => rating !== null ? rating : 0);
 
     const profileStats = {
       products: Number(productsCountRows[0]?.count ?? 0),
@@ -136,6 +160,7 @@ export async function GET(request) {
       customerRating: ratingRows[0]?.avg_rating 
         ? Number(Number(ratingRows[0].avg_rating).toFixed(1)) 
         : null,
+      monthlyRatings: monthlyRatingsForChart,
     };
 
     return NextResponse.json({ success: true, stats: profileStats });

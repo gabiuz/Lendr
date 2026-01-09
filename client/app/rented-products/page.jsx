@@ -18,55 +18,21 @@ export default function RentedProduct() {
     const id = typeof window !== "undefined" ? localStorage.getItem("customer_id") : null;
     setCustomerId(id);
     
-    // Mock data for demonstration (replace with API call later)
     if (id) {
-      setRentals([
-        {
-          rental_id: 1,
-          product_id: 101,
-          product_name: "Canon EOS 90D Camera",
-          category_type: "Photography",
-          product_rate: 950,
-          image_path: "/pictures/product_card_photo.png",
-          rental_start: "2026-01-01",
-          rental_end: "2026-01-05",
-          status: "completed",
-          total_cost: 4750,
-          business_name: "Pro Camera Rentals",
-          business_address: "Makati City, Metro Manila",
-          owner_avatar: "/pictures/sample-pfp-productCard.png",
-        },
-        {
-          rental_id: 2,
-          product_id: 102,
-          product_name: "DJI Mavic Air 2 Drone",
-          category_type: "Drones",
-          product_rate: 1500,
-          image_path: "/pictures/product_card_photo.png",
-          rental_start: "2026-01-06",
-          rental_end: "2026-01-10",
-          status: "active",
-          total_cost: 7500,
-          business_name: "Sky View Rentals",
-          business_address: "Quezon City, Metro Manila",
-          owner_avatar: "/pictures/sample-pfp-productCard.png",
-        },
-        {
-          rental_id: 3,
-          product_id: 103,
-          product_name: "Sony A7 III Mirrorless Camera",
-          category_type: "Photography",
-          product_rate: 1200,
-          image_path: "/pictures/product_card_photo.png",
-          rental_start: "2025-12-20",
-          rental_end: "2025-12-25",
-          status: "completed",
-          total_cost: 7200,
-          business_name: "Elite Photography Gear",
-          business_address: "Pasig City, Metro Manila",
-          owner_avatar: "/pictures/sample-pfp-productCard.png",
-        },
-      ]);
+      async function fetchRentals() {
+        try {
+          const res = await fetch(`/api/customer-rentals?customer_id=${id}`);
+          const data = await res.json();
+          if (data.success) {
+            setRentals(data.rentals || []);
+          } else {
+            console.error("Error fetching rentals:", data.message);
+          }
+        } catch (error) {
+          console.error("Failed to fetch rentals:", error);
+        }
+      }
+      fetchRentals();
     }
   }, []);
 
@@ -78,7 +44,7 @@ export default function RentedProduct() {
     setReviews({ ...reviews, [rentalId]: value });
   };
 
-  const handleSubmitRating = (rentalId) => {
+  const handleSubmitRating = async (rentalId) => {
     const rating = ratings[rentalId];
     const review = reviews[rentalId];
 
@@ -87,26 +53,55 @@ export default function RentedProduct() {
       return;
     }
 
-    // Mock submission (replace with API call later)
-    console.log("Submitting rating:", { rentalId, rating, review });
-    setSubmittedRatings({ ...submittedRatings, [rentalId]: true });
-    alert("Thank you for your review! Your rating has been submitted.");
+    const rental = rentals.find(r => r.rental_id === rentalId);
+    if (!rental || !customerId) {
+      alert("Unable to submit review. Missing rental or customer information.");
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/submit-review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: customerId,
+          productId: rental.product_id,
+          rating: rating,
+          comment: review || null
+        })
+      });
+
+      const data = await res.json();
+      
+      if (data.success) {
+        setSubmittedRatings({ ...submittedRatings, [rentalId]: true });
+        alert("Thank you for your review! Your rating has been submitted.");
+      } else {
+        alert("Error submitting review: " + data.message);
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      alert("Failed to submit review. Please try again.");
+    }
   };
 
   const getStatusBadge = (status) => {
     const statusColors = {
-      active: "bg-blue-100 text-blue-800 border-blue-300",
-      completed: "bg-green-100 text-green-800 border-green-300",
-      pending: "bg-yellow-100 text-yellow-800 border-yellow-300",
+      "to ship": "bg-orange-100 text-orange-800 border-orange-300",
+      "shipped": "bg-blue-100 text-blue-800 border-blue-300",
+      "completed": "bg-green-100 text-green-800 border-green-300",
+      "pending": "bg-yellow-100 text-yellow-800 border-yellow-300",
     };
+
+    const lowerStatus = status?.toLowerCase() || "pending";
 
     return (
       <span
         className={`px-3 py-1 rounded-full text-xs font-semibold border ${
-          statusColors[status] || "bg-gray-100 text-gray-800 border-gray-300"
+          statusColors[lowerStatus] || "bg-gray-100 text-gray-800 border-gray-300"
         }`}
       >
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {status}
       </span>
     );
   };
@@ -287,7 +282,7 @@ export default function RentedProduct() {
                         {/* Owner Info */}
                         <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
                           <img
-                            src={rental.owner_avatar}
+                            src={rental.business_profile_picture || "/pictures/sample-pfp-productCard.png"}
                             alt={rental.business_name}
                             className="w-12 h-12 rounded-full object-cover"
                           />
@@ -305,7 +300,7 @@ export default function RentedProduct() {
                   </div>
 
                   {/* Rating Section - Only for Completed Rentals */}
-                  {rental.status === "completed" && (
+                  {rental.status && rental.status.toLowerCase() === "completed" && (
                     <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-gray-200 pt-6 lg:pt-0 lg:pl-6">
                       {submittedRatings[rental.rental_id] ? (
                         <div className="flex flex-col items-center justify-center h-full text-center">

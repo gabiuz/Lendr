@@ -93,7 +93,7 @@ export default function OwnerProfile() {
           { href: "/owner-homepage", label: "Home" },
           { href: "/browse-rentals", label: "Browse Rentals" },
           { href: "/owner-booking", label: "Bookings" },
-          { href: "/payments", label: "Payments" },
+          { href: "/owner-payments", label: "Payments" },
         ]}
         showOwnerButton={false}
         profileInCircle={true}
@@ -402,23 +402,66 @@ export default function OwnerProfile() {
               </div>
             </div>
             <div className="h-48 relative">
-              <svg
-                className="w-full h-full"
-                viewBox="0 0 400 150"
-                preserveAspectRatio="none"
-              >
-                <path
-                  d="M 0 150 L 0 100 Q 50 80, 100 70 T 200 50 T 300 55 L 400 45 L 400 150 Z"
-                  fill="#1e40af"
-                  stroke="none"
-                />
-                <path
-                  d="M 0 100 Q 50 80, 100 70 T 200 50 T 300 55 T 400 45"
-                  fill="none"
-                  stroke="#1e40af"
-                  strokeWidth="2"
-                />
-              </svg>
+              {profileStats?.monthlyRatings && profileStats.monthlyRatings.length > 0 ? (
+                <svg
+                  className="w-full h-full"
+                  viewBox="0 0 400 150"
+                  preserveAspectRatio="none"
+                >
+                  {/* Grid lines */}
+                  {[0, 1, 2, 3, 4, 5].map((i) => (
+                    <line
+                      key={`grid-${i}`}
+                      x1="0"
+                      y1={150 - (150 / 5) * i}
+                      x2="400"
+                      y2={150 - (150 / 5) * i}
+                      stroke="#e5e7eb"
+                      strokeWidth="0.5"
+                    />
+                  ))}
+                  {/* Area under line */}
+                  <path
+                    d={`M 0 150 L ${profileStats.monthlyRatings.map((rating, idx) => {
+                      const x = (idx / (profileStats.monthlyRatings.length - 1 || 1)) * 400;
+                      const y = 150 - (rating / 5) * 150;
+                      return `${x} ${y}`;
+                    }).join(' L ')} L 400 150 Z`}
+                    fill="#1e40af"
+                    fillOpacity="0.2"
+                    stroke="none"
+                  />
+                  {/* Line */}
+                  <path
+                    d={`M ${profileStats.monthlyRatings.map((rating, idx) => {
+                      const x = (idx / (profileStats.monthlyRatings.length - 1 || 1)) * 400;
+                      const y = 150 - (rating / 5) * 150;
+                      return `${x} ${y}`;
+                    }).join(' L ')}`}
+                    fill="none"
+                    stroke="#1e40af"
+                    strokeWidth="2"
+                  />
+                  {/* Data points */}
+                  {profileStats.monthlyRatings.map((rating, idx) => {
+                    const x = (idx / (profileStats.monthlyRatings.length - 1 || 1)) * 400;
+                    const y = 150 - (rating / 5) * 150;
+                    return (
+                      <circle
+                        key={`point-${idx}`}
+                        cx={x}
+                        cy={y}
+                        r="2.5"
+                        fill="#1e40af"
+                      />
+                    );
+                  })}
+                </svg>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gray-50 rounded-lg">
+                  <p className="text-gray-400 text-sm">No rating data available yet</p>
+                </div>
+              )}
             </div>
             <div className="flex justify-between text-xs text-gray-500 mt-2">
               <span>Jan</span>
