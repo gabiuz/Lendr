@@ -109,7 +109,7 @@ export default function OwnerPayments() {
       <div className=" text-gray-700 px-4 md:px-8 lg:px-20 xl:px-36 py-8 md:py-12 lg:mt-24">
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-2 text-sm mb-6">
-          <Link href="/" className="hover:text-gray-700">
+          <Link href="/homepage" className="hover:text-gray-700">
             Home
           </Link>
           <span>›</span>
