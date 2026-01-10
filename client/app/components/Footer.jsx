@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <>
       <footer className="bg-zinc-100 text-stone-950 flex flex-col lg:flex-row px-4 md:px-8 lg:px-20 xl:px-36 py-6 md:py-8 lg:py-10 justify-between items-start gap-8 md:gap-12 lg:gap-16 xl:gap-28">
-        <div className="flex flex-col gap-4 md:gap-6 lg:gap-9 w-full lg:max-w-[368px]">
+        <div className="flex flex-col gap-4 md:gap-6 lg:gap-9 w-full lg:max-w-[368px] justify-center items-center text-center lg:text-start lg:justify-start lg:items-start">
           <Image
             width={2109}
             height={810}
@@ -18,7 +18,7 @@ export default function Footer() {
             RENT
           </p>
         </div>
-        <div className="footer-links w-full lg:w-auto">
+        <div className="footer-links w-full lg:w-auto text-center lg:text-start">
           <ul className="flex flex-col gap-2 md:gap-2.5 lg:gap-3">
             <li>
               <span className="whitespace-nowrap text-red-800 text-sm md:text-15 lg:text-base font-bold">
@@ -39,10 +39,12 @@ export default function Footer() {
             </li>
           </ul>
         </div>
-        <div className="footer-links w-full lg:w-auto">
+        <div className="footer-links w-full lg:w-auto text-center lg:text-start">
           <ul className="flex flex-col gap-2 md:gap-2.5 lg:gap-3">
             <li>
-              <span className="text-red-800 text-sm md:text-base font-bold">Contact</span>
+              <span className="text-red-800 text-sm md:text-base font-bold">
+                Contact
+              </span>
             </li>
             <li className="text-sm md:text-base">
               <p>Call:</p>
@@ -54,14 +56,14 @@ export default function Footer() {
             </li>
           </ul>
         </div>
-        <div className="footer-links justify-start w-full lg:w-auto">
+        <div className="footer-links justify-start w-full lg:w-auto text-center lg:text-start">
           <ul className="flex flex-col gap-2 md:gap-2.5 lg:gap-3">
             <li>
               <span className="text-red-800 text-sm md:text-base font-bold">
                 Social Media
               </span>
             </li>
-            <li>
+            <li className="mx-auto">
               <svg
                 className="w-32 md:w-40 lg:w-44"
                 viewBox="0 0 172 27"
@@ -123,10 +125,12 @@ export default function Footer() {
             </li>
           </ul>
         </div>
-        <div className="footer-links w-full lg:w-auto">
+        <div className="footer-links w-full lg:w-auto text-center lg:text-start">
           <ul className="flex flex-col gap-2 md:gap-2.5 lg:gap-3">
             <li>
-              <span className="text-red-800 text-sm md:text-base font-bold">View Map</span>
+              <span className="text-red-800 text-sm md:text-base font-bold">
+                View Map
+              </span>
             </li>
             <li>
               <Image
