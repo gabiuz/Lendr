@@ -4,16 +4,62 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 export default function OwnerReviews() {
+  const [selectedFilter, setSelectedFilter] = useState(null);
+
   // Sample reviews data - this would come from an API in production
-  const reviews = [
+  const allReviews = [
     {
       customerName: "Juan Dela Cruz",
       product: "Power Drill",
       rating: 4.5,
       comment: "Works great and owner was responsive!",
+      date: "Oct 12, 2025"
+    },
+    {
+      customerName: "Ana Reyes",
+      product: "Toyota Vios",
+      rating: 4.5,
+      comment: "Smooth transaction!",
       date: "Oct 11, 2025"
     }
   ];
+
+  // Filter reviews based on selected star rating
+  const filteredReviews = selectedFilter
+    ? allReviews.filter(review => Math.floor(review.rating) === selectedFilter)
+    : allReviews;
+
+  // Render star icons
+  const renderStars = (rating, size = "w-4 h-4") => {
+    return [...Array(5)].map((_, i) => {
+      const starValue = i + 1;
+      const isHalfStar = rating >= starValue - 0.5 && rating < starValue;
+      const isFullStar = rating >= starValue;
+      
+      return (
+        <svg
+          key={i}
+          viewBox="0 0 24 24"
+          fill={isFullStar ? "#FCD34D" : "none"}
+          xmlns="http://www.w3.org/2000/svg"
+          className={size}
+        >
+          {isHalfStar ? (
+            <defs>
+              <linearGradient id={`half-star-${i}`}>
+                <stop offset="50%" stopColor="#FCD34D" />
+                <stop offset="50%" stopColor="#E5E7EB" />
+              </linearGradient>
+            </defs>
+          ) : null}
+          <path
+            d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+            fill={isHalfStar ? `url(#half-star-${i})` : isFullStar ? "#FCD34D" : "#E5E7EB"}
+          />
+        </svg>
+      );
+    });
+  };
 
   return (
     <div className="min-h-screen w-full bg-white">
@@ -65,119 +111,65 @@ export default function OwnerReviews() {
             Reviews
           </h1>
           <p className="text-sm md:text-base text-gray-600">
-            Manage your products, all in one place.
+            View your reviews, all in one place.
           </p>
         </div>
 
-        {/* Reviews Table */}
-        <div className="bg-white border-2 border-gray-200 shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-neutral-100 border-b-2 border-gray-200">
-                  <th className="text-left py-3 md:py-4 px-3 md:px-6 font-bold text-black text-xs md:text-sm lg:text-base">
-                    Customer Name
-                  </th>
-                  <th className="text-left py-3 md:py-4 px-3 md:px-6 font-bold text-black text-xs md:text-sm lg:text-base">
-                    Product
-                  </th>
-                  <th className="text-left py-3 md:py-4 px-3 md:px-6 font-bold text-black text-xs md:text-sm lg:text-base">
-                    Rating
-                  </th>
-                  <th className="text-left py-3 md:py-4 px-3 md:px-6 font-bold text-black text-xs md:text-sm lg:text-base">
-                    Comment
-                  </th>
-                  <th className="text-left py-3 md:py-4 px-3 md:px-6 font-bold text-black text-xs md:text-sm lg:text-base">
-                    Date
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {reviews.length === 0 ? (
-                  <tr>
-                    <td colSpan="5" className="text-center py-12 md:py-16 text-gray-400">
-                      <div className="flex flex-col items-center gap-3 md:gap-4">
-                        <svg
-                          width="48"
-                          height="48"
-                          viewBox="0 0 64 64"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="md:w-16 md:h-16"
-                        >
-                          <path
-                            d="M32 8C18.745 8 8 18.745 8 32C8 45.255 18.745 56 32 56C45.255 56 56 45.255 56 32C56 18.745 45.255 8 32 8ZM32 12C43.046 12 52 20.954 52 32C52 43.046 43.046 52 32 52C20.954 52 12 43.046 12 32C12 20.954 20.954 12 32 12ZM28 24V28H36V24H28ZM28 32V44H36V32H28Z"
-                            fill="#d1d5db"
-                          />
-                        </svg>
-                        <p className="text-base md:text-lg font-medium">No reviews yet</p>
-                        <p className="text-xs md:text-sm">
-                          Your customer reviews will appear here
-                        </p>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  reviews.map((review, index) => (
-                    <tr
-                      key={index}
-                      className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="py-3 md:py-4 px-3 md:px-6 text-sky-800 font-medium text-xs md:text-sm">
+        {/* Star Filter Buttons */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          {[5, 4, 3, 2, 1].map(stars => (
+            <button
+              key={stars}
+              onClick={() => setSelectedFilter(selectedFilter === stars ? null : stars)}
+              className={`flex items-center gap-2 px-4 py-2 border rounded-full transition-all ${
+                selectedFilter === stars
+                  ? 'bg-red-50 border-red-600 text-red-600'
+                  : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'
+              }`}
+            >
+              <span className="font-medium">{stars} Star{stars > 1 ? 's' : ''}</span>
+              <div className="flex gap-0.5">
+                {renderStars(stars, "w-3.5 h-3.5")}
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Reviews Cards */}
+        <div className="space-y-4">
+          {filteredReviews.length === 0 ? (
+            <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
+              <p className="text-gray-400 text-lg">No reviews found for this filter</p>
+            </div>
+          ) : (
+            filteredReviews.map((review, index) => (
+              <div
+                key={index}
+                className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="text-blue-600 font-semibold text-base">
                         {review.customerName}
-                      </td>
-                      <td className="py-3 md:py-4 px-3 md:px-6 text-gray-800 text-xs md:text-sm">
-                        {review.product}
-                      </td>
-                      <td className="py-3 md:py-4 px-3 md:px-6 text-xs md:text-sm">
-                        <div className="flex items-center gap-1">
-                          <span className="font-semibold text-gray-800">{review.rating}</span>
-                          <div className="flex">
-                            {[...Array(5)].map((_, i) => {
-                              const starValue = i + 1;
-                              const isHalfStar = review.rating >= starValue - 0.5 && review.rating < starValue;
-                              const isFullStar = review.rating >= starValue;
-                              
-                              return (
-                                <svg
-                                  key={i}
-                                  width="16"
-                                  height="16"
-                                  viewBox="0 0 24 24"
-                                  fill={isFullStar ? "#FCD34D" : "none"}
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="md:w-5 md:h-5"
-                                >
-                                  {isHalfStar ? (
-                                    <defs>
-                                      <linearGradient id={`half-${index}-${i}`}>
-                                        <stop offset="50%" stopColor="#FCD34D" />
-                                        <stop offset="50%" stopColor="#E5E7EB" />
-                                      </linearGradient>
-                                    </defs>
-                                  ) : null}
-                                  <path
-                                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                                    fill={isHalfStar ? `url(#half-${index}-${i})` : isFullStar ? "#FCD34D" : "#E5E7EB"}
-                                  />
-                                </svg>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-3 md:py-4 px-3 md:px-6 text-gray-800 text-xs md:text-sm">
-                        &quot;{review.comment}&quot;
-                      </td>
-                      <td className="py-3 md:py-4 px-3 md:px-6 text-gray-800 text-xs md:text-sm">
-                        {review.date}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                      </h3>
+                      <span className="text-gray-800 font-medium">{review.rating}</span>
+                      <div className="flex gap-0.5">
+                        {renderStars(review.rating)}
+                      </div>
+                    </div>
+                    <p className="text-gray-700 text-sm">
+                      &quot;{review.comment}&quot;
+                    </p>
+                  </div>
+                  <div className="text-right ml-4">
+                    <p className="text-gray-600 text-sm mb-1">{review.date}</p>
+                    <p className="text-gray-900 font-semibold text-sm">{review.product}</p>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
