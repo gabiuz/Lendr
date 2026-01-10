@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Navbar from "../components/Navbar";
 import Image from "next/image";
 import Footer from "../components/Footer";
@@ -98,10 +99,6 @@ export default function OwnerPayments() {
             href: "/owner-payments",
             label: "Payments",
           },
-          {
-            href: "/about-us",
-            label: "About Us",
-          },
         ]}
         showOwnerButton={false}
         profileInCircle={true}
@@ -109,17 +106,14 @@ export default function OwnerPayments() {
       />
 
       {/* Main Content */}
-      <div className="px-4 md:px-8 lg:px-20 xl:px-36 py-8 md:py-12 lg:mt-24">
+      <div className=" text-gray-700 px-4 md:px-8 lg:px-20 xl:px-36 py-8 md:py-12 lg:mt-24">
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-2 text-sm mb-6">
-          <a
-            href="/owner-homepage"
-            className="text-gray-600 hover:text-red-600 transition-colors"
-          >
+          <Link href="/" className="hover:text-gray-700">
             Home
-          </a>
-          <span className="text-gray-400">›</span>
-          <span className="text-gray-900 font-medium">Payments</span>
+          </Link>
+          <span>›</span>
+          <span className="text-black">Payments</span>
         </div>
 
         {/* Page Header */}
