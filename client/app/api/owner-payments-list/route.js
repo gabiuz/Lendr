@@ -46,7 +46,7 @@ export async function GET(req) {
         JOIN categories cat ON p.category_code = cat.category_code
         LEFT JOIN payments pa ON r.rental_id = pa.rental_id
         WHERE p.owner_id = ?${statusFilter}
-        ORDER BY r.start_date DESC
+        ORDER BY r.start_date ASC
       `,
       values: values
     });

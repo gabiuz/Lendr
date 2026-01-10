@@ -62,14 +62,14 @@ export async function POST(request) {
       // continue even if payments insert fails
     }
 
-    // Mark product as reserved (if advance booking) or rented (if same-day booking)
+    // Mark product as reserved (if advance booking or today) or rented (if in the past)
     try {
       const startDateObj = new Date(start_date);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      // If start_date is in the future, mark as Reserved; otherwise mark as Rented
-      const status = startDateObj > today ? 'Reserved' : 'Rented';
+      // If start_date is today or in the future, mark as Reserved; otherwise mark as Rented
+      const status = startDateObj >= today ? 'Reserved' : 'Rented';
       
       await query({
         query: 'UPDATE products SET availability_status = ? WHERE product_id = ?',

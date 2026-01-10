@@ -454,14 +454,22 @@ export default function Booking({
                       const totalDays = Math.ceil((selectedDates.end - selectedDates.start) / (1000 * 60 * 60 * 24)) + 1;
                       const totalAmount = totalDays * pricePerDay;
 
+                      // Format dates in local timezone (YYYY-MM-DD)
+                      const formatLocalDate = (date) => {
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        return `${year}-${month}-${day}`;
+                      };
+
                       const res = await fetch('/api/create-booking', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                           customer_id: customerId,
                           product_id: productId,
-                          start_date: selectedDates.start.toISOString().split('T')[0],
-                          end_date: selectedDates.end.toISOString().split('T')[0],
+                          start_date: formatLocalDate(selectedDates.start),
+                          end_date: formatLocalDate(selectedDates.end),
                           total_amount: totalAmount,
                           payment_method: paymentMethod,
                           delivery_option: deliveryOption,

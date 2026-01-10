@@ -64,8 +64,12 @@ export default function OwnerBooking() {
           }
           
           const startDate = new Date(b.start_date);
+          // Normalize dates to compare only date parts (year, month, day)
+          const normalizedStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+          const normalizedToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          const isToday = normalizedStartDate.getTime() === normalizedToday.getTime();
           const isReserved = startDate > today;
-          const status = isReserved ? 'Reserved' : b.availability_status;
+          const status = isToday ? 'Reserved' : (isReserved ? 'Reserved' : b.availability_status);
           return status === activeFilter;
         })
       );
@@ -335,8 +339,12 @@ export default function OwnerBooking() {
                   filteredBookings.map((booking) => {
                     const startDate = new Date(booking.start_date);
                     const today = new Date();
+                    // Normalize dates to compare only date parts (year, month, day)
+                    const normalizedStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+                    const normalizedToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                    const isToday = normalizedStartDate.getTime() === normalizedToday.getTime();
                     const isReserved = startDate > today;
-                    const status = booking.rental_status === 'Completed' || booking.rental_status === 'Cancelled' ? booking.rental_status : (isReserved ? 'Reserved' : booking.availability_status);
+                    const status = booking.rental_status === 'Completed' || booking.rental_status === 'Cancelled' ? booking.rental_status : (isToday ? 'Reserved' : (isReserved ? 'Reserved' : booking.availability_status));
                     return (
                     <tr key={booking.rental_id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-4">
