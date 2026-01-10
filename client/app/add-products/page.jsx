@@ -66,51 +66,28 @@ export default function AddProduct() {
 
       if (!mainImage) return alert('Main product image is required');
 
-      let mainImageData = await new Promise((res, rej) => {
-        const reader = new FileReader();
-        reader.onload = () => res(reader.result);
-        reader.onerror = rej;
-        reader.readAsDataURL(mainImage);
-      });
-
-      // Convert thumbnails (optional) to data URLs
-      const thumbnailsData = [];
+      // Use FormData instead of JSON to avoid large base64 strings
+      const formPayload = new FormData();
+      formPayload.append('productName', formData.productName);
+      formPayload.append('description', formData.description);
+      formPayload.append('pricePerDay', formData.pricePerDay);
+      formPayload.append('condition', formData.condition);
+      formPayload.append('category', formData.category);
+      formPayload.append('owner_id', owner_id);
+      
+      // Append main image file
+      formPayload.append('mainImage', mainImage);
+      
+      // Append thumbnail files
       for (let i = 0; i < images.length; i++) {
-        const f = images[i];
-        if (f) {
-          // eslint-disable-next-line no-await-in-loop
-          const d = await new Promise((res, rej) => {
-            const reader = new FileReader();
-            reader.onload = () => res(reader.result);
-            reader.onerror = rej;
-            reader.readAsDataURL(f);
-          });
-          thumbnailsData.push(d);
+        if (images[i]) {
+          formPayload.append(`thumbnail_${i}`, images[i]);
         }
       }
 
-      // Map image_path1..image_path6 (image_path1 required)
-      const payload = {
-        productName: formData.productName,
-        description: formData.description,
-        pricePerDay: formData.pricePerDay,
-        condition: formData.condition,
-        category: formData.category,
-        owner_id,
-        mainImage: mainImageData,
-        thumbnails: thumbnailsData,
-        image_path1: mainImageData,
-        image_path2: thumbnailsData[0] || null,
-        image_path3: thumbnailsData[1] || null,
-        image_path4: thumbnailsData[2] || null,
-        image_path5: thumbnailsData[3] || null,
-        image_path6: thumbnailsData[4] || null,
-      };
-
       const res = await fetch('/api/products', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: formPayload,
       });
       const data = await res.json();
       if (data.success) {

@@ -45,7 +45,7 @@ export default function TestimonialCard({
             >
               {quoteIcon.paths.map((path, index) => (
                 <path
-                  key={index}
+                  key={`path-${index}`}
                   opacity={path.opacity}
                   d={path.d}
                   fill={path.fill}

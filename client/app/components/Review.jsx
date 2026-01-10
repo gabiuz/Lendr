@@ -21,7 +21,7 @@ export default function Review({ reviews = [] }) {
                                     <div className="text-zinc-800 text-sm">{r.rating}</div>
                                     <div className="flex items-center gap-0.5">
                                         {Array.from({ length: 5 }).map((_, i) => (
-                                            <div key={i} className={`w-3 h-3 ${i < Math.round(r.rating) ? 'bg-yellow-500' : 'bg-gray-200'}`} />
+                                            <div key={`${r.review_id}-star-${i}`} className={`w-3 h-3 ${i < Math.round(r.rating) ? 'bg-yellow-500' : 'bg-gray-200'}`} />
                                         ))}
                                     </div>
                                 </div>

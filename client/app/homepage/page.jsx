@@ -103,15 +103,17 @@ export default function Homepage() {
           if (userCity) {
               const searchRes = await fetch(`/api/search?location=${encodeURIComponent(userCity)}`);
               const searchData = await searchRes.json();
-
+              
+              const ownerId = typeof window !== 'undefined' ? localStorage.getItem('owner_id') : null;
+              
+              // Get nearby products
               if (searchData.success && searchData.products && searchData.products.length > 0) {
-                const ownerId = typeof window !== 'undefined' ? localStorage.getItem('owner_id') : null;
-                const filtered = ownerId
+                const nearbyProductsList = ownerId
                   ? searchData.products.filter(p => String(p.owner_id) !== String(ownerId))
                   : searchData.products;
-
-                if (filtered.length > 0) {
-                  setNearbyProducts(filtered.slice(0, 6));
+                
+                if (nearbyProductsList.length > 0) {
+                  setNearbyProducts(nearbyProductsList.slice(0, 6));
                   return;
                 }
               }
@@ -293,7 +295,7 @@ export default function Homepage() {
           </button>
           <AnimatePresence initial={false} custom={direction} mode="wait">
             <motion.div
-              key={currentTestimonial}
+              key={`testimonial-${currentTestimonial}`}
               custom={direction}
               variants={variants}
               initial="enter"

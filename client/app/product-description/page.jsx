@@ -54,6 +54,8 @@ export default function ProductDescription() {
       } catch (e) {
         console.error(e);
       }
+      // Scroll to top of page
+      window.scrollTo(0, 0);
     }
     load();
   }, [productId]);
@@ -150,7 +152,7 @@ export default function ProductDescription() {
             </h2>
           </div>
           <div className="product-description font-medium text-base">
-            <p>{product ? product.description : 'Product details will appear here.'}</p>
+            <p className="whitespace-pre-wrap break-words">{product ? product.description : 'Product details will appear here.'}</p>
           </div>
           <div className="owner-container flex items-center gap-3.5">
             {product && product.owner_avatar && (
@@ -506,7 +508,7 @@ export default function ProductDescription() {
             <div className="thumbnail-container grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-3">
               {thumbnailImages.map((image, index) => (
                 <div
-                  key={index}
+                  key={`thumbnail-${productId}-${index}`}
                   onClick={() => setSelectedImage(image)}
                   className={`thumbnail-item rounded-lg overflow-hidden cursor-pointer border-2 transition-all duration-200 ${
                     selectedImage === image

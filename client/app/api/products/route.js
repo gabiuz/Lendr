@@ -42,8 +42,21 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const body = await request.json();
-    const { productName, description, pricePerDay, location, condition, category, owner_id, mainImage, thumbnails = [] } = body;
+    const formData = await request.formData();
+    const productName = formData.get('productName');
+    const description = formData.get('description');
+    const pricePerDay = formData.get('pricePerDay');
+    const condition = formData.get('condition');
+    const category = formData.get('category');
+    const owner_id = formData.get('owner_id');
+    const mainImage = formData.get('mainImage');
+    
+    // Collect thumbnail files
+    const thumbnails = [];
+    for (let i = 0; i < 5; i++) {
+      const thumb = formData.get(`thumbnail_${i}`);
+      if (thumb) thumbnails.push(thumb);
+    }
 
     if (!owner_id) return NextResponse.json({ success: false, error: 'missing owner_id' }, { status: 400 });
     if (!productName || !pricePerDay) return NextResponse.json({ success: false, error: 'missing required fields' }, { status: 400 });
@@ -87,14 +100,14 @@ export async function POST(request) {
     ensureDir(publicDir);
 
     const savedPaths = [];
-    // mainImage -> image_path1
+    
+    // mainImage -> image_path1 (File object now)
     if (mainImage) {
-      const match = mainImage.match(/^data:(image\/(png|jpeg|jpg|webp));base64,(.*)$/);
-      const ext = match && match[2] ? match[2] : 'jpg';
-      const data = match ? match[3] : mainImage.split(',')[1] || mainImage;
+      const buffer = await mainImage.arrayBuffer();
+      const ext = mainImage.name.split('.').pop() || 'jpg';
       const filename = `prod_${productId}_main_${Date.now()}.${ext}`;
       const filepath = path.join(publicDir, filename);
-      fs.writeFileSync(filepath, Buffer.from(data, 'base64'));
+      fs.writeFileSync(filepath, Buffer.from(buffer));
       const publicPath = `/pictures/products/${filename}`;
       savedPaths.push(publicPath);
     }
@@ -102,12 +115,11 @@ export async function POST(request) {
     // thumbnails array -> image_path2..image_path6 (max 5)
     for (let i = 0; i < Math.min(thumbnails.length, 5); i++) {
       const img = thumbnails[i];
-      const match = img.match(/^data:(image\/(png|jpeg|jpg|webp));base64,(.*)$/);
-      const ext = match && match[2] ? match[2] : 'jpg';
-      const data = match ? match[3] : img.split(',')[1] || img;
+      const buffer = await img.arrayBuffer();
+      const ext = img.name.split('.').pop() || 'jpg';
       const filename = `prod_${productId}_thumb_${i}_${Date.now()}.${ext}`;
       const filepath = path.join(publicDir, filename);
-      fs.writeFileSync(filepath, Buffer.from(data, 'base64'));
+      fs.writeFileSync(filepath, Buffer.from(buffer));
       const publicPath = `/pictures/products/${filename}`;
       savedPaths.push(publicPath);
     }
