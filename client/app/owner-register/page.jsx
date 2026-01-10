@@ -95,7 +95,7 @@ export default function OwnerRegister() {
       </div>
       <div className="flex lg:justify-end lg:items-end">
         <form className="register w-full lg:w-5xl" onSubmit={handleSubmit}>
-          <div className="bg-white px-6 py-10 lg:px-22 lg:py-20 lg:mr-28">
+          <div className="bg-white px-6 py-10 lg:px-22 lg:pt-20 lg:pb-28 lg:mr-28">
             <div className="red-line mx-auto mb-8"></div>
             <div className="flex flex-col justify-center items-center lg:mb-8 lg:items-start">
               <h1 className="text-2xl font-bold text-black mt-0 mb-1 w-fit text-center lg:text-5xl">
@@ -105,7 +105,7 @@ export default function OwnerRegister() {
                 Fill up the following:
               </p>
             </div>
-            <div className="business-info flex flex-col gap-4 mb-4 lg:flex-row">
+            <div className="business-info flex flex-col gap-4 mb-4 lg:grid lg:grid-cols-2">
               {formFields.businessInfo.map((field) => (
                 <Input
                   key={field.id}
@@ -116,7 +116,7 @@ export default function OwnerRegister() {
                   id={field.id}
                   required={true}
                   placeholder={field.placeholder}
-                  containerClassName="w-full"
+                  containerClassName={`w-full ${field.id === 'businessName' ? 'lg:col-span-2' : ''}`}
                 />
               ))}
             </div>

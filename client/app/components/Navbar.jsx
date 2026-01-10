@@ -104,15 +104,31 @@ export default function Navbar({
           {isLoggedIn ? (
             <>
               {!profileInCircle && (
-                <Link href={`${profileInCircle ? "/owner-profile" : "/profile"}`}>
-                  <button className={`flex items-center gap-2 cursor-pointer font-semibold transition-colors ${
-                    profileInCircle
-                      ? "bg-red-800 hover:bg-red-900 text-white px-3 lg:px-7 lg:py-3.5 rounded-full"
-                      : "px-3 lg:px-4 py-2 hover:text-red"
-                  }`}>
+                <Link
+                  href={`${profileInCircle ? "/owner-profile" : "/profile"}`}
+                >
+                  <button
+                    className={`flex items-center gap-2 cursor-pointer font-semibold transition-colors ${
+                      profileInCircle
+                        ? "bg-red-800 hover:bg-red-900 text-white px-3 lg:px-7 lg:py-3.5 rounded-full"
+                        : "px-3 lg:px-4 py-2 hover:text-red"
+                    }`}
+                  >
                     <svg width="20" height="19" viewBox="0 0 19 19" fill="none">
-                      <path d="M15.8333 16.625V15.0417C15.8333 14.2018 15.4997 13.3964 14.9058 12.8025C14.3119 12.2086 13.5065 11.875 12.6666 11.875H6.33329C5.49344 11.875 4.68799 12.2086 4.09412 12.8025C3.50026 13.3964 3.16663 14.2018 3.16663 15.0417V16.625" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M9.50004 8.70833C11.2489 8.70833 12.6667 7.29057 12.6667 5.54167C12.6667 3.79276 11.2489 2.375 9.50004 2.375C7.75114 2.375 6.33337 3.79276 6.33337 5.54167C6.33337 7.29057 7.75114 8.70833 9.50004 8.70833Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path
+                        d="M15.8333 16.625V15.0417C15.8333 14.2018 15.4997 13.3964 14.9058 12.8025C14.3119 12.2086 13.5065 11.875 12.6666 11.875H6.33329C5.49344 11.875 4.68799 12.2086 4.09412 12.8025C3.50026 13.3964 3.16663 14.2018 3.16663 15.0417V16.625"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M9.50004 8.70833C11.2489 8.70833 12.6667 7.29057 12.6667 5.54167C12.6667 3.79276 11.2489 2.375 9.50004 2.375C7.75114 2.375 6.33337 3.79276 6.33337 5.54167C6.33337 7.29057 7.75114 8.70833 9.50004 8.70833Z"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                     <span className="text-sm lg:text-base">Profile</span>
                   </button>
@@ -135,8 +151,21 @@ export default function Navbar({
                 </Link>
               )}
 
-              <button onClick={handleLogout} className="flex items-center gap-2 cursor-pointer font-semibold px-3 lg:px-4 py-2 hover:text-red transition-colors" title="Logout">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 cursor-pointer font-semibold px-3 lg:px-4 py-2 hover:text-red transition-colors"
+                title="Logout"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                   <polyline points="16 17 21 12 16 7"></polyline>
                   <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -145,8 +174,21 @@ export default function Navbar({
               </button>
             </>
           ) : (
-            <button onClick={handleLogin} className="flex items-center gap-2 cursor-pointer font-semibold px-3 lg:px-4 py-2 hover:text-red transition-colors" title="Login">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <button
+              onClick={handleLogin}
+              className="flex items-center gap-2 cursor-pointer font-semibold px-3 lg:px-4 py-2 hover:text-red transition-colors"
+              title="Login"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
                 <polyline points="10 17 15 12 10 7"></polyline>
                 <line x1="15" y1="12" x2="3" y2="12"></line>
@@ -202,15 +244,15 @@ export default function Navbar({
             {/* Mobile Nav Links */}
             <ul className="space-y-3 text-black font-semibold">
               {links.map((link, index) => {
-                  // Hide "About Us" only for owners when viewing owner routes
-                  if (
-                    link.label === "About Us" &&
-                    hasBusinessAccount &&
-                    pathname &&
-                    pathname.startsWith("/owner")
-                  ) {
-                    return null;
-                  }
+                // Hide "About Us" only for owners when viewing owner routes
+                if (
+                  link.label === "About Us" &&
+                  hasBusinessAccount &&
+                  pathname &&
+                  pathname.startsWith("/owner")
+                ) {
+                  return null;
+                }
                 return (
                   <li key={index}>
                     <Link
@@ -304,7 +346,16 @@ export default function Navbar({
                   }}
                   className="w-full flex items-center justify-center gap-2 cursor-pointer font-semibold px-4 py-3 rounded-full border border-gray-300 hover:border-red hover:text-red transition-colors"
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                     <polyline points="16 17 21 12 16 7"></polyline>
                     <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -319,7 +370,16 @@ export default function Navbar({
                   }}
                   className="w-full flex items-center justify-center gap-2 cursor-pointer font-semibold px-4 py-3 rounded-full border border-gray-300 hover:border-red hover:text-red transition-colors"
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
                     <polyline points="10 17 15 12 10 7"></polyline>
                     <line x1="15" y1="12" x2="3" y2="12"></line>
