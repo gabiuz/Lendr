@@ -25,16 +25,16 @@ export default function Footer() {
                 Quick Links
               </span>
             </li>
-            <li className="text-sm md:text-base">
+            <li className="text-sm md:text-base whitespace-nowrap hover:text-red-800 transition-colors duration-200">
               <Link href="#home">Home</Link>
             </li>
-            <li className="text-sm md:text-base">
+            <li className="text-sm md:text-base whitespace-nowrap hover:text-red-800 transition-colors duration-200">
               <Link href="#browse">Browse Rentals</Link>
             </li>
-            <li className="text-sm md:text-base">
+            <li className="text-sm md:text-base whitespace-nowrap hover:text-red-800 transition-colors duration-200">
               <Link href="#categories">Categories</Link>
             </li>
-            <li className="text-sm md:text-base">
+            <li className="text-sm md:text-base whitespace-nowrap hover:text-red-800 transition-colors duration-200">
               <Link href="#aboutUs">About Us</Link>
             </li>
           </ul>

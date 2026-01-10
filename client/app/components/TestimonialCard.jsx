@@ -33,15 +33,16 @@ export default function TestimonialCard({
 }) {
   return (
     <>
-      <div className="p-7 bg-zinc-100 rounded-3xl flex flex-col justify-start items-start gap-6 w-[936px] mx-auto mt-24">
-        <div className="flex flex-col gap-6">
-          <div className="flex justify-center items-center w-24 h-24 bg-pink-100 rounded-[300px]">
+      <div className="p-4 md:p-6 lg:p-7 bg-zinc-100 rounded-2xl md:rounded-3xl flex flex-col justify-start items-start gap-4 md:gap-5 lg:gap-6 w-full max-w-[936px] mx-auto mt-12 md:mt-16 lg:mt-24">
+        <div className="flex flex-col gap-4 md:gap-5 lg:gap-6">
+          <div className="flex justify-center items-center w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 bg-pink-100 rounded-full">
             <svg
               width={quoteIcon.width}
               height={quoteIcon.height}
               viewBox={quoteIcon.viewBox}
               fill={quoteIcon.fill}
               xmlns="http://www.w3.org/2000/svg"
+              className="w-10 h-10 md:w-12 md:h-12 lg:w-16 lg:h-16"
             >
               {quoteIcon.paths.map((path, index) => (
                 <path
@@ -53,20 +54,20 @@ export default function TestimonialCard({
               ))}
             </svg>
           </div>
-          <div className="text-black text-xl font-medium">{description}</div>
+          <div className="text-black text-base md:text-lg lg:text-xl font-medium">{description}</div>
         </div>
         <hr className="w-full border-light-gray" />
-        <div className="flex justify-center items-center gap-4">
+        <div className="flex justify-center items-center gap-3 md:gap-4">
           <Image
             width={65}
             height={65}
             alt="profile-photo-image"
             src={image}
-            className="w-16"
+            className="w-12 md:w-14 lg:w-16"
           ></Image>
           <div>
-            <div className="text-zinc-800 text-2xl font-semibold">{name}</div>
-            <div className="text-zinc-800 text-base font-medium">{renter}</div>
+            <div className="text-zinc-800 text-lg md:text-xl lg:text-2xl font-semibold">{name}</div>
+            <div className="text-zinc-800 text-sm md:text-base font-medium">{renter}</div>
           </div>
         </div>
       </div>

@@ -273,7 +273,7 @@ export default function Homepage() {
           <h3 className="font-bold text-xl md:text-2xl">Testimonial</h3>
           <h2 className="font-bold text-3xl md:text-4xl lg:text-5xl">What our customers say?</h2>
         </div>
-        <div className="testimonialCard-container flex justify-center items-center mx-4 md:mx-8 lg:mx-[280px] gap-6 md:gap-12 lg:gap-36">
+        <div className="testimonialCard-container flex justify-center items-center mx-4 md:mx-8 lg:mx-16 gap-6 md:gap-12 lg:gap-36">
           <button className="cursor-pointer hidden md:block" onClick={prevTestimonial}>
             <svg
               width="56"
