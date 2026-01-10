@@ -37,7 +37,7 @@ export async function GET(request) {
         LEFT JOIN products_image pi ON p.product_id = pi.product_id
         LEFT JOIN categories cat ON p.category_code = cat.category_code
         WHERE r.customer_id = ?
-        ORDER BY r.start_date DESC
+        ORDER BY r.start_date ASC
       `,
       values: [customerId]
     });

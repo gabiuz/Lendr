@@ -287,12 +287,12 @@ export default function AddProduct() {
                       required
                     >
                       <option value="">Categories</option>
-                      <option value="electronics">Electronics</option>
-                      <option value="vehicles">Vehicles</option>
-                      <option value="tools">Tools</option>
-                      <option value="sports">Sports Equipment</option>
-                      <option value="party">Party Supplies</option>
-                      <option value="other">Other</option>
+                      <option value="Vehicles">Vehicles</option>
+                      <option value="Devices & Electronics">Devices & Electronics</option>
+                      <option value="Clothing & Apparel">Clothing & Apparel</option>
+                      <option value="Tools & Equipment">Tools & Equipment</option>
+                      <option value="Furniture & Home">Furniture & Home</option>
+                      <option value="Party & Events">Party & Events</option>
                     </select>
                     <div className="absolute right-4 md:right-6 bottom-3 md:bottom-4 pointer-events-none">
                       <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">

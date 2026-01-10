@@ -63,7 +63,7 @@ export async function GET(request) {
     const rentalRows = await query({
       query: `SELECT rental_id, start_date, end_date
               FROM rentals
-              WHERE product_id = ? AND status IN ('To ship', 'Shipped', 'Completed')
+              WHERE product_id = ? AND status IN ('To ship', 'Out for Delivery', 'Delivered', 'Shipped', 'Completed')
               ORDER BY start_date ASC`,
       values: [product_id],
     });

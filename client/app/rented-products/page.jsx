@@ -25,6 +25,18 @@ export default function RentedProduct() {
           const data = await res.json();
           if (data.success) {
             setRentals(data.rentals || []);
+            
+            // Fetch existing reviews
+            const reviewRes = await fetch(`/api/customer-reviews?customer_id=${id}`);
+            const reviewData = await reviewRes.json();
+            if (reviewData.success && reviewData.reviewedRentalIds) {
+              // Create a map of rental_id -> true for reviewed rentals
+              const submittedMap = {};
+              reviewData.reviewedRentalIds.forEach(rentalId => {
+                submittedMap[rentalId] = true;
+              });
+              setSubmittedRatings(submittedMap);
+            }
           } else {
             console.error("Error fetching rentals:", data.message);
           }
@@ -66,6 +78,7 @@ export default function RentedProduct() {
         body: JSON.stringify({
           customerId: customerId,
           productId: rental.product_id,
+          rentalId: rentalId,
           rating: rating,
           comment: review || null
         })
@@ -85,12 +98,45 @@ export default function RentedProduct() {
     }
   };
 
+  const handleCancelRental = async (rentalId) => {
+    if (!window.confirm("Are you sure you want to cancel this rental? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/cancel-rental', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rental_id: rentalId,
+          customer_id: customerId
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert("Rental cancelled successfully.");
+        // Update the rental status to cancelled instead of removing it
+        setRentals(rentals.map(r => 
+          r.rental_id === rentalId ? { ...r, status: 'Cancelled' } : r
+        ));
+      } else {
+        alert("Error cancelling rental: " + data.error);
+      }
+    } catch (error) {
+      console.error("Error cancelling rental:", error);
+      alert("Failed to cancel rental. Please try again.");
+    }
+  };
+
   const getStatusBadge = (status) => {
     const statusColors = {
       "to ship": "bg-orange-100 text-orange-800 border-orange-300",
       "shipped": "bg-blue-100 text-blue-800 border-blue-300",
       "completed": "bg-green-100 text-green-800 border-green-300",
       "pending": "bg-yellow-100 text-yellow-800 border-yellow-300",
+      "cancelled": "bg-red-100 text-red-800 border-red-300",
     };
 
     const lowerStatus = status?.toLowerCase() || "pending";
@@ -140,7 +186,15 @@ export default function RentedProduct() {
 
   return (
     <div className="bg-white min-h-screen w-full">
-      <Navbar />
+      <Navbar
+        links={[
+          { href: "/homepage", label: "Home" },
+          { href: "/product-result", label: "Browse Rentals" },
+          { href: "/rented-products", label: "My Rentals" },
+          { href: "/product-result", label: "Categories" },
+          { href: "/homepage#aboutUs", label: "About Us" },
+        ]}
+      />
       
       {/* Page Header */}
       <div className="text-black px-4 py-8 lg:px-36 lg:pt-36">
@@ -292,6 +346,38 @@ export default function RentedProduct() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Cancel Rental Section - Only for rentals not yet started and not cancelled */}
+                  {rental.status && ['To ship', 'Pending', 'Reserved'].includes(rental.status) && rental.status.toLowerCase() !== 'cancelled' && (
+                    <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-gray-200 pt-6 lg:pt-0 lg:pl-6">
+                      <div className="flex flex-col items-center justify-center h-full">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-3">
+                          <svg
+                            className="w-8 h-8 text-red-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </div>
+                        <p className="text-sm text-zinc-600 text-center mb-4">
+                          Haven't started yet? You can still cancel this rental.
+                        </p>
+                        <button
+                          onClick={() => handleCancelRental(rental.rental_id)}
+                          className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200"
+                        >
+                          Cancel Rental
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Rating Section - Only for Completed Rentals */}
                   {rental.status && rental.status.toLowerCase() === "completed" && (

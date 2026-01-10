@@ -19,6 +19,10 @@ export async function GET(request) {
     const where = [];
     const values = [];
 
+    // Exclude unavailable products from customer view
+    where.push('p.availability_status != ?');
+    values.push('Unavailable');
+
     if (q) {
       where.push('(p.product_name LIKE ? OR p.description LIKE ?)');
       values.push(`%${q}%`, `%${q}%`);

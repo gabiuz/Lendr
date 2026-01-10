@@ -164,6 +164,44 @@ export default function ProductEdit() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!productId) return alert('Product ID is required');
+    
+    const confirmed = window.confirm(
+      'Are you sure you want to delete this product? This will also delete all associated rentals, reviews, and payments. This action cannot be undone.'
+    );
+    
+    if (!confirmed) return;
+
+    setSaving(true);
+    try {
+      const ownerId = localStorage.getItem('owner_id');
+      if (!ownerId) return alert('Owner ID is required');
+
+      const res = await fetch('/api/product-delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: productId,
+          owner_id: ownerId,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        alert('Product and all associated records deleted successfully');
+        router.push('/browse-rentals');
+      } else {
+        alert(data.error || 'Delete failed');
+      }
+    } catch (err) {
+      console.error('Error deleting product:', err);
+      alert('Error deleting product');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const renderStarRating = (rating) => {
     return (
       <div className="flex gap-1">
@@ -198,8 +236,7 @@ export default function ProductEdit() {
           { href: "/owner-homepage", label: "Home" },
           { href: "/browse-rentals", label: "Browse Rentals" },
           { href: "/owner-booking", label: "Bookings" },
-          { href: "/owner-payments", label: "Payments" },
-          { href: "/about-us", label: "About Us" }
+          { href: "/owner-payments", label: "Payments" }
         ]}
         showOwnerButton={false}
         profileInCircle={true}
@@ -478,6 +515,14 @@ export default function ProductEdit() {
                 className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 rounded-lg transition-colors"
               >
                 Back to Browse
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={saving}
+                className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold py-3 rounded-lg transition-colors"
+              >
+                {saving ? 'Deleting...' : 'Delete Product'}
               </button>
             </div>
           )}

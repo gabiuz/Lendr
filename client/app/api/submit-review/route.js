@@ -18,13 +18,13 @@ async function generateReviewId() {
 
 export async function POST(request) {
   try {
-    const { customerId, productId, rating, comment } = await request.json();
+    const { customerId, productId, rentalId, rating, comment } = await request.json();
 
-    console.log('Submit review request:', { customerId, productId, rating, comment });
+    console.log('Submit review request:', { customerId, productId, rentalId, rating, comment });
 
-    if (!customerId || !productId || !rating) {
+    if (!customerId || !productId || !rentalId || !rating) {
       return NextResponse.json(
-        { success: false, message: 'Customer ID, Product ID, and Rating are required' },
+        { success: false, message: 'Customer ID, Product ID, Rental ID, and Rating are required' },
         { status: 400 }
       );
     }
@@ -41,10 +41,10 @@ export async function POST(request) {
 
     const result = await query({
       query: `
-        INSERT INTO reviews (review_id, product_id, customer_id, rating, comment, created_at)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO reviews (review_id, product_id, customer_id, rental_id, rating, comment, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `,
-      values: [reviewId, productId, customerId, parseInt(rating), comment || null, createdAt]
+      values: [reviewId, productId, customerId, rentalId, parseInt(rating), comment || null, createdAt]
     });
 
     console.log('Review inserted successfully:', reviewId);

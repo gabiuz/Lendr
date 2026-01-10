@@ -31,7 +31,7 @@ export async function POST(request) {
         : payment_method
       : null;
 
-    // Insert booking into rentals table. Note: rentals table doesn't have payment_method/delivery_option columns
+    // Insert booking into rentals table
     const result = await query({
       query: `
         INSERT INTO rentals 
@@ -50,24 +50,30 @@ export async function POST(request) {
 
     const rentalId = result.insertId;
 
-    // Optionally record a payment record in the payments table if payment method provided
-    if (pm) {
-      try {
-        await query({
-          query: `INSERT INTO payments (rental_id, payment_date, payment_method, amount_paid, payment_status) VALUES (?, NOW(), ?, ?, ?)`,
-          values: [rentalId, pm, total_amount, 'Paid'],
-        });
-      } catch (e) {
-        console.warn('Failed to insert payment record:', e.message || e);
-        // continue even if payments insert fails
-      }
+    // Always create a payment record with Pending status
+    try {
+      const paymentMethod = pm || 'Cash'; // Default to Cash if no method provided
+      await query({
+        query: `INSERT INTO payments (rental_id, payment_date, payment_method, amount_paid, payment_status) VALUES (?, NOW(), ?, ?, ?)`,
+        values: [rentalId, paymentMethod, total_amount, 'Pending'],
+      });
+    } catch (e) {
+      console.warn('Failed to insert payment record:', e.message || e);
+      // continue even if payments insert fails
     }
 
-    // Mark product as rented so owner views show updated availability
+    // Mark product as reserved (if advance booking) or rented (if same-day booking)
     try {
+      const startDateObj = new Date(start_date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // If start_date is in the future, mark as Reserved; otherwise mark as Rented
+      const status = startDateObj > today ? 'Reserved' : 'Rented';
+      
       await query({
         query: 'UPDATE products SET availability_status = ? WHERE product_id = ?',
-        values: ['Rented', product_id],
+        values: [status, product_id],
       });
     } catch (e) {
       console.warn('Failed to update product availability:', e.message || e);

@@ -14,8 +14,9 @@ export async function GET(req) {
     let values = [owner_id];
 
     if (status && status !== 'all') {
+      // For all statuses, filter by payment_status
       statusFilter = ' AND pa.payment_status = ?';
-      values.push(status);
+      values.push(status.charAt(0).toUpperCase() + status.slice(1));
     }
 
     // Get completed rentals (payments) for the owner's products

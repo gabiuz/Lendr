@@ -156,10 +156,12 @@ export default function BrowseRentals() {
 
         {/* Category Sections (dynamic) */}
         {categoriesProducts.map((group) => {
-          const filteredProducts = group.products.filter(product =>
-            product.name.toLowerCase().includes(activeSearchQuery.toLowerCase()) ||
-            product.description?.toLowerCase().includes(activeSearchQuery.toLowerCase())
-          );
+          const filteredProducts = group.products
+            .filter(product => product.status !== 'Unavailable') // Exclude unavailable products from categories
+            .filter(product =>
+              product.name.toLowerCase().includes(activeSearchQuery.toLowerCase()) ||
+              product.description?.toLowerCase().includes(activeSearchQuery.toLowerCase())
+            );
           
           // Only show categories with matching products when searching
           if (activeSearchQuery && filteredProducts.length === 0) return null;
@@ -180,6 +182,24 @@ export default function BrowseRentals() {
             </div>
           );
         })}
+
+        {/* Unavailable Products Section */}
+        {categoriesProducts.some(group => group.products.some(p => p.status === 'Unavailable')) && (
+          <div className="mb-8 md:mb-10 lg:mb-12">
+            <h2 className="text-xl md:text-2xl font-bold text-red-600 mb-4 md:mb-6">Unavailable</h2>
+            <div className="flex gap-4 md:gap-5 lg:gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+              {categoriesProducts
+                .flatMap(group => group.products)
+                .filter(product => product.status === 'Unavailable')
+                .map((product) => (
+                  <div key={product.id} className="shrink-0 w-64 md:w-72 lg:w-80 opacity-60">
+                    <ProductCard product={product} />
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        )}
 
         {/* No products found message */}
         {activeSearchQuery && categoriesProducts.every(group =>

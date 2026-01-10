@@ -9,8 +9,11 @@ export default function OwnerBooking() {
   const [bookings, setBookings] = useState([]);
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [showDeliveryModal, setShowDeliveryModal] = useState(false);
+  const [selectedRentalId, setSelectedRentalId] = useState(null);
+  const [approvedRentals, setApprovedRentals] = useState(new Set());
 
-  const filters = ["All", "Available", "Rented", "Reserved", "Unavailable"];
+  const filters = ["All", "Available", "Rented", "Reserved", "Completed", "Cancelled"];
 
   // fetchBookings is used on mount and after state changes
   async function fetchBookings() {
@@ -42,17 +45,38 @@ export default function OwnerBooking() {
   }, []);
 
   useEffect(() => {
+    const today = new Date();
     if (activeFilter === 'All') {
+      // Display all rentals including completed and cancelled ones
       setFilteredBookings(bookings);
+    } else if (activeFilter === 'Completed') {
+      // Filter to show only completed rentals
+      setFilteredBookings(bookings.filter(b => b.rental_status === 'Completed'));
+    } else if (activeFilter === 'Cancelled') {
+      // Filter to show only cancelled rentals
+      setFilteredBookings(bookings.filter(b => b.rental_status === 'Cancelled'));
     } else {
-      setFilteredBookings(bookings.filter(b => b.availability_status === activeFilter));
+      setFilteredBookings(
+        bookings.filter((b) => {
+          // Skip completed or cancelled rentals for other filters
+          if (b.rental_status === 'Completed' || b.rental_status === 'Cancelled') {
+            return false;
+          }
+          
+          const startDate = new Date(b.start_date);
+          const isReserved = startDate > today;
+          const status = isReserved ? 'Reserved' : b.availability_status;
+          return status === activeFilter;
+        })
+      );
     }
   }, [activeFilter, bookings]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (openDropdown && !event.target.closest('.dropdown-container')) {
+      const dropdownContainer = event.target.closest('.dropdown-container');
+      if (openDropdown && !dropdownContainer) {
         setOpenDropdown(null);
       }
     };
@@ -65,6 +89,140 @@ export default function OwnerBooking() {
       document.removeEventListener('click', handleClickOutside);
     };
   }, [openDropdown]);
+
+  const handleApprove = (rentalId) => {
+    // Open delivery modal without changing status
+    setSelectedRentalId(rentalId);
+    setShowDeliveryModal(true);
+    setOpenDropdown(null);
+  };
+
+  const handleDeliveryModalConfirm = async (deliveryOption) => {
+    // Update both rental status to "To ship" and payment status to "Paid" when approving
+    if (!selectedRentalId) return;
+
+    try {
+      const res = await fetch('/api/update-rental-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rental_id: selectedRentalId,
+          status: 'To ship',
+        }),
+      });
+
+      const data = await res.json();
+      console.log('API Response:', data);
+
+      if (data.success) {
+        // Also update the payment status to "Paid"
+        try {
+          await fetch('/api/update-payment-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              rental_id: selectedRentalId,
+              payment_status: 'Paid',
+            }),
+          });
+        } catch (e) {
+          console.warn('Failed to update payment status:', e);
+        }
+
+        // Update the local state to reflect the status change
+        const updatedBooking = {
+          rental_status: 'To ship'
+        };
+        setFilteredBookings(prevBookings =>
+          prevBookings.map(booking =>
+            booking.rental_id === selectedRentalId
+              ? { ...booking, ...updatedBooking }
+              : booking
+          )
+        );
+        setBookings(prevBookings =>
+          prevBookings.map(booking =>
+            booking.rental_id === selectedRentalId
+              ? { ...booking, ...updatedBooking }
+              : booking
+          )
+        );
+        // Mark this rental as approved
+        setApprovedRentals(prev => new Set(prev).add(selectedRentalId));
+        console.log('Status updated to To ship and payment status to Paid');
+        // Reopen the dropdown to show the new status tracker BEFORE clearing selectedRentalId
+        setOpenDropdown(selectedRentalId);
+        setShowDeliveryModal(false);
+        setSelectedRentalId(null);
+      } else {
+        console.error('API Error:', data.error);
+        alert(data.error || 'Failed to approve rental');
+      }
+    } catch (err) {
+      console.error('Error approving rental:', err);
+      alert('Error approving rental: ' + err.message);
+    }
+  };
+
+  const handleStatusTransition = async (rentalId, newStatus) => {
+    console.log('Status transition clicked:', rentalId, 'new status:', newStatus);
+    try {
+      const res = await fetch('/api/update-rental-status-manual', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rental_id: rentalId,
+          status: newStatus,
+        }),
+      });
+
+      const data = await res.json();
+      console.log('Status transition response:', data);
+      
+      if (data.success) {
+        // If transitioning to "Out for Delivery", update product availability_status to "Rented"
+        if (newStatus === 'Out for Delivery') {
+          const booking = bookings.find(b => b.rental_id === rentalId);
+          if (booking) {
+            try {
+              await fetch('/api/update-product-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  product_id: booking.product_id,
+                  availability_status: 'Rented',
+                }),
+              });
+            } catch (e) {
+              console.warn('Failed to update product status:', e);
+            }
+          }
+        }
+
+        setFilteredBookings(prevBookings =>
+          prevBookings.map(booking =>
+            booking.rental_id === rentalId
+              ? { ...booking, rental_status: newStatus }
+              : booking
+          )
+        );
+        setBookings(prevBookings =>
+          prevBookings.map(booking =>
+            booking.rental_id === rentalId
+              ? { ...booking, rental_status: newStatus }
+              : booking
+          )
+        );
+        console.log('Status transitioned to', newStatus);
+      } else {
+        console.error('API Error:', data.error);
+        alert(data.error || 'Failed to update status');
+      }
+    } catch (err) {
+      console.error('Error updating status:', err);
+      alert('Error updating status: ' + err.message);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -110,10 +268,10 @@ export default function OwnerBooking() {
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
-              className={`flex items-center gap-3 px-4 py-2 rounded-full border transition-colors ${
+              className={`flex items-center gap-3 px-4 py-2 rounded-full border-2 transition-all text-sm md:text-base ${
                 activeFilter === filter
-                  ? "bg-red-50 border-red-600 text-red-600"
-                  : "bg-white border-gray-300 text-gray-700 hover:border-red-300"
+                  ? "bg-red-50 border-red-200 text-red-600"
+                  : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
               }`}
             >
               <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center shrink-0">
@@ -141,8 +299,8 @@ export default function OwnerBooking() {
         </div>
 
         {/* Products Table */}
-        <div className="bg-white border border-gray-200 shadow-lg overflow-hidden flex-1 overflow-y-auto">
-          <div className="overflow-x-auto h-full">
+        <div className="bg-white border border-gray-200 shadow-lg overflow-hidden flex-1 flex flex-col relative">
+          <div className="overflow-x-auto overflow-y-auto flex-1">
             <table className="w-full">
               <thead className="bg-gray-50 border-b-2 border-gray-300">
                 <tr>
@@ -165,9 +323,6 @@ export default function OwnerBooking() {
                     Category
                   </th>
                   <th className="px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-700">
-                    Price
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-700">
                     Status
                   </th>
                   <th className="px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-700">
@@ -177,7 +332,12 @@ export default function OwnerBooking() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {filteredBookings.length > 0 ? (
-                  filteredBookings.map((booking) => (
+                  filteredBookings.map((booking) => {
+                    const startDate = new Date(booking.start_date);
+                    const today = new Date();
+                    const isReserved = startDate > today;
+                    const status = booking.rental_status === 'Completed' || booking.rental_status === 'Cancelled' ? booking.rental_status : (isReserved ? 'Reserved' : booking.availability_status);
+                    return (
                     <tr key={booking.rental_id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-4">
                         <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-200 rounded flex items-center justify-center mx-auto overflow-hidden">
@@ -226,32 +386,26 @@ export default function OwnerBooking() {
                       <td className="px-4 py-4 text-sm md:text-base text-gray-900 text-center">
                         {booking.category_type || 'N/A'}
                       </td>
-                      <td className="px-4 py-4 text-sm md:text-base font-semibold text-gray-900 text-center">
-                        ₱{booking.total_amount}
-                      </td>
                       <td className="px-4 py-4 text-center">
-                        {(() => {
-                          const startDate = new Date(booking.start_date);
-                          const today = new Date();
-                          const isReserved = startDate > today;
-                          const status = isReserved ? 'Reserved' : booking.availability_status;
-                          return (
-                            <span className={`text-xs md:text-sm font-semibold px-3 py-1 rounded-full ${
-                              status === 'Available' ? 'bg-green-100 text-green-800' :
-                              status === 'Rented' ? 'bg-blue-100 text-blue-800' :
-                              status === 'Reserved' ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-red-100 text-red-800'
-                            }`}>
-                              {status}
-                            </span>
-                          );
-                        })()}
+                        <span className={`text-xs md:text-sm font-semibold px-3 py-1 rounded-full ${
+                          status === 'Available' ? 'bg-green-100 text-green-800' :
+                          status === 'Rented' ? 'bg-blue-100 text-blue-800' :
+                          status === 'Reserved' ? 'bg-yellow-100 text-yellow-800' :
+                          status === 'Completed' ? 'bg-gray-100 text-gray-800' :
+                          status === 'Cancelled' ? 'bg-red-100 text-red-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {status}
+                        </span>
                       </td>
                       <td className="px-4 py-4 relative dropdown-container">
                         <div className="flex items-center justify-center">
                           <button 
-                            onClick={() => setOpenDropdown(openDropdown === booking.rental_id ? null : booking.rental_id)}
-                            className="text-red-600 hover:text-red-700 mx-auto block"
+                            onClick={() => {
+                              setOpenDropdown(openDropdown === booking.rental_id ? null : booking.rental_id);
+                            }}
+                            className="text-red-600 hover:text-red-700 p-2 rounded hover:bg-red-50"
+                            type="button"
                           >
                             <Image
                               src="/icons/owner-booking/caret-down-duotone-light-full 1.svg"
@@ -265,55 +419,404 @@ export default function OwnerBooking() {
 
                         {/* Dropdown Menu */}
                         {openDropdown === booking.rental_id && (
-                          <div className="absolute right-4 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 min-w-[280px]">
+                          <div 
+                            className="absolute right-0 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 min-w-[300px]"
+                          >
                             {/* For Pending Status - Show Approve/Decline */}
-                            {booking.availability_status === 'Reserved' && (
+                            {status === 'Reserved' && booking.rental_status === 'To ship' && !approvedRentals.has(booking.rental_id) && (
                               <div className="p-6">
                                 <div className="space-y-4">
-                                  <div className="grid grid-cols-3 gap-3 text-xs text-gray-700 border-b pb-4">
-                                    <div>
-                                      <div className="font-medium text-gray-500">Oct 10, 2025</div>
-                                      <div className="font-semibold">₱600</div>
-                                    </div>
-                                    <div>
-                                      <div className="font-medium text-gray-500">Oct 11, 2025</div>
-                                      <div className="font-semibold">₱600</div>
-                                    </div>
-                                    <div>
-                                      <div className="font-medium text-gray-500">Oct 12, 2025</div>
-                                      <div className="font-semibold">₱600</div>
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="flex justify-between text-sm border-b pb-3">
-                                    <span className="text-gray-600">Sub Total</span>
-                                    <span className="font-semibold">₱1,800</span>
-                                  </div>
-                                  
-                                  <div className="flex justify-between text-sm border-b pb-3">
-                                    <span className="text-gray-600">Delivery Fee</span>
-                                    <span className="font-semibold text-green-600">Free</span>
-                                  </div>
-                                  
-                                  <div className="flex justify-between text-base font-bold">
-                                    <span>Total</span>
-                                    <span className="text-blue-600">₱1,800</span>
-                                  </div>
-                                  
-                                  <div className="flex gap-3 pt-2">
-                                    <button className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
-                                      Decline
-                                    </button>
-                                    <button className="flex-1 px-4 py-2 text-sm font-medium text-white bg-gray-300 rounded-md cursor-not-allowed">
-                                      Approve
-                                    </button>
-                                  </div>
+                                  {(() => {
+                                    const startDate = new Date(booking.start_date);
+                                    const endDate = new Date(booking.end_date);
+                                    const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                                    const dailyRate = booking.product_rate;
+                                    const totalAmount = booking.total_amount;
+                                    const dailyBreakdown = [];
+                                    
+                                    for (let i = 0; i < days; i++) {
+                                      const currentDate = new Date(startDate);
+                                      currentDate.setDate(currentDate.getDate() + i);
+                                      dailyBreakdown.push({
+                                        date: currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                                        amount: dailyRate
+                                      });
+                                    }
+                                    
+                                    return (
+                                      <>
+                                        <div className="grid grid-cols-3 gap-3 text-xs text-gray-700 border-b pb-4">
+                                          {dailyBreakdown.slice(0, 3).map((day, idx) => (
+                                            <div key={idx}>
+                                              <div className="font-medium text-gray-500">{day.date}</div>
+                                              <div className="font-semibold">₱{day.amount}</div>
+                                            </div>
+                                          ))}
+                                          {dailyBreakdown.length > 3 && (
+                                            <div className="col-span-3 text-center text-gray-500 text-xs">
+                                              +{dailyBreakdown.length - 3} more day(s)
+                                            </div>
+                                          )}
+                                        </div>
+                                        
+                                        <div className="flex justify-between text-sm border-b pb-3">
+                                          <span className="text-gray-600">Sub Total</span>
+                                          <span className="font-semibold">₱{totalAmount}</span>
+                                        </div>
+                                        
+                                        <div className="flex justify-between text-sm border-b pb-3">
+                                          <span className="text-gray-600">Delivery Fee</span>
+                                          <span className="font-semibold text-green-600">Free</span>
+                                        </div>
+                                        
+                                        <div className="flex justify-between text-base font-bold">
+                                          <span>Total</span>
+                                          <span className="text-blue-600">₱{totalAmount}</span>
+                                        </div>
+                                        
+                                        <div className="flex gap-3 pt-2">
+                                          <button className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+                                            Decline
+                                          </button>
+                                          <button
+                                            onClick={() => handleApprove(booking.rental_id)}
+                                            className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors"
+                                          >
+                                            Approve
+                                          </button>
+                                        </div>
+                                      </>
+                                    );
+                                  })()}
                                 </div>
                               </div>
                             )}
 
                             {/* For Ongoing Status - Show Status Tracker with some completed */}
-                            {booking.availability_status === 'Rented' && (
+                            {booking.rental_status === 'To ship' && approvedRentals.has(booking.rental_id) && (
+                              <div className="p-6">
+                                <div className="space-y-4">
+                                  {/* Status Tracker */}
+                                  <div className="relative pl-8">
+                                    {/* Shipping - Current Status */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Shipping</div>
+                                        <div className="text-xs text-blue-600 font-medium">{booking.rental_status}</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Out for Delivery - Pending */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-white border-4 border-gray-300 shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-gray-300"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Out for Delivery</div>
+                                        <div className="text-xs text-gray-400 font-medium">Pending</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Delivered - Pending */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-white border-4 border-gray-300 shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-gray-300"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Delivered</div>
+                                        <div className="text-xs text-gray-400 font-medium">Pending</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Return Shipped - Pending */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-white border-4 border-gray-300 shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-gray-300"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Return Shipped</div>
+                                        <div className="text-xs text-gray-400 font-medium">Pending</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Return Received - Pending */}
+                                    <div className="relative">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-white border-4 border-gray-300 shadow-md"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Return Received</div>
+                                        <div className="text-xs text-gray-400 font-medium">Pending</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <button
+                                    onClick={() => handleStatusTransition(booking.rental_id, 'Out for Delivery')}
+                                    className="w-full px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors mt-4"
+                                  >
+                                    Out for Delivery
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* For Out for Delivery Status - Show Status Tracker with Out for Delivery completed */}
+                            {booking.rental_status === 'Out for Delivery' && (
+                              <div className="p-6">
+                                <div className="space-y-4">
+                                  {/* Status Tracker */}
+                                  <div className="relative pl-8">
+                                    {/* Shipping - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Shipping</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Out for Delivery - Current Status */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Out for Delivery</div>
+                                        <div className="text-xs text-blue-600 font-medium">{booking.rental_status}</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Delivered - Pending */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-white border-4 border-gray-300 shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-gray-300"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Delivered</div>
+                                        <div className="text-xs text-gray-400 font-medium">Pending</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Return Shipped - Pending */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-white border-4 border-gray-300 shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-gray-300"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Return Shipped</div>
+                                        <div className="text-xs text-gray-400 font-medium">Pending</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Return Received - Pending */}
+                                    <div className="relative">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-white border-4 border-gray-300 shadow-md"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Return Received</div>
+                                        <div className="text-xs text-gray-400 font-medium">Pending</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <button
+                                    onClick={() => handleStatusTransition(booking.rental_id, 'Delivered')}
+                                    className="w-full px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors mt-4"
+                                  >
+                                    Delivered
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* For Delivered Status - Show Status Tracker with Delivered completed */}
+                            {booking.rental_status === 'Delivered' && (
+                              <div className="p-6">
+                                <div className="space-y-4">
+                                  {/* Status Tracker */}
+                                  <div className="relative pl-8">
+                                    {/* Shipping - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Shipping</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Out for Delivery - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Out for Delivery</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Delivered - Current Status */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Delivered</div>
+                                        <div className="text-xs text-blue-600 font-medium">{booking.rental_status}</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Return Shipped - Pending */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-white border-4 border-gray-300 shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-gray-300"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Return Shipped</div>
+                                        <div className="text-xs text-gray-400 font-medium">Pending</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Return Received - Pending */}
+                                    <div className="relative">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-white border-4 border-gray-300 shadow-md"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Return Received</div>
+                                        <div className="text-xs text-gray-400 font-medium">Pending</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <button
+                                    onClick={() => handleStatusTransition(booking.rental_id, 'Return Shipped')}
+                                    className="w-full px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors mt-4"
+                                  >
+                                    Return Shipped
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* For Return Shipped Status - Show Status Tracker with Return Shipped completed */}
+                            {booking.rental_status === 'Return Shipped' && (
+                              <div className="p-6">
+                                <div className="space-y-4">
+                                  {/* Status Tracker */}
+                                  <div className="relative pl-8">
+                                    {/* Shipping - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Shipping</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Out for Delivery - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Out for Delivery</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Delivered - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Delivered</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Return Shipped - Current Status */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Return Shipped</div>
+                                        <div className="text-xs text-blue-600 font-medium">{booking.rental_status}</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Return Received - Pending */}
+                                    <div className="relative">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-white border-4 border-gray-300 shadow-md"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Return Received</div>
+                                        <div className="text-xs text-gray-400 font-medium">Pending</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <button
+                                    onClick={() => handleStatusTransition(booking.rental_id, 'Completed')}
+                                    className="w-full px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors mt-4"
+                                  >
+                                    Received
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* For Completed Status - Show Status Tracker with all completed */}
+                            {booking.rental_status === 'Completed' && (
+                              <div className="p-6">
+                                <div className="space-y-4">
+                                  {/* Status Tracker */}
+                                  <div className="relative pl-8">
+                                    {/* Shipping - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Shipping</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Out for Delivery - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Out for Delivery</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Delivered - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Delivered</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Return Shipped - Completed */}
+                                    <div className="relative pb-8">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="absolute left-2 top-4 w-0.5 h-full bg-red-600"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Return Shipped</div>
+                                        <div className="text-xs text-blue-600 font-medium">Completed</div>
+                                      </div>
+                                    </div>
+
+                                    {/* Return Received - Current Status */}
+                                    <div className="relative">
+                                      <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-red-600 border-4 border-white shadow-md"></div>
+                                      <div className="pl-4">
+                                        <div className="font-semibold text-sm text-gray-900">Return Received</div>
+                                        <div className="text-xs text-blue-600 font-medium">{booking.rental_status}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* For Rented Status - Show Status Tracker with more completed */}
+                            {booking.rental_status === 'Rented' && (
                               <div className="p-6">
                                 <div className="space-y-4">
                                   {/* Status Tracker */}
@@ -372,7 +875,7 @@ export default function OwnerBooking() {
                             )}
 
                             {/* For Available/Completed Status - Show All Completed */}
-                            {(booking.availability_status === 'Available' || booking.availability_status === 'Unavailable') && (
+                            {(status === 'Available' || status === 'Unavailable') && (booking.rental_status === 'Completed') && (
                               <div className="p-6">
                                 <div className="space-y-4">
                                   {/* Status Tracker - All Completed */}
@@ -433,7 +936,8 @@ export default function OwnerBooking() {
                         )}
                       </td>
                     </tr>
-                  ))
+                  );
+                })
                 ) : (
                   <tr>
                     <td colSpan="9" className="px-4 py-8 text-center text-gray-600">
@@ -446,6 +950,48 @@ export default function OwnerBooking() {
           </div>
         </div>
       </div>
+
+      {/* Delivery Status Modal */}
+      {showDeliveryModal && selectedRentalId && (() => {
+        const booking = bookings.find(b => b.rental_id === selectedRentalId);
+        const deliveryLabel = booking?.delivery_option === 'Lalamove' ? 'Delivery via Lalamove' : 'Customer Pick-up';
+        
+        return (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 md:p-8 animate-slideUp">
+              <h2 className="text-xl md:text-2xl font-bold text-black mb-4">Confirm Delivery</h2>
+              <p className="text-gray-600 text-sm md:text-base mb-6">Customer's chosen delivery method:</p>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+                <div className="font-semibold text-black text-lg">{deliveryLabel}</div>
+                <div className="text-sm text-gray-600 mt-1">
+                  {booking?.delivery_option === 'Lalamove' 
+                    ? 'You will deliver using Lalamove' 
+                    : 'Customer will pick up the item'}
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeliveryModal(false);
+                    setSelectedRentalId(null);
+                  }}
+                  className="flex-1 px-4 py-2.5 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDeliveryModalConfirm(booking?.delivery_option)}
+                  className="flex-1 px-4 py-2.5 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors font-medium"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

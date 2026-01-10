@@ -56,7 +56,7 @@ export default function OwnerPayments() {
             day: "numeric",
           }),
           price: `₱${Number(payment.total_amount).toFixed(2)}`,
-          paymentStatus: payment.payment_status || payment.status,
+          paymentStatus: payment.payment_status,
         }));
         setPayments(formattedPayments);
       }
@@ -241,9 +241,9 @@ export default function OwnerPayments() {
           </button>
 
           <button
-            onClick={() => setActiveFilter("failed")}
+            onClick={() => setActiveFilter("cancelled")}
             className={`flex items-center gap-2 md:gap-3 px-3 md:px-4 py-1.5 md:py-2 rounded-full border-2 transition-all text-sm md:text-base ${
-              activeFilter === "failed"
+              activeFilter === "cancelled"
                 ? "bg-red-50 border-red-200 text-red-600"
                 : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
             }`}
@@ -267,7 +267,7 @@ export default function OwnerPayments() {
                 />
               </svg>
             </div>
-            <span className="font-medium">Failed</span>
+            <span className="font-medium">Cancelled</span>
           </button>
         </div>
 
@@ -406,6 +406,8 @@ export default function OwnerPayments() {
                                 ? "bg-yellow-100 text-yellow-700"
                                 : payment.paymentStatus?.toLowerCase() === "refunded"
                                 ? "bg-blue-100 text-blue-700"
+                                : payment.paymentStatus?.toLowerCase() === "cancelled"
+                                ? "bg-red-100 text-red-700"
                                 : "bg-rose-100 text-rose-700"
                             }`}
                           >
