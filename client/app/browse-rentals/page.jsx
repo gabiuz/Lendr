@@ -145,7 +145,7 @@ export default function BrowseRentals() {
       <Navbar
         links={[
           { href: "/owner-homepage", label: "Home" },
-          { href: "/browse-rentals", label: "Browse Rentals" },
+          { href: "/browse-rentals", label: "My Rentals" },
           { href: "/owner-booking", label: "Bookings" },
           { href: "/owner-payments", label: "Payments" },
         ]}

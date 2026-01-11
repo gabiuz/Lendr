@@ -89,7 +89,7 @@ export default function OwnerPayments() {
           },
           {
             href: "/browse-rentals",
-            label: "Browse Rentals",
+            label: "My Rentals",
           },
           {
             href: "/owner-booking",
