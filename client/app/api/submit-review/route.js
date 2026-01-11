@@ -36,6 +36,26 @@ export async function POST(request) {
       );
     }
 
+    // Check if the rental exists and is not cancelled
+    const rentalCheck = await query({
+      query: 'SELECT status FROM rentals WHERE rental_id = ?',
+      values: [rentalId]
+    });
+
+    if (!rentalCheck || rentalCheck.length === 0) {
+      return NextResponse.json(
+        { success: false, message: 'Rental not found' },
+        { status: 404 }
+      );
+    }
+
+    if (rentalCheck[0].status === 'Cancelled') {
+      return NextResponse.json(
+        { success: false, message: 'Cannot submit a review for a cancelled rental' },
+        { status: 400 }
+      );
+    }
+
     const reviewId = await generateReviewId();
     const createdAt = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 

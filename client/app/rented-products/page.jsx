@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 import Link from "next/link";
@@ -14,39 +14,41 @@ export default function RentedProduct() {
   const [reviews, setReviews] = useState({});
   const [submittedRatings, setSubmittedRatings] = useState({});
 
+  // Extract fetchRentals into useCallback so it can be reused
+  const fetchRentals = useCallback(async (id) => {
+    try {
+      const res = await fetch(`/api/customer-rentals?customer_id=${id}`);
+      const data = await res.json();
+      if (data.success) {
+        setRentals(data.rentals || []);
+        
+        // Fetch existing reviews
+        const reviewRes = await fetch(`/api/customer-reviews?customer_id=${id}`);
+        const reviewData = await reviewRes.json();
+        if (reviewData.success && reviewData.reviewedRentalIds) {
+          // Create a map of rental_id -> true for reviewed rentals
+          const submittedMap = {};
+          reviewData.reviewedRentalIds.forEach(rentalId => {
+            submittedMap[rentalId] = true;
+          });
+          setSubmittedRatings(submittedMap);
+        }
+      } else {
+        console.error("Error fetching rentals:", data.message);
+      }
+    } catch (error) {
+      console.error("Failed to fetch rentals:", error);
+    }
+  }, []);
+
   useEffect(() => {
     const id = typeof window !== "undefined" ? localStorage.getItem("customer_id") : null;
     setCustomerId(id);
     
     if (id) {
-      async function fetchRentals() {
-        try {
-          const res = await fetch(`/api/customer-rentals?customer_id=${id}`);
-          const data = await res.json();
-          if (data.success) {
-            setRentals(data.rentals || []);
-            
-            // Fetch existing reviews
-            const reviewRes = await fetch(`/api/customer-reviews?customer_id=${id}`);
-            const reviewData = await reviewRes.json();
-            if (reviewData.success && reviewData.reviewedRentalIds) {
-              // Create a map of rental_id -> true for reviewed rentals
-              const submittedMap = {};
-              reviewData.reviewedRentalIds.forEach(rentalId => {
-                submittedMap[rentalId] = true;
-              });
-              setSubmittedRatings(submittedMap);
-            }
-          } else {
-            console.error("Error fetching rentals:", data.message);
-          }
-        } catch (error) {
-          console.error("Failed to fetch rentals:", error);
-        }
-      }
-      fetchRentals();
+      fetchRentals(id);
     }
-  }, []);
+  }, [fetchRentals]);
 
   const handleStarClick = (rentalId, star) => {
     setRatings({ ...ratings, [rentalId]: star });
@@ -117,10 +119,10 @@ export default function RentedProduct() {
 
       if (data.success) {
         alert("Rental cancelled successfully.");
-        // Update the rental status to cancelled instead of removing it
-        setRentals(rentals.map(r => 
-          r.rental_id === rentalId ? { ...r, status: 'Cancelled' } : r
-        ));
+        // Refetch rentals to get the updated status from the database
+        if (customerId) {
+          await fetchRentals(customerId);
+        }
       } else {
         alert("Error cancelling rental: " + data.error);
       }
@@ -375,6 +377,35 @@ export default function RentedProduct() {
                         >
                           Cancel Rental
                         </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Cancelled Rental Message */}
+                  {rental.status && rental.status.toLowerCase() === 'cancelled' && (
+                    <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-gray-200 pt-6 lg:pt-0 lg:pl-6">
+                      <div className="flex flex-col items-center justify-center h-full text-center">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-3">
+                          <svg
+                            className="w-8 h-8 text-red-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </div>
+                        <p className="font-semibold text-black">
+                          Booking Cancelled
+                        </p>
+                        <p className="text-sm text-zinc-600 mt-1">
+                          This rental was cancelled and cannot be reviewed.
+                        </p>
                       </div>
                     </div>
                   )}

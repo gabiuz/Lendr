@@ -2,7 +2,54 @@ import { NextResponse } from 'next/server';
 import { query } from '@/source/database.js';
 
 export async function POST(request) {
+  console.log('[update-rental-status POST] Starting...');
+  
   try {
+    const { searchParams } = new URL(request.url);
+    const rental_id = searchParams.get('rental_id');
+    const status = searchParams.get('status');
+
+    console.log('[update-rental-status POST] Received via query params:', { rental_id, status });
+
+    // If rental_id and status are provided, update that specific rental
+    if (rental_id && status) {
+      // Validate the status
+      const validStatuses = ['To ship', 'Shipped', 'Out for Delivery', 'Delivered', 'Return Shipped', 'Return Received', 'Completed', 'Cancelled'];
+      if (!validStatuses.includes(status)) {
+        console.error('[update-rental-status] Invalid status:', status);
+        return NextResponse.json(
+          { success: false, error: `Invalid status: ${status}` },
+          { status: 400 }
+        );
+      }
+
+      console.log('[update-rental-status] Updating rental', rental_id, 'to status:', status);
+      
+      try {
+        const updateResult = await query({
+          query: 'UPDATE rentals SET status = ? WHERE rental_id = ?',
+          values: [status, rental_id],
+        });
+
+        console.log('[update-rental-status] Update result:', updateResult);
+
+        const responseData = {
+          success: true,
+          message: `Rental status updated to ${status}`,
+        };
+
+        console.log('[update-rental-status] Returning response:', responseData);
+        return NextResponse.json(responseData);
+      } catch (dbError) {
+        console.error('[update-rental-status] Database error:', dbError);
+        return NextResponse.json(
+          { success: false, error: 'Database update failed: ' + dbError.message },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Otherwise, auto-update expired rentals (legacy behavior)
     const today = new Date().toISOString().split('T')[0];
 
     // Find all rentals where end_date has passed and status is not "Completed"
@@ -41,7 +88,7 @@ export async function POST(request) {
       updatedCount: expiredRentals.length,
     });
   } catch (error) {
-    console.error('Error updating rental status:', error);
+    console.error('[update-rental-status POST Error]', error);
     return NextResponse.json(
       { success: false, error: error.message || 'Internal server error' },
       { status: 500 }

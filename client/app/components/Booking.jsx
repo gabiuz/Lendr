@@ -37,9 +37,14 @@ export default function Booking({
       const data = await res.json();
       
       if (data.success && data.product && data.product.rentals) {
-        // Create an array of booked dates
+        // Create an array of booked dates (excluding cancelled rentals - they should be available again)
         const booked = [];
         data.product.rentals.forEach(rental => {
+          // Skip cancelled rentals - their dates should be clickable for rebooking
+          if (rental.status === 'Cancelled') {
+            return;
+          }
+          
           const startDate = new Date(rental.start_date);
           const endDate = new Date(rental.end_date);
           

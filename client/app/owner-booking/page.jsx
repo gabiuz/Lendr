@@ -269,6 +269,107 @@ export default function OwnerBooking() {
     }
   };
 
+  const handleDecline = async (rentalId) => {
+    try {
+      console.log('[handleDecline] Starting for rental:', rentalId);
+      
+      // Use query parameters instead of body due to proxy issue
+      const url = new URL("/api/update-rental-status", window.location.origin);
+      url.searchParams.append("rental_id", rentalId);
+      url.searchParams.append("status", "Cancelled");
+      
+      console.log('[handleDecline] URL:', url.toString());
+      
+      const res = await fetch(url.toString(), {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("[handleDecline] Response status:", res.status);
+
+      // Check if response is ok before parsing JSON
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("[handleDecline] HTTP Error - Status:", res.status, "Response:", text);
+        alert(`Error: ${res.status} - Failed to decline booking`);
+        return;
+      }
+
+      // Get response as text first to debug
+      const responseText = await res.text();
+      console.log("[handleDecline] Response text:", responseText);
+
+      // Check if response is empty
+      if (!responseText || responseText.trim() === '') {
+        console.error("[handleDecline] Empty response from server");
+        alert("Error: Server returned empty response");
+        return;
+      }
+
+      // Parse JSON manually with error handling
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseErr) {
+        console.error("[handleDecline] Failed to parse JSON:", parseErr.message, "Response was:", responseText);
+        alert("Error: Invalid response format from server: " + parseErr.message);
+        return;
+      }
+
+      console.log("[handleDecline] Parsed response data:", data);
+
+      if (data.success) {
+        // Find the booking to get product_id
+        const booking = bookings.find(b => b.rental_id === rentalId);
+        
+        // Update the local state to reflect the status change
+        setFilteredBookings((prevBookings) =>
+          prevBookings.map((b) =>
+            b.rental_id === rentalId
+              ? { ...b, rental_status: "Cancelled" }
+              : b,
+          ),
+        );
+        setBookings((prevBookings) =>
+          prevBookings.map((b) =>
+            b.rental_id === rentalId
+              ? { ...b, rental_status: "Cancelled" }
+              : b,
+          ),
+        );
+        
+        // Update product availability status to "Available"
+        if (booking) {
+          try {
+            await fetch("/api/update-product-status", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                product_id: booking.product_id,
+                availability_status: "Available",
+              }),
+            });
+            console.log("[handleDecline] Product status updated to Available");
+          } catch (e) {
+            console.error("[handleDecline] Failed to update product status:", e);
+          }
+        }
+        
+        setOpenDropdown(null);
+        alert("Booking declined successfully. The customer has been notified.");
+        console.log("[handleDecline] Booking declined successfully:", rentalId);
+      } else {
+        console.error("[handleDecline] API returned error:", data.error);
+        alert(data.error || "Failed to decline booking");
+      }
+    } catch (err) {
+      console.error("[handleDecline] Unexpected error:", err.message, err);
+      alert("Error declining booking: " + err.message);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar
@@ -607,7 +708,13 @@ export default function OwnerBooking() {
                                             </div>
 
                                             <div className="flex gap-3 pt-2">
-                                              <button className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+                                              <button 
+                                                onClick={() =>
+                                                  handleDecline(
+                                                    booking.rental_id,
+                                                  )
+                                                }
+                                                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
                                                 Decline
                                               </button>
                                               <button
