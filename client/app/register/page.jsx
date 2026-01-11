@@ -91,7 +91,7 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-[url('/bg-image-register.jpg')] bg-cover bg-center bg-no-repeat">
+    <div className="min-h-screen flex flex-col justify-between bg-[url('/create-acc-bg.png')] bg-cover bg-center bg-no-repeat">
       <div className="flex justify-center w-full pt-6 md:justify-center lg:justify-start lg:pl-24 lg:pt-16">
         <Image src="/lendr-logo.png" alt="Lendr Logo" width={142} height={54} />
       </div>
