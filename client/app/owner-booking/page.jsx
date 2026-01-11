@@ -15,8 +15,8 @@ export default function OwnerBooking() {
 
   const filters = [
     "All",
-    "Pending",
-    "Ongoing",
+    "Reserved",
+    "Rented",
     "Completed",
     "Cancelled",
   ];
@@ -354,6 +354,21 @@ export default function OwnerBooking() {
           } catch (e) {
             console.error("[handleDecline] Failed to update product status:", e);
           }
+
+          // Update payment status to "Cancelled"
+          try {
+            const paymentUrl = new URL("/api/update-payment-status", window.location.origin);
+            paymentUrl.searchParams.append("rental_id", rentalId);
+            paymentUrl.searchParams.append("payment_status", "Cancelled");
+            
+            await fetch(paymentUrl.toString(), {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+            });
+            console.log("[handleDecline] Payment status updated to Cancelled");
+          } catch (e) {
+            console.error("[handleDecline] Failed to update payment status:", e);
+          }
         }
         
         setOpenDropdown(null);
@@ -424,9 +439,9 @@ export default function OwnerBooking() {
                   src={`/icons/owner-booking/${
                     filter === "All"
                       ? "list-check-duotone-solid-full (1) 1.svg"
-                      : filter === "Pending"
+                      : filter === "Reserved"
                         ? "timer-duotone-light-full 1.svg"
-                        : filter === "Ongoing"
+                        : filter === "Rented"
                           ? "arrows-rotate-sharp-duotone-regular-full 1.svg"
                           : filter === "Completed"
                             ? "circle-check-duotone-light-full 1.svg"
@@ -594,14 +609,21 @@ export default function OwnerBooking() {
                           <div className="flex items-center justify-center">
                             <button
                               onClick={() => {
-                                setOpenDropdown(
-                                  openDropdown === booking.rental_id
-                                    ? null
-                                    : booking.rental_id,
-                                );
+                                if (status !== "Cancelled") {
+                                  setOpenDropdown(
+                                    openDropdown === booking.rental_id
+                                      ? null
+                                      : booking.rental_id,
+                                  );
+                                }
                               }}
-                              className="text-red-600 hover:text-red-700 p-2 rounded hover:bg-red-50"
+                              className={`p-2 rounded ${
+                                status === "Cancelled"
+                                  ? "text-gray-400 cursor-not-allowed"
+                                  : "text-red-600 hover:text-red-700 hover:bg-red-50"
+                              }`}
                               type="button"
+                              disabled={status === "Cancelled"}
                             >
                               <Image
                                 src="/icons/owner-booking/caret-down-duotone-light-full 1.svg"
@@ -613,8 +635,8 @@ export default function OwnerBooking() {
                             </button>
                           </div>
 
-                          {/* Dropdown Menu */}
-                          {openDropdown === booking.rental_id && (
+                          {/* Dropdown Menu - Not shown if Cancelled */}
+                          {openDropdown === booking.rental_id && status !== "Cancelled" && (
                             <div className="absolute right-0 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 min-w-[300px]">
                               {/* For Pending Status - Show Approve/Decline */}
                               {status === "Reserved" &&

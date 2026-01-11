@@ -286,7 +286,10 @@ export default function OwnerDashboard() {
               </thead>
               <tbody>
                 {rentals.length > 0 ? (
-                  rentals.map((rental) => (
+                  rentals
+                    .filter((rental) => rental.status !== "Cancelled")
+                    .slice(0, 5)
+                    .map((rental) => (
                     <tr
                       key={rental.rental_id}
                       className="border-b border-gray-200 hover:bg-gray-200 transition-colors"

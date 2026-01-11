@@ -3,8 +3,21 @@ import { query } from '@/source/database.js';
 
 export async function POST(request) {
   try {
-    const body = await request.json();
-    const { rental_id, payment_status } = body;
+    // Try to get parameters from query string first (for our use case)
+    const { searchParams } = new URL(request.url);
+    let rental_id = searchParams.get('rental_id');
+    let payment_status = searchParams.get('payment_status');
+
+    // If not in query params, try to read from body (for backward compatibility)
+    if (!rental_id || !payment_status) {
+      try {
+        const body = await request.json();
+        rental_id = rental_id || body.rental_id;
+        payment_status = payment_status || body.payment_status;
+      } catch {
+        // Body might not be JSON, continue with query params
+      }
+    }
 
     // Validate inputs
     if (!rental_id || !payment_status) {

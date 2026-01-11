@@ -17,7 +17,7 @@ export async function GET(request) {
 
     const activeRentalsRows = await query({
       query:
-        'SELECT COUNT(*) AS count FROM rentals r JOIN products p ON r.product_id = p.product_id WHERE p.owner_id = ? AND r.status <> "Completed"',
+        'SELECT COUNT(*) AS count FROM rentals r JOIN products p ON r.product_id = p.product_id WHERE p.owner_id = ? AND r.status <> "Completed" AND r.status <> "Cancelled"',
       values: [owner_id],
     });
 
