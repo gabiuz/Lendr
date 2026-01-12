@@ -142,11 +142,6 @@ export default function OwnerProfileSettings() {
         type: "tel",
         placeholder: "09123456789",
       },
-      {
-        key: "business_address",
-        label: "Business Address",
-        placeholder: "123 Business St",
-      },
     ],
   };
 
@@ -323,6 +318,23 @@ export default function OwnerProfileSettings() {
                   containerClassName="w-full"
                 />
               ))}
+            </div>
+
+            <div className="mt-4">
+              <Input
+                label="Business Address"
+                placeholder="123 Business St"
+                value={profile ? profile.business_address || "" : ""}
+                onChange={(e) =>
+                  setProfile((p) =>
+                    p
+                      ? { ...p, business_address: e.target.value }
+                      : { business_address: e.target.value }
+                  )
+                }
+                readOnly={!editing}
+                containerClassName="w-full"
+              />
             </div>
 
             <div className="mt-4">
