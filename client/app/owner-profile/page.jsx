@@ -15,9 +15,9 @@ export default function OwnerProfile() {
   useEffect(() => {
     async function fetchOwnerData() {
       try {
-        const owner_id = localStorage.getItem('owner_id');
+        const owner_id = localStorage.getItem("owner_id");
         if (!owner_id) {
-          console.error('No owner_id found');
+          console.error("No owner_id found");
           setLoading(false);
           return;
         }
@@ -27,12 +27,14 @@ export default function OwnerProfile() {
         const ownerResult = await ownerRes.json();
         if (ownerResult.success && ownerResult.data) {
           setOwnerData(ownerResult.data);
-          
+
           // Use customer data from the API response if available, otherwise fetch it separately
           if (ownerResult.customer) {
             setCustomerData(ownerResult.customer);
           } else if (ownerResult.data.customer_id) {
-            const customerRes = await fetch(`/api/profile?customer_id=${ownerResult.data.customer_id}`);
+            const customerRes = await fetch(
+              `/api/profile?customer_id=${ownerResult.data.customer_id}`
+            );
             const customerResult = await customerRes.json();
             if (customerResult.success && customerResult.profile) {
               setCustomerData(customerResult.profile);
@@ -41,7 +43,9 @@ export default function OwnerProfile() {
         }
 
         // Fetch profile stats
-        const statsRes = await fetch(`/api/owner-profile-stats?owner_id=${owner_id}`);
+        const statsRes = await fetch(
+          `/api/owner-profile-stats?owner_id=${owner_id}`
+        );
         const statsResult = await statsRes.json();
         if (statsResult.success) {
           setProfileStats(statsResult.stats);
@@ -50,28 +54,32 @@ export default function OwnerProfile() {
           try {
             const prodsRes = await fetch(`/api/products?owner_id=${owner_id}`);
             const prodsJson = await prodsRes.json();
-            const prods = prodsJson.success ? (prodsJson.products || []) : [];
+            const prods = prodsJson.success ? prodsJson.products || [] : [];
 
-            const rentalsRes = await fetch(`/api/owner-rentals?owner_id=${owner_id}`);
+            const rentalsRes = await fetch(
+              `/api/owner-rentals?owner_id=${owner_id}`
+            );
             const rentalsJson = await rentalsRes.json();
-            const rentals = rentalsJson.success ? (rentalsJson.rentals || []) : [];
+            const rentals = rentalsJson.success
+              ? rentalsJson.rentals || []
+              : [];
 
             setProfileStats({
               products: prods.length,
               activeRentals: rentals.length,
-              topEarningProduct: { name: 'No data', earnings: 0 },
+              topEarningProduct: { name: "No data", earnings: 0 },
               currentMonthRevenue: 0,
               monthlyRevenue: Array(12).fill(0),
-              mostRentedCategory: { name: 'N/A', count: 0 },
+              mostRentedCategory: { name: "N/A", count: 0 },
               categoryBreakdown: [],
               customerRating: null,
             });
           } catch (e) {
-            console.error('Fallback stats fetch failed:', e);
+            console.error("Fallback stats fetch failed:", e);
           }
         }
       } catch (error) {
-        console.error('Error fetching owner data:', error);
+        console.error("Error fetching owner data:", error);
       } finally {
         setLoading(false);
       }
@@ -104,8 +112,8 @@ export default function OwnerProfile() {
         {/* Profile Header Card */}
         <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6 md:p-8 mb-8 relative">
           {/* Edit Button - Top Right */}
-          <button 
-            onClick={() => router.push('/owner-profile-settings')}
+          <button
+            onClick={() => router.push("/owner-profile-settings")}
             className="cursor-pointer absolute top-4 right-4 bg-black text-white p-2 rounded-full hover:bg-gray-800"
           >
             <svg
@@ -147,32 +155,42 @@ export default function OwnerProfile() {
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
-                      className={`w-4 h-4 ${i < Math.floor(profileStats?.customerRating ?? 0) ? 'fill-current' : 'fill-current opacity-30'}`}
+                      className={`w-4 h-4 ${
+                        i < Math.floor(profileStats?.customerRating ?? 0)
+                          ? "fill-current"
+                          : "fill-current opacity-30"
+                      }`}
                       viewBox="0 0 24 24"
                     >
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
                   ))}
                 </div>
-                <span className="text-sm font-semibold">{profileStats?.customerRating ?? '—'}</span>
+                <span className="text-sm font-semibold">
+                  {profileStats?.customerRating ?? "—"}
+                </span>
               </div>
 
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-black mb-1">
-                {customerData?.first_name && customerData?.last_name 
+                {customerData?.first_name && customerData?.last_name
                   ? `${customerData.first_name} ${customerData.last_name}`
-                  : 'Rental Owner Name'}
+                  : "Rental Owner Name"}
               </h1>
               <p className="text-gray-600 mb-1">
-                {customerData?.address ? customerData.address.split(',')[0].trim() : 'Los Angeles, CA'}
+                {customerData?.address
+                  ? customerData.address.split(",")[0].trim()
+                  : "Los Angeles, CA"}
               </p>
               <p className="text-red-600 font-semibold mb-4">
-                {ownerData?.business_name ? `${ownerData.business_name} Rental Owner` : 'Rental Owner'}
+                {ownerData?.business_name
+                  ? `${ownerData.business_name} Rental Owner`
+                  : "Rental Owner"}
               </p>
 
               <p className="text-sm md:text-base text-gray-700 mb-6 max-w-2xl">
-                {ownerData?.business_description 
+                {ownerData?.business_description
                   ? ownerData.business_description
-                  : 'No business description available yet.'}
+                  : "No business description available yet."}
               </p>
 
               <div className="flex flex-wrap gap-4 mb-6">
@@ -190,7 +208,9 @@ export default function OwnerProfile() {
                       d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                     />
                   </svg>
-                  <span className="text-gray-700">{ownerData?.contact_number || '09123456789'}</span>
+                  <span className="text-gray-700">
+                    {ownerData?.contact_number || "09123456789"}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm md:text-base">
                   <svg
@@ -206,7 +226,9 @@ export default function OwnerProfile() {
                       d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                     />
                   </svg>
-                  <span className="text-gray-700">{ownerData?.contact_email || 'owner@gmail.com'}</span>
+                  <span className="text-gray-700">
+                    {ownerData?.contact_email || "owner@gmail.com"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -216,27 +238,33 @@ export default function OwnerProfile() {
               <div className="flex items-center gap-3 md:gap-4">
                 <div className="w-16 h-16 md:w-20 md:h-20 lg:w-16 lg:h-16 flex items-center justify-center shrink-0">
                   <svg
-                    className="w-16 h-16 md:w-20 md:h-20 lg:w-16 lg:h-16"
-                    width="1000"
-                    height="1000"
-                    viewBox="0 0 202 202"
+                    width="170"
+                    height="170"
+                    viewBox="0 0 170 170"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      d="M151.5 45.45C154.278 45.45 156.55 47.7225 156.55 50.5V151.5C156.55 154.278 154.278 156.55 151.5 156.55H50.5C47.7225 156.55 45.45 154.278 45.45 151.5V50.5C45.45 47.7225 47.7225 45.45 50.5 45.45H151.5ZM50.5 30.3C39.3585 30.3 30.3 39.3585 30.3 50.5V151.5C30.3 162.642 39.3585 171.7 50.5 171.7H151.5C162.642 171.7 171.7 162.642 171.7 151.5V50.5C171.7 39.3585 162.642 30.3 151.5 30.3H50.5ZM65.65 136.35C65.65 139.128 67.9225 141.4 70.7 141.4H131.3C134.078 141.4 136.35 139.128 136.35 136.35C136.35 122.399 125.051 111.1 111.1 111.1H90.9C76.9494 111.1 65.65 122.399 65.65 136.35ZM101 98.475C110.753 98.475 118.675 90.5529 118.675 80.8C118.675 71.0472 110.753 63.125 101 63.125C91.2472 63.125 83.325 71.0472 83.325 80.8C83.325 90.5529 91.2472 98.475 101 98.475Z"
-                      fill="black"
+                      opacity="0.4"
+                      d="M27.3594 68H142.614L130.369 129.173C129.572 133.158 126.092 136 122.028 136H47.8922C43.8281 136 40.3484 133.131 39.5516 129.173L27.3594 68ZM51 89.25V114.75C51 117.087 52.9125 119 55.25 119C57.5875 119 59.5 117.087 59.5 114.75V89.25C59.5 86.9125 57.5875 85 55.25 85C52.9125 85 51 86.9125 51 89.25ZM80.75 89.25V114.75C80.75 117.087 82.6625 119 85 119C87.3375 119 89.25 117.087 89.25 114.75V89.25C89.25 86.9125 87.3375 85 85 85C82.6625 85 80.75 86.9125 80.75 89.25ZM110.5 89.25V114.75C110.5 117.087 112.412 119 114.75 119C117.088 119 119 117.087 119 114.75V89.25C119 86.9125 117.088 85 114.75 85C112.412 85 110.5 86.9125 110.5 89.25Z"
+                      fill="#990000"
+                    />
+                    <path
+                      d="M85 17C86.2219 17 87.3641 17.5047 88.1609 18.4078L124.923 59.5H153C155.337 59.5 157.25 61.4125 157.25 63.75C157.25 66.0875 155.337 68 153 68H151.3L138.736 130.847C137.142 138.789 130.183 144.5 122.055 144.5H47.9187C39.8172 144.5 32.8312 138.789 31.2375 130.847L18.7 68H17C14.6625 68 12.75 66.0875 12.75 63.75C12.75 61.4125 14.6625 59.5 17 59.5H45.0766L81.8391 18.4078C82.6359 17.5047 83.8047 17 85 17ZM85 27.625L56.4719 59.5H113.528L85 27.625ZM27.3594 68L39.6047 129.173C40.4016 133.158 43.8813 136 47.9453 136H122.081C126.145 136 129.625 133.131 130.422 129.173L142.641 68H27.3594ZM59.5 89.25V114.75C59.5 117.088 57.5875 119 55.25 119C52.9125 119 51 117.088 51 114.75V89.25C51 86.9125 52.9125 85 55.25 85C57.5875 85 59.5 86.9125 59.5 89.25ZM85 85C87.3375 85 89.25 86.9125 89.25 89.25V114.75C89.25 117.088 87.3375 119 85 119C82.6625 119 80.75 117.088 80.75 114.75V89.25C80.75 86.9125 82.6625 85 85 85ZM119 89.25V114.75C119 117.088 117.088 119 114.75 119C112.412 119 110.5 117.088 110.5 114.75V89.25C110.5 86.9125 112.412 85 114.75 85C117.088 85 119 86.9125 119 89.25Z"
+                      fill="#990000"
                     />
                   </svg>
                 </div>
                 <div className="text-left">
                   <p className="text-2xl md:text-3xl lg:text-2xl xl:text-3xl font-bold text-black">
-                    {profileStats?.products ?? '0'}
+                    {profileStats?.products ?? "0"}
                   </p>
-                  <p className="text-sm md:text-base lg:text-sm text-gray-600">Products</p>
+                  <p className="text-sm md:text-base lg:text-sm text-gray-600">
+                    Products
+                  </p>
                 </div>
               </div>
-              
+
               {/* Divider */}
               <div className="w-px h-16 md:h-20 bg-black mx-4"></div>
 
@@ -258,9 +286,11 @@ export default function OwnerProfile() {
                 </div>
                 <div className="text-left">
                   <p className="text-2xl md:text-3xl lg:text-2xl xl:text-3xl font-bold text-black">
-                    {profileStats?.activeRentals ?? '0'}
+                    {profileStats?.activeRentals ?? "0"}
                   </p>
-                  <p className="text-sm md:text-base lg:text-sm text-gray-600">Rentals</p>
+                  <p className="text-sm md:text-base lg:text-sm text-gray-600">
+                    Rentals
+                  </p>
                 </div>
               </div>
             </div>
@@ -271,13 +301,20 @@ export default function OwnerProfile() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8">
           {/* Top Earning Product */}
           <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-4 md:p-6">
-            <h3 className="text-xs md:text-sm text-gray-600 mb-2">Top Earning Product</h3>
+            <h3 className="text-xs md:text-sm text-gray-600 mb-2">
+              Top Earning Product
+            </h3>
             <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-black mb-3 md:mb-4">
-              {profileStats?.topEarningProduct?.name || 'No data'}
+              {profileStats?.topEarningProduct?.name || "No data"}
             </h2>
             <div className="text-right">
               <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-black">
-                ₱{profileStats?.topEarningProduct?.earnings ? Number(profileStats.topEarningProduct.earnings).toLocaleString() : '0'}
+                ₱
+                {profileStats?.topEarningProduct?.earnings
+                  ? Number(
+                      profileStats.topEarningProduct.earnings
+                    ).toLocaleString()
+                  : "0"}
               </p>
               <p className="text-sm md:text-base text-gray-600">this month</p>
             </div>
@@ -286,32 +323,42 @@ export default function OwnerProfile() {
           {/* Monthly Revenue Chart */}
           <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-4 md:p-6">
             <div className="flex justify-between items-start mb-4 md:mb-6">
-              <h3 className="text-xs md:text-sm text-gray-600">Monthly Revenue</h3>
+              <h3 className="text-xs md:text-sm text-gray-600">
+                Monthly Revenue
+              </h3>
               <p className="text-xl md:text-2xl lg:text-3xl font-bold text-black">
-                ₱{profileStats?.currentMonthRevenue ? Number(profileStats.currentMonthRevenue).toLocaleString() : '0'}
+                ₱
+                {profileStats?.currentMonthRevenue
+                  ? Number(profileStats.currentMonthRevenue).toLocaleString()
+                  : "0"}
               </p>
             </div>
             <div className="h-48 flex items-end justify-between gap-2">
-              {profileStats?.monthlyRevenue ? 
-                profileStats.monthlyRevenue.map((value, i) => {
-                  const maxValue = Math.max(...profileStats.monthlyRevenue, 1);
-                  const height = (value / maxValue) * 100;
-                  return (
-                    <div
-                      key={i}
-                      className="flex-1 bg-gray-300 hover:bg-gray-400 rounded-t transition-colors"
-                      style={{ height: `${Math.max(height, 5)}%` }}
-                      title={`₱${Number(value).toLocaleString()}`}
-                    ></div>
-                  );
-                })
-              : [40, 50, 55, 65, 70, 60, 75, 95, 70, 65, 70, 75].map((height, i) => (
-                  <div
-                    key={i}
-                    className="flex-1 bg-gray-300 rounded-t"
-                    style={{ height: `${height}%` }}
-                  ></div>
-                ))}
+              {profileStats?.monthlyRevenue
+                ? profileStats.monthlyRevenue.map((value, i) => {
+                    const maxValue = Math.max(
+                      ...profileStats.monthlyRevenue,
+                      1
+                    );
+                    const height = (value / maxValue) * 100;
+                    return (
+                      <div
+                        key={i}
+                        className="flex-1 bg-gray-300 hover:bg-gray-400 rounded-t transition-colors"
+                        style={{ height: `${Math.max(height, 5)}%` }}
+                        title={`₱${Number(value).toLocaleString()}`}
+                      ></div>
+                    );
+                  })
+                : [40, 50, 55, 65, 70, 60, 75, 95, 70, 65, 70, 75].map(
+                    (height, i) => (
+                      <div
+                        key={i}
+                        className="flex-1 bg-gray-300 rounded-t"
+                        style={{ height: `${height}%` }}
+                      ></div>
+                    )
+                  )}
             </div>
             <div className="flex justify-around text-xs text-gray-500 mt-2 gap-2">
               <span>Jan</span>
@@ -331,7 +378,9 @@ export default function OwnerProfile() {
 
           {/* Most Rented Category */}
           <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
-            <h3 className="text-sm md:text-base text-gray-600 mb-4">Most Rented Category</h3>
+            <h3 className="text-sm md:text-base text-gray-600 mb-4">
+              Most Rented Category
+            </h3>
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8">
               <div className="relative w-40 h-40 md:w-48 md:h-48">
                 <svg viewBox="0 0 100 100" className="transform -rotate-90">
@@ -350,8 +399,32 @@ export default function OwnerProfile() {
                     fill="none"
                     stroke="#1e40af"
                     strokeWidth="20"
-                    strokeDasharray={profileStats?.categoryBreakdown?.length ? `${(profileStats.mostRentedCategory?.count / profileStats.categoryBreakdown.reduce((sum, cat) => sum + (cat.product_count || 0), 0)) * 251.2}` : '251.2'}
-                    strokeDashoffset={profileStats?.categoryBreakdown?.length ? `${251.2 - ((profileStats.mostRentedCategory?.count / profileStats.categoryBreakdown.reduce((sum, cat) => sum + (cat.product_count || 0), 0)) * 251.2) / 2}` : '41.87'}
+                    strokeDasharray={
+                      profileStats?.categoryBreakdown?.length
+                        ? `${
+                            (profileStats.mostRentedCategory?.count /
+                              profileStats.categoryBreakdown.reduce(
+                                (sum, cat) => sum + (cat.product_count || 0),
+                                0
+                              )) *
+                            251.2
+                          }`
+                        : "251.2"
+                    }
+                    strokeDashoffset={
+                      profileStats?.categoryBreakdown?.length
+                        ? `${
+                            251.2 -
+                            ((profileStats.mostRentedCategory?.count /
+                              profileStats.categoryBreakdown.reduce(
+                                (sum, cat) => sum + (cat.product_count || 0),
+                                0
+                              )) *
+                              251.2) /
+                              2
+                          }`
+                        : "41.87"
+                    }
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -361,15 +434,22 @@ export default function OwnerProfile() {
               </div>
               <div>
                 <div className="bg-black text-white px-3 md:px-4 py-2 rounded-lg mb-3 md:mb-4">
-                  <p className="text-xl md:text-2xl font-bold">{profileStats?.mostRentedCategory?.count || '0'} {profileStats?.mostRentedCategory?.name || 'Items'}</p>
+                  <p className="text-xl md:text-2xl font-bold">
+                    {profileStats?.mostRentedCategory?.count || "0"}{" "}
+                    {profileStats?.mostRentedCategory?.name || "Items"}
+                  </p>
                 </div>
                 <div className="space-y-2 text-xs md:text-sm">
-                  {profileStats?.categoryBreakdown?.length ? profileStats.categoryBreakdown.map((cat, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full bg-gray-300"></span>
-                      <span>{cat.product_count} {cat.category_type}</span>
-                    </div>
-                  )) : (
+                  {profileStats?.categoryBreakdown?.length ? (
+                    profileStats.categoryBreakdown.map((cat, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-gray-300"></span>
+                        <span>
+                          {cat.product_count} {cat.category_type}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
                     <>
                       <div className="flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full bg-gray-300"></span>
@@ -385,24 +465,33 @@ export default function OwnerProfile() {
           {/* Customer Ratings */}
           <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
             <div className="flex justify-between items-start mb-6">
-              <h3 className="text-lg md:text-xl font-semibold text-black">Customer Ratings</h3>
+              <h3 className="text-lg md:text-xl font-semibold text-black">
+                Customer Ratings
+              </h3>
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5 text-yellow-400">
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
-                      className={`w-5 h-5 ${i < Math.floor(profileStats?.customerRating ?? 0) ? 'fill-current' : 'fill-current opacity-30'}`}
+                      className={`w-5 h-5 ${
+                        i < Math.floor(profileStats?.customerRating ?? 0)
+                          ? "fill-current"
+                          : "fill-current opacity-30"
+                      }`}
                       viewBox="0 0 24 24"
                     >
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
                   ))}
                 </div>
-                <span className="text-3xl md:text-4xl font-bold text-black">{profileStats?.customerRating ?? '—'}</span>
+                <span className="text-3xl md:text-4xl font-bold text-black">
+                  {profileStats?.customerRating ?? "—"}
+                </span>
               </div>
             </div>
             <div className="h-48 relative">
-              {profileStats?.monthlyRatings && profileStats.monthlyRatings.length > 0 ? (
+              {profileStats?.monthlyRatings &&
+              profileStats.monthlyRatings.length > 0 ? (
                 <svg
                   className="w-full h-full"
                   viewBox="0 0 400 150"
@@ -422,29 +511,41 @@ export default function OwnerProfile() {
                   ))}
                   {/* Area under line */}
                   <path
-                    d={`M 0 150 L ${profileStats.monthlyRatings.map((rating, idx) => {
-                      const x = (idx / (profileStats.monthlyRatings.length - 1 || 1)) * 400;
-                      const y = 150 - (rating / 5) * 150;
-                      return `${x} ${y}`;
-                    }).join(' L ')} L 400 150 Z`}
+                    d={`M 0 150 L ${profileStats.monthlyRatings
+                      .map((rating, idx) => {
+                        const x =
+                          (idx /
+                            (profileStats.monthlyRatings.length - 1 || 1)) *
+                          400;
+                        const y = 150 - (rating / 5) * 150;
+                        return `${x} ${y}`;
+                      })
+                      .join(" L ")} L 400 150 Z`}
                     fill="#1e40af"
                     fillOpacity="0.2"
                     stroke="none"
                   />
                   {/* Line */}
                   <path
-                    d={`M ${profileStats.monthlyRatings.map((rating, idx) => {
-                      const x = (idx / (profileStats.monthlyRatings.length - 1 || 1)) * 400;
-                      const y = 150 - (rating / 5) * 150;
-                      return `${x} ${y}`;
-                    }).join(' L ')}`}
+                    d={`M ${profileStats.monthlyRatings
+                      .map((rating, idx) => {
+                        const x =
+                          (idx /
+                            (profileStats.monthlyRatings.length - 1 || 1)) *
+                          400;
+                        const y = 150 - (rating / 5) * 150;
+                        return `${x} ${y}`;
+                      })
+                      .join(" L ")}`}
                     fill="none"
                     stroke="#1e40af"
                     strokeWidth="2"
                   />
                   {/* Data points */}
                   {profileStats.monthlyRatings.map((rating, idx) => {
-                    const x = (idx / (profileStats.monthlyRatings.length - 1 || 1)) * 400;
+                    const x =
+                      (idx / (profileStats.monthlyRatings.length - 1 || 1)) *
+                      400;
                     const y = 150 - (rating / 5) * 150;
                     return (
                       <circle
@@ -459,7 +560,9 @@ export default function OwnerProfile() {
                 </svg>
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gray-50 rounded-lg">
-                  <p className="text-gray-400 text-sm">No rating data available yet</p>
+                  <p className="text-gray-400 text-sm">
+                    No rating data available yet
+                  </p>
                 </div>
               )}
             </div>
