@@ -29,20 +29,38 @@ export async function POST(request) {
     }
 
     // Normalize payment method to match DB/check constraints if needed
-    const pm = payment_method
-      ? payment_method.toString().toLowerCase() === "cash"
-        ? "Cash"
-        : payment_method.toString().toLowerCase() === "gcash"
-        ? "Gcash"
-        : payment_method
-      : null;
+    // Map "gcash" to "E-Wallet" for database storage
+    let normalizedPaymentMethod = "Cash"; // Default
+    if (payment_method) {
+      const method = payment_method.toString().toLowerCase();
+      if (method === "cash") {
+        normalizedPaymentMethod = "Cash";
+      } else if (method === "gcash") {
+        normalizedPaymentMethod = "E-Wallet"; // Map Gcash to E-Wallet
+      } else {
+        normalizedPaymentMethod = payment_method;
+      }
+    }
+
+    // Normalize delivery option for database storage
+    let normalizedDeliveryOption = "Pickup"; // Default
+    if (delivery_option) {
+      const option = delivery_option.toString().toLowerCase();
+      if (option === "pickup") {
+        normalizedDeliveryOption = "Pickup";
+      } else if (option === "lalamove") {
+        normalizedDeliveryOption = "Lalamove"; // Map lalamove to Lalamove
+      } else {
+        normalizedDeliveryOption = delivery_option;
+      }
+    }
 
     // Insert booking into rentals table
     const result = await query({
       query: `
         INSERT INTO rentals 
-        (customer_id, product_id, start_date, end_date, total_amount, status)
-        VALUES (?, ?, ?, ?, ?, ?)
+        (customer_id, product_id, start_date, end_date, total_amount, status, delivery_option)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `,
       values: [
         customer_id,
@@ -51,6 +69,7 @@ export async function POST(request) {
         end_date,
         total_amount,
         "To ship",
+        normalizedDeliveryOption,
       ],
     });
 
@@ -58,10 +77,9 @@ export async function POST(request) {
 
     // Always create a payment record with Pending status
     try {
-      const paymentMethod = pm || "Cash"; // Default to Cash if no method provided
       await query({
         query: `INSERT INTO payments (rental_id, payment_date, payment_method, amount_paid, payment_status) VALUES (?, NOW(), ?, ?, ?)`,
-        values: [rentalId, paymentMethod, total_amount, "Pending"],
+        values: [rentalId, normalizedPaymentMethod, total_amount, "Pending"],
       });
     } catch (e) {
       console.warn("Failed to insert payment record:", e.message || e);
