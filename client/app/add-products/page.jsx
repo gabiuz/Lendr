@@ -7,7 +7,6 @@ export default function AddProduct() {
     productName: "",
     description: "",
     pricePerDay: "",
-    condition: "",
     category: "",
   });
 
@@ -53,7 +52,6 @@ export default function AddProduct() {
       productName: "",
       description: "",
       pricePerDay: "",
-      condition: "",
       category: "",
     });
   };
@@ -61,23 +59,22 @@ export default function AddProduct() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const owner_id = localStorage.getItem('owner_id');
-      if (!owner_id) return alert('No owner_id found');
+      const owner_id = localStorage.getItem("owner_id");
+      if (!owner_id) return alert("No owner_id found");
 
-      if (!mainImage) return alert('Main product image is required');
+      if (!mainImage) return alert("Main product image is required");
 
       // Use FormData instead of JSON to avoid large base64 strings
       const formPayload = new FormData();
-      formPayload.append('productName', formData.productName);
-      formPayload.append('description', formData.description);
-      formPayload.append('pricePerDay', formData.pricePerDay);
-      formPayload.append('condition', formData.condition);
-      formPayload.append('category', formData.category);
-      formPayload.append('owner_id', owner_id);
-      
+      formPayload.append("productName", formData.productName);
+      formPayload.append("description", formData.description);
+      formPayload.append("pricePerDay", formData.pricePerDay);
+      formPayload.append("category", formData.category);
+      formPayload.append("owner_id", owner_id);
+
       // Append main image file
-      formPayload.append('mainImage', mainImage);
-      
+      formPayload.append("mainImage", mainImage);
+
       // Append thumbnail files
       for (let i = 0; i < images.length; i++) {
         if (images[i]) {
@@ -85,21 +82,21 @@ export default function AddProduct() {
         }
       }
 
-      const res = await fetch('/api/products', {
-        method: 'POST',
+      const res = await fetch("/api/products", {
+        method: "POST",
         body: formPayload,
       });
       const data = await res.json();
       if (data.success) {
-        alert('Product added');
+        alert("Product added");
         // redirect to browse rentals
-        window.location.href = '/browse-rentals';
+        window.location.href = "/browse-rentals";
       } else {
-        alert(data.error || 'Add product failed');
+        alert(data.error || "Add product failed");
       }
     } catch (err) {
       console.error(err);
-      alert('Error adding product');
+      alert("Error adding product");
     }
   };
 
@@ -126,7 +123,7 @@ export default function AddProduct() {
           {
             href: "/about-us",
             label: "About Us",
-          }
+          },
         ]}
         showOwnerButton={false}
         profileInCircle={true}
@@ -136,11 +133,17 @@ export default function AddProduct() {
       <div className="px-4 md:px-8 lg:px-20 xl:px-36 py-8 md:py-12 lg:mt-24">
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-2 text-sm mb-6">
-          <a href="/owner-homepage" className="text-gray-600 hover:text-red-600 transition-colors">
+          <a
+            href="/owner-homepage"
+            className="text-gray-600 hover:text-red-600 transition-colors"
+          >
             Home
           </a>
           <span className="text-gray-400">›</span>
-          <a href="/owner-rentals" className="text-gray-600 hover:text-red-600 transition-colors">
+          <a
+            href="/owner-rentals"
+            className="text-gray-600 hover:text-red-600 transition-colors"
+          >
             My Rentals
           </a>
           <span className="text-gray-400">›</span>
@@ -155,7 +158,11 @@ export default function AddProduct() {
         </div>
 
         {/* Form Container */}
-        <form id="add-product-form" onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        <form
+          id="add-product-form"
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8"
+        >
           {/* Left Side - Form Fields */}
           <div className="lg:col-span-2 space-y-6">
             {/* General Information */}
@@ -167,7 +174,10 @@ export default function AddProduct() {
               <div className="space-y-4">
                 {/* Product Name */}
                 <div className="flex flex-col border-2 border-gray-200 rounded-xl px-4 md:px-6 py-2 md:py-3">
-                  <label htmlFor="productName" className="text-sm text-gray-700 mb-1">
+                  <label
+                    htmlFor="productName"
+                    className="text-sm text-gray-700 mb-1"
+                  >
                     Product Name <span className="text-red-600">*</span>
                   </label>
                   <input
@@ -184,7 +194,10 @@ export default function AddProduct() {
 
                 {/* Description */}
                 <div className="flex flex-col border-2 border-gray-200 rounded-xl px-4 md:px-6 py-2 md:py-3">
-                  <label htmlFor="description" className="text-sm text-gray-700 mb-1">
+                  <label
+                    htmlFor="description"
+                    className="text-sm text-gray-700 mb-1"
+                  >
                     Description <span className="text-red-600">*</span>
                   </label>
                   <textarea
@@ -205,10 +218,13 @@ export default function AddProduct() {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
               {/* Pricing and Details Container */}
               <div className="lg:col-span-3 bg-white border-2 border-gray-200 rounded-xl p-4 md:p-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Price per Day */}
                   <div className="flex flex-col border-2 border-gray-200 rounded-xl px-4 md:px-6 py-2 md:py-3">
-                    <label htmlFor="pricePerDay" className="text-sm text-gray-700 mb-1">
+                    <label
+                      htmlFor="pricePerDay"
+                      className="text-sm text-gray-700 mb-1"
+                    >
                       Price per Day <span className="text-red-600">*</span>
                     </label>
                     <input
@@ -223,36 +239,11 @@ export default function AddProduct() {
                     />
                   </div>
 
-
-
-                  {/* Condition */}
-                  <div className="flex flex-col border-2 border-gray-200 rounded-xl px-4 md:px-6 py-2 md:py-3 relative">
-                    <label htmlFor="condition" className="text-sm text-gray-700 mb-1">
-                      Condition <span className="text-red-600">*</span>
-                    </label>
-                    <select
-                      id="condition"
-                      name="condition"
-                      value={formData.condition}
-                      onChange={handleInputChange}
-                      className="outline-none text-sm md:text-base appearance-none bg-white cursor-pointer text-gray-900 pr-8"
-                      required
-                    >
-                      <option value="new">New</option>
-                      <option value="like-new">Like New</option>
-                      <option value="good">Good</option>
-                      <option value="fair">Fair</option>
-                      <option value="poor">Poor</option>
-                    </select>
-                  <div className="absolute right-4 md:right-6 bottom-3 md:bottom-4 pointer-events-none">
-                    <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path opacity="0.4" d="M12 18L24 30L36 18" stroke="#4B5563" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
-                  </div>
-                  {/* Category (moved beside Condition) */}
                   <div className="flex flex-col border-2 border-gray-200 rounded-xl px-4 md:px-6 py-2 md:py-3">
-                    <label htmlFor="category" className="text-sm text-gray-700 mb-1">
+                    <label
+                      htmlFor="category"
+                      className="text-sm text-gray-700 mb-1"
+                    >
                       Category <span className="text-red-600">*</span>
                     </label>
                     <select
@@ -265,15 +256,34 @@ export default function AddProduct() {
                     >
                       <option value="">Categories</option>
                       <option value="Vehicles">Vehicles</option>
-                      <option value="Devices & Electronics">Devices & Electronics</option>
-                      <option value="Clothing & Apparel">Clothing & Apparel</option>
-                      <option value="Tools & Equipment">Tools & Equipment</option>
+                      <option value="Devices & Electronics">
+                        Devices & Electronics
+                      </option>
+                      <option value="Clothing & Apparel">
+                        Clothing & Apparel
+                      </option>
+                      <option value="Tools & Equipment">
+                        Tools & Equipment
+                      </option>
                       <option value="Furniture & Home">Furniture & Home</option>
                       <option value="Party & Events">Party & Events</option>
                     </select>
                     <div className="absolute right-4 md:right-6 bottom-3 md:bottom-4 pointer-events-none">
-                      <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path opacity="0.4" d="M12 18L24 30L36 18" stroke="#4B5563" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 48 48"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          opacity="0.4"
+                          d="M12 18L24 30L36 18"
+                          stroke="#4B5563"
+                          strokeWidth="4"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
                       </svg>
                     </div>
                   </div>
@@ -445,3 +455,4 @@ export default function AddProduct() {
     </div>
   );
 }
+
