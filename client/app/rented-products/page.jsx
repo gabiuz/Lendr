@@ -401,10 +401,10 @@ export default function RentedProduct() {
                           </svg>
                         </div>
                         <p className="font-semibold text-black">
-                          Booking Cancelled
+                          {rental.payment_method === "E-Wallet" ? "Transaction Refunded" : "Booking Cancelled"}
                         </p>
                         <p className="text-sm text-zinc-600 mt-1">
-                          This rental was cancelled and cannot be reviewed.
+                          {rental.payment_method === "E-Wallet" ? "This rental was cancelled and payment is refunded." : "This rental was cancelled and cannot be reviewed."}
                         </p>
                       </div>
                     </div>

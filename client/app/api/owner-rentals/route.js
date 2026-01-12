@@ -26,7 +26,7 @@ export async function GET(req) {
         JOIN products p ON r.product_id = p.product_id
         JOIN customer c ON r.customer_id = c.customer_id
         WHERE p.owner_id = ? AND r.status != 'Completed'
-        ORDER BY r.start_date DESC
+        ORDER BY r.start_date ASC
       `,
       values: [owner_id]
     });

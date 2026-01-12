@@ -30,12 +30,14 @@ export async function GET(request) {
           r.start_date as rental_start,
           r.end_date as rental_end,
           r.total_amount as total_cost,
-          r.status
+          r.status,
+          pa.payment_method
         FROM rentals r
         JOIN products p ON r.product_id = p.product_id
         JOIN rental_owner ro ON p.owner_id = ro.owner_id
         LEFT JOIN products_image pi ON p.product_id = pi.product_id
         LEFT JOIN categories cat ON p.category_code = cat.category_code
+        LEFT JOIN payments pa ON r.rental_id = pa.rental_id
         WHERE r.customer_id = ?
         ORDER BY r.start_date ASC
       `,
