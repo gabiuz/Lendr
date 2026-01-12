@@ -33,7 +33,7 @@ export async function GET(request) {
       values.push(`%${location}%`);
     }
 
-    if (category) {
+    if (category && category !== '') {
       where.push('p.category_code = ?');
       values.push(category);
     }
@@ -46,10 +46,13 @@ export async function GET(request) {
 
     let products = rows || [];
 
-    if (startDate && endDate) {
-      // find product_ids that have overlapping rentals
-      const overlapSql = `SELECT DISTINCT product_id FROM rentals WHERE NOT (end_date < ? OR start_date > ?)`;
-      const overlapRows = await query({ query: overlapSql, values: [startDate, endDate] });
+    if (startDate) {
+      // If end date not provided, use start date as end date
+      const finalEndDate = endDate || startDate;
+      // find product_ids that have overlapping active rentals (exclude completed/cancelled/return_received)
+      // Use >= and <= to catch same-day bookings
+      const overlapSql = `SELECT DISTINCT product_id FROM rentals WHERE status NOT IN ('Completed', 'Cancelled', 'Return Received') AND start_date <= ? AND end_date >= ?`;
+      const overlapRows = await query({ query: overlapSql, values: [finalEndDate, startDate] });
       const unavailable = new Set((overlapRows || []).map(r => r.product_id));
       products = products.filter(p => !unavailable.has(p.product_id));
     }

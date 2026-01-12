@@ -20,8 +20,8 @@ export default function ProductEdit() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [images, setImages] = useState([]);
-  const [imageUrls, setImageUrls] = useState([]);
+  const [images, setImages] = useState(new Array(6).fill(null));
+  const [imageUrls, setImageUrls] = useState(new Array(6).fill(null));
   const [editing, setEditing] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
@@ -56,8 +56,16 @@ export default function ProductEdit() {
           };
           setFormData(newFormData);
           setOriginalFormData(newFormData);
-          setImages(product.images || []);
-          setImageUrls(product.images || []);
+          setImages(new Array(6).fill(null));
+          // Set existing images as URLs
+          const urls = product.images || [];
+          const urlArray = new Array(6).fill(null);
+          urls.forEach((url, i) => {
+            if (i < 6 && url) {
+              urlArray[i] = url;
+            }
+          });
+          setImageUrls(urlArray);
         } else {
           alert('Failed to load product');
           router.push('/browse-rentals');
@@ -101,15 +109,18 @@ export default function ProductEdit() {
 
   const handleImageChange = (index, file) => {
     if (!file) return;
+    
+    // Store the File object
+    const newImages = [...images];
+    newImages[index] = file;
+    setImages(newImages);
+
+    // Create preview URL
     const reader = new FileReader();
     reader.onload = () => {
       const newImageUrls = [...imageUrls];
       newImageUrls[index] = reader.result;
       setImageUrls(newImageUrls);
-
-      const newImages = [...images];
-      newImages[index] = reader.result;
-      setImages(newImages);
     };
     reader.readAsDataURL(file);
   };
@@ -123,20 +134,25 @@ export default function ProductEdit() {
       const ownerId = localStorage.getItem('owner_id');
       if (!ownerId) return alert('Owner ID is required');
 
-      const payload = {
-        product_id: productId,
-        owner_id: ownerId,
-        product_name: formData.productName,
-        description: formData.description,
-        product_rate: parseFloat(formData.pricePerDay),
-        category_code: formData.category,
-        availability_status: formData.availability_status,
-      };
+      const formDataToSend = new FormData();
+      formDataToSend.append('product_id', productId);
+      formDataToSend.append('owner_id', ownerId);
+      formDataToSend.append('product_name', formData.productName);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('product_rate', parseFloat(formData.pricePerDay));
+      formDataToSend.append('category_code', formData.category);
+      formDataToSend.append('availability_status', formData.availability_status);
+
+      // Add image files (only new files, not existing URLs)
+      images.forEach((img, index) => {
+        if (img instanceof File) {
+          formDataToSend.append(`image_${index}`, img);
+        }
+      });
 
       const res = await fetch('/api/product-edit', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: formDataToSend,
       });
 
       const data = await res.json();
@@ -144,6 +160,8 @@ export default function ProductEdit() {
         alert('Product updated successfully');
         setEditing(false);
         setOriginalFormData(formData);
+        // Reset images to maintain current state
+        setImages(new Array(6).fill(null));
       } else {
         alert(data.error || 'Update failed');
       }
@@ -234,7 +252,7 @@ export default function ProductEdit() {
       <Navbar
         links={[
           { href: "/owner-homepage", label: "Home" },
-          { href: "/browse-rentals", label: "Browse Rentals" },
+          { href: "/browse-rentals", label: "My Rentals" },
           { href: "/owner-booking", label: "Bookings" },
           { href: "/owner-payments", label: "Payments" }
         ]}

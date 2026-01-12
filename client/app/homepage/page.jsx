@@ -98,29 +98,9 @@ export default function Homepage() {
             if (parts.length > 0) userCity = parts[parts.length - 1];
             // If address is like "100 Banana St., Manila City" parts = ["100 Banana St.", "Manila City"], take last => Manila City
           }
-
-          // Fetch products based on user's city if available
-          if (userCity) {
-              const searchRes = await fetch(`/api/search?location=${encodeURIComponent(userCity)}`);
-              const searchData = await searchRes.json();
-              
-              const ownerId = typeof window !== 'undefined' ? localStorage.getItem('owner_id') : null;
-              
-              // Get nearby products
-              if (searchData.success && searchData.products && searchData.products.length > 0) {
-                const nearbyProductsList = ownerId
-                  ? searchData.products.filter(p => String(p.owner_id) !== String(ownerId))
-                  : searchData.products;
-                
-                if (nearbyProductsList.length > 0) {
-                  setNearbyProducts(nearbyProductsList.slice(0, 6));
-                  return;
-                }
-              }
-            }
         }
 
-        // If not logged in or no city/products found, fetch top-rented products
+        // Fetch top-rented products
         const topRes = await fetch('/api/top-rented');
         const topData = await topRes.json();
         if (topData.success && topData.products) {
@@ -135,7 +115,7 @@ export default function Homepage() {
           }
         }
 
-        // Last fallback: fetch 6 most recent products
+        // Fallback: fetch 6 most recent products
         const searchRes = await fetch('/api/search');
         const searchData = await searchRes.json();
 
@@ -239,7 +219,7 @@ export default function Homepage() {
       </div>
       <div className="flex justify-center items-baseline text-center mt-16 md:mt-24 lg:mt-32 mb-10 md:mb-16 lg:mb-20 px-4">
         <h2 className="text-black text-3xl md:text-4xl lg:text-5xl font-bold">
-{isLoggedIn ? 'Most Rented Items Near You' : 'Most Rented Items'}
+          Most Rented Items
         </h2>
       </div>
       {/* product card */}

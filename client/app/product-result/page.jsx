@@ -70,8 +70,9 @@ export default function ProductResult() {
           if (ownerId) {
             results = results.filter(p => String(p.owner_id) !== String(ownerId));
           }
-          // If category parameter is absent or present, show results but cap display to 15 maximum
-          if (results.length > 15) {
+          // Only limit to 15 products if a specific category is selected (not for All Items)
+          const category = searchParams.get('category');
+          if (category && category !== '' && results.length > 15) {
             results = results.slice(0, 15);
           }
           setProducts(results);

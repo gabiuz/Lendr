@@ -59,55 +59,47 @@ export default function OwnerBooking() {
     fetchBookings();
   }, []);
 
+  // Helper function to calculate display status
+  const getDisplayStatus = (booking) => {
+    if (booking.rental_status === "Completed" || booking.rental_status === "Cancelled") {
+      return booking.rental_status;
+    } else if (booking.rental_status === "To ship" || booking.rental_status === "Shipped") {
+      return "Reserved";
+    } else if (booking.rental_status === "Return Shipped" || booking.rental_status === "Return Received") {
+      return "Completed";
+    } else if (booking.rental_status === "Out for Delivery" || booking.rental_status === "Delivered") {
+      return "Rented";
+    } else {
+      return "Reserved";
+    }
+  };
+
   useEffect(() => {
-    const today = new Date();
     if (activeFilter === "All") {
       // Display all rentals including completed and cancelled ones
       setFilteredBookings(bookings);
     } else if (activeFilter === "Completed") {
       // Filter to show only completed rentals
       setFilteredBookings(
-        bookings.filter((b) => b.rental_status === "Completed"),
+        bookings.filter((b) => getDisplayStatus(b) === "Completed"),
       );
     } else if (activeFilter === "Cancelled") {
       // Filter to show only cancelled rentals
       setFilteredBookings(
-        bookings.filter((b) => b.rental_status === "Cancelled"),
+        bookings.filter((b) => getDisplayStatus(b) === "Cancelled"),
+      );
+    } else if (activeFilter === "Reserved") {
+      // Filter to show only reserved rentals
+      setFilteredBookings(
+        bookings.filter((b) => getDisplayStatus(b) === "Reserved"),
+      );
+    } else if (activeFilter === "Rented") {
+      // Filter to show only rented rentals
+      setFilteredBookings(
+        bookings.filter((b) => getDisplayStatus(b) === "Rented"),
       );
     } else {
-      setFilteredBookings(
-        bookings.filter((b) => {
-          // Skip completed or cancelled rentals for other filters
-          if (
-            b.rental_status === "Completed" ||
-            b.rental_status === "Cancelled"
-          ) {
-            return false;
-          }
-
-          const startDate = new Date(b.start_date);
-          // Normalize dates to compare only date parts (year, month, day)
-          const normalizedStartDate = new Date(
-            startDate.getFullYear(),
-            startDate.getMonth(),
-            startDate.getDate(),
-          );
-          const normalizedToday = new Date(
-            today.getFullYear(),
-            today.getMonth(),
-            today.getDate(),
-          );
-          const isToday =
-            normalizedStartDate.getTime() === normalizedToday.getTime();
-          const isReserved = startDate > today;
-          const status = isToday
-            ? "Reserved"
-            : isReserved
-              ? "Reserved"
-              : b.availability_status;
-          return status === activeFilter;
-        }),
-      );
+      setFilteredBookings(bookings);
     }
   }, [activeFilter, bookings]);
 
@@ -193,6 +185,11 @@ export default function OwnerBooking() {
         setOpenDropdown(selectedRentalId);
         setShowDeliveryModal(false);
         setSelectedRentalId(null);
+        
+        // Refresh bookings from database to ensure consistency
+        setTimeout(() => {
+          fetchBookings();
+        }, 500);
       } else {
         console.error("API Error:", data.error);
         alert(data.error || "Failed to approve rental");
@@ -224,25 +221,7 @@ export default function OwnerBooking() {
       console.log("Status transition response:", data);
 
       if (data.success) {
-        // If transitioning to "Out for Delivery", update product availability_status to "Rented"
-        if (newStatus === "Out for Delivery") {
-          const booking = bookings.find((b) => b.rental_id === rentalId);
-          if (booking) {
-            try {
-              await fetch("/api/update-product-status", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  product_id: booking.product_id,
-                  availability_status: "Rented",
-                }),
-              });
-            } catch (e) {
-              console.warn("Failed to update product status:", e);
-            }
-          }
-        }
-
+        // Update local state immediately
         setFilteredBookings((prevBookings) =>
           prevBookings.map((booking) =>
             booking.rental_id === rentalId
@@ -258,6 +237,11 @@ export default function OwnerBooking() {
           ),
         );
         console.log("Status transitioned to", newStatus);
+        
+        // Refresh bookings from database to ensure consistency
+        setTimeout(() => {
+          fetchBookings();
+        }, 500);
       } else {
         console.error("API Error:", data.error);
         alert(data.error || "Failed to update status");
@@ -355,17 +339,20 @@ export default function OwnerBooking() {
             console.error("[handleDecline] Failed to update product status:", e);
           }
 
-          // Update payment status to "Cancelled"
+          // Update payment status based on payment method
           try {
             const paymentUrl = new URL("/api/update-payment-status", window.location.origin);
             paymentUrl.searchParams.append("rental_id", rentalId);
-            paymentUrl.searchParams.append("payment_status", "Cancelled");
+            
+            // Determine payment status based on payment method
+            const paymentStatus = booking.payment_method === "E-Wallet" ? "Refunded" : "Cancelled";
+            paymentUrl.searchParams.append("payment_status", paymentStatus);
             
             await fetch(paymentUrl.toString(), {
               method: "POST",
               headers: { "Content-Type": "application/json" },
             });
-            console.log("[handleDecline] Payment status updated to Cancelled");
+            console.log("[handleDecline] Payment status updated to", paymentStatus);
           } catch (e) {
             console.error("[handleDecline] Failed to update payment status:", e);
           }
@@ -374,6 +361,11 @@ export default function OwnerBooking() {
         setOpenDropdown(null);
         alert("Booking declined successfully. The customer has been notified.");
         console.log("[handleDecline] Booking declined successfully:", rentalId);
+        
+        // Refresh bookings from database to ensure consistency
+        setTimeout(() => {
+          fetchBookings();
+        }, 500);
       } else {
         console.error("[handleDecline] API returned error:", data.error);
         alert(data.error || "Failed to decline booking");
@@ -510,15 +502,9 @@ export default function OwnerBooking() {
                       normalizedStartDate.getTime() ===
                       normalizedToday.getTime();
                     const isReserved = startDate > today;
-                    const status =
-                      booking.rental_status === "Completed" ||
-                      booking.rental_status === "Cancelled"
-                        ? booking.rental_status
-                        : isToday
-                          ? "Reserved"
-                          : isReserved
-                            ? "Reserved"
-                            : booking.availability_status;
+                    
+                    // Use helper function to determine status
+                    const status = getDisplayStatus(booking);
                     return (
                       <tr
                         key={booking.rental_id}

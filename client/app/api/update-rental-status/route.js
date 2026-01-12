@@ -1,6 +1,35 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/source/database.js';
 
+// Helper function to update product availability status based on rental status
+async function updateProductAvailabilityStatus(product_id) {
+  try {
+    // Check if there are any active rentals with status "Out for Delivery", "Delivered", or "Return Shipped"
+    const activeRentals = await query({
+      query: `SELECT rental_id FROM rentals 
+              WHERE product_id = ? AND status IN ('Out for Delivery', 'Delivered', 'Return Shipped')
+              LIMIT 1`,
+      values: [product_id],
+    });
+
+    if (activeRentals && activeRentals.length > 0) {
+      // Product has active rentals with these statuses, set to "Rented"
+      await query({
+        query: 'UPDATE products SET availability_status = ? WHERE product_id = ?',
+        values: ['Rented', product_id],
+      });
+    } else {
+      // No active rentals with those statuses, set to "Available"
+      await query({
+        query: 'UPDATE products SET availability_status = ? WHERE product_id = ?',
+        values: ['Available', product_id],
+      });
+    }
+  } catch (error) {
+    console.error('Error updating product availability status:', error);
+  }
+}
+
 export async function POST(request) {
   console.log('[update-rental-status POST] Starting...');
   
@@ -26,12 +55,25 @@ export async function POST(request) {
       console.log('[update-rental-status] Updating rental', rental_id, 'to status:', status);
       
       try {
+        // Get the product_id for this rental
+        const rentalData = await query({
+          query: 'SELECT product_id FROM rentals WHERE rental_id = ?',
+          values: [rental_id],
+        });
+
+        const product_id = rentalData?.[0]?.product_id;
+
         const updateResult = await query({
           query: 'UPDATE rentals SET status = ? WHERE rental_id = ?',
           values: [status, rental_id],
         });
 
         console.log('[update-rental-status] Update result:', updateResult);
+
+        // Update product availability status based on all its rentals
+        if (product_id) {
+          await updateProductAvailabilityStatus(product_id);
+        }
 
         const responseData = {
           success: true,
@@ -75,11 +117,8 @@ export async function POST(request) {
         values: ['Completed', rental.rental_id],
       });
 
-      // Update product availability status back to "Available"
-      await query({
-        query: 'UPDATE products SET availability_status = ? WHERE product_id = ?',
-        values: ['Available', rental.product_id],
-      });
+      // Update product availability status based on all its rentals
+      await updateProductAvailabilityStatus(rental.product_id);
     }
 
     return NextResponse.json({

@@ -410,6 +410,93 @@ export default function RentedProduct() {
                     </div>
                   )}
 
+                  {/* Out for Delivery Message */}
+                  {rental.status && rental.status === 'Out for Delivery' && (
+                    <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-gray-200 pt-6 lg:pt-0 lg:pl-6">
+                      <div className="flex flex-col items-center justify-center h-full text-center">
+                        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-3">
+                          <svg
+                            className="w-8 h-8 text-blue-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M13 10V3L4 14h7v7l9-11h-7z"
+                            />
+                          </svg>
+                        </div>
+                        <p className="font-semibold text-black">
+                          On Its Way!
+                        </p>
+                        <p className="text-sm text-zinc-600 mt-1">
+                          The product is on its way to you
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Delivered Message */}
+                  {rental.status && rental.status === 'Delivered' && (
+                    <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-gray-200 pt-6 lg:pt-0 lg:pl-6">
+                      <div className="flex flex-col items-center justify-center h-full text-center">
+                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                          <svg
+                            className="w-8 h-8 text-green-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        </div>
+                        <p className="font-semibold text-black">
+                          Product Delivered!
+                        </p>
+                        <p className="text-sm text-zinc-600 mt-1">
+                          Have a good rental day!
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Return Shipped Message */}
+                  {rental.status && rental.status === 'Return Shipped' && (
+                    <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-gray-200 pt-6 lg:pt-0 lg:pl-6">
+                      <div className="flex flex-col items-center justify-center h-full text-center">
+                        <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-3">
+                          <svg
+                            className="w-8 h-8 text-yellow-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M13 10V3L4 14h7v7l9-11h-7z"
+                            />
+                          </svg>
+                        </div>
+                        <p className="font-semibold text-black">
+                          Being Returned
+                        </p>
+                        <p className="text-sm text-zinc-600 mt-1">
+                          Product is being returned to the owner
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Rating Section - Only for Completed Rentals */}
                   {rental.status && rental.status.toLowerCase() === "completed" && (
                     <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-gray-200 pt-6 lg:pt-0 lg:pl-6">

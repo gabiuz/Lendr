@@ -39,7 +39,8 @@ export async function GET(req) {
           r.end_date,
           r.total_amount,
           r.status,
-          pa.payment_status
+          pa.payment_status,
+          pa.payment_method
         FROM rentals r
         JOIN products p ON r.product_id = p.product_id
         JOIN customer c ON r.customer_id = c.customer_id

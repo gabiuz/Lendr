@@ -295,6 +295,9 @@ export default function OwnerPayments() {
                     Rental Period
                   </th>
                   <th className="text-left py-3 md:py-4 px-3 md:px-6 font-bold text-black text-xs md:text-sm lg:text-base">
+                    Payment Method
+                  </th>
+                  <th className="text-left py-3 md:py-4 px-3 md:px-6 font-bold text-black text-xs md:text-sm lg:text-base">
                     Amount
                   </th>
                   <th className="text-left py-3 md:py-4 px-3 md:px-6 font-bold text-black text-xs md:text-sm lg:text-base">
@@ -306,7 +309,7 @@ export default function OwnerPayments() {
                 {loading ? (
                   <tr>
                     <td
-                      colSpan="5"
+                      colSpan="6"
                       className="text-center py-12 md:py-16 text-gray-400"
                     >
                       <p>Loading payments...</p>
@@ -315,7 +318,7 @@ export default function OwnerPayments() {
                 ) : payments.length === 0 ? (
                   <tr>
                     <td
-                      colSpan="5"
+                      colSpan="6"
                       className="text-center py-12 md:py-16 text-gray-400"
                     >
                       <div className="flex flex-col items-center gap-3 md:gap-4">
@@ -399,6 +402,13 @@ export default function OwnerPayments() {
                             {payment.rentalEndDate}
                           </p>
                         </div>
+                      </td>
+
+                      {/* Payment Method */}
+                      <td className="py-4 px-3 md:px-6 text-center">
+                        <p className="text-gray-800 text-sm md:text-base font-bold">
+                          {payment.payment_method || "N/A"}
+                        </p>
                       </td>
 
                       {/* Amount */}

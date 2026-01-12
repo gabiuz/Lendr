@@ -48,6 +48,12 @@ export async function POST(request) {
       values: ['Cancelled', rental_id],
     });
 
+    // Update product availability status to 'Available'
+    await query({
+      query: 'UPDATE products SET availability_status = ? WHERE product_id = ?',
+      values: ['Available', rental.product_id],
+    });
+
     return NextResponse.json(
       { success: true, message: 'Rental cancelled successfully' },
       { status: 200 }

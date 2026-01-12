@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/source/database.js';
+import fs from 'fs';
+import path from 'path';
 
 export async function GET(request) {
   try {
@@ -95,16 +97,14 @@ export async function GET(request) {
 
 export async function PUT(request) {
   try {
-    const body = await request.json();
-    const {
-      product_id,
-      owner_id,
-      product_name,
-      description,
-      product_rate,
-      availability_status,
-      category_code
-    } = body;
+    const formData = await request.formData();
+    const product_id = formData.get('product_id');
+    const owner_id = formData.get('owner_id');
+    const product_name = formData.get('product_name');
+    const description = formData.get('description');
+    const product_rate = formData.get('product_rate');
+    const availability_status = formData.get('availability_status');
+    const category_code = formData.get('category_code');
 
     if (!product_id || !owner_id) {
       return NextResponse.json(
@@ -141,6 +141,64 @@ export async function PUT(request) {
         WHERE product_id = ?
       `,
       values: [product_name, description, product_rate, availability_status, category_code, product_id]
+    });
+
+    // Handle image uploads
+    const savedPaths = [];
+    const publicDir = path.join(process.cwd(), 'public', 'pictures', 'products');
+    
+    function ensureDir(dir) {
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    }
+    
+    ensureDir(publicDir);
+
+    // Get existing images first
+    const existingImages = await query({
+      query: `SELECT image_path1, image_path2, image_path3, image_path4, image_path5, image_path6 FROM products_image WHERE product_id = ?`,
+      values: [product_id]
+    });
+
+    // Process new image uploads (0-5)
+    for (let i = 0; i < 6; i++) {
+      const imageFile = formData.get(`image_${i}`);
+      
+      if (imageFile) {
+        // New file uploaded, save it
+        const buffer = await imageFile.arrayBuffer();
+        const ext = imageFile.name.split('.').pop() || 'jpg';
+        const filename = `prod_${product_id}_img_${i}_${Date.now()}.${ext}`;
+        const filepath = path.join(publicDir, filename);
+        fs.writeFileSync(filepath, Buffer.from(buffer));
+        const publicPath = `/pictures/products/${filename}`;
+        savedPaths.push(publicPath);
+      } else if (existingImages.length > 0) {
+        // No new file, keep existing path
+        const existingImage = existingImages[0];
+        const fieldName = `image_path${i + 1}`;
+        savedPaths.push(existingImage[fieldName] || null);
+      } else {
+        savedPaths.push(null);
+      }
+    }
+
+    // Delete old images record and insert new one
+    await query({
+      query: 'DELETE FROM products_image WHERE product_id = ?',
+      values: [product_id]
+    });
+
+    const imgVals = [product_id];
+    for (let i = 0; i < 6; i++) {
+      imgVals.push(savedPaths[i] || null);
+    }
+
+    await query({
+      query: `
+        INSERT INTO products_image (product_id, image_path1, image_path2, image_path3, image_path4, image_path5, image_path6)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `,
+      values: imgVals
     });
 
     return NextResponse.json({
