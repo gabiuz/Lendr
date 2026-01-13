@@ -43,13 +43,13 @@ export async function POST(request) {
     }
 
     // Normalize delivery option for database storage
-    let normalizedDeliveryOption = "Pickup"; // Default
+    let normalizedDeliveryOption = "Pick Up"; // Default
     if (delivery_option) {
       const option = delivery_option.toString().toLowerCase();
-      if (option === "pickup") {
-        normalizedDeliveryOption = "Pickup";
+      if (option === "pickup" || option === "pick up") {
+        normalizedDeliveryOption = "Pick Up";
       } else if (option === "lalamove") {
-        normalizedDeliveryOption = "Lalamove"; // Map lalamove to Lalamove
+        normalizedDeliveryOption = "Lalamove";
       } else {
         normalizedDeliveryOption = delivery_option;
       }

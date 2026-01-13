@@ -566,7 +566,7 @@ export default function OwnerBooking() {
                             (new Date(booking.end_date) -
                               new Date(booking.start_date)) /
                               (1000 * 60 * 60 * 24),
-                          )}{" "}
+                          ) + 1}{" "}
                           days)
                         </td>
                         <td className="px-4 py-4 text-sm md:text-base text-gray-900 text-center">
@@ -668,25 +668,19 @@ export default function OwnerBooking() {
 
                                         return (
                                           <>
-                                            <div className="grid grid-cols-3 gap-3 text-xs text-gray-700 border-b pb-4">
-                                              {dailyBreakdown
-                                                .slice(0, 3)
-                                                .map((day, idx) => (
-                                                  <div key={idx}>
-                                                    <div className="font-medium text-gray-500">
-                                                      {day.date}
-                                                    </div>
-                                                    <div className="font-semibold">
-                                                      ₱{day.amount}
-                                                    </div>
-                                                  </div>
-                                                ))}
-                                              {dailyBreakdown.length > 3 && (
-                                                <div className="col-span-3 text-center text-gray-500 text-xs">
-                                                  +{dailyBreakdown.length - 3}{" "}
-                                                  more day(s)
-                                                </div>
-                                              )}
+                                            <div className="space-y-3 border-b pb-4 mb-4">
+                                              <div className="flex justify-between text-sm">
+                                                <span className="text-gray-600">Start Date</span>
+                                                <span className="font-medium">{startDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                                              </div>
+                                              <div className="flex justify-between text-sm">
+                                                <span className="text-gray-600">End Date</span>
+                                                <span className="font-medium">{endDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                                              </div>
+                                              <div className="flex justify-between text-sm">
+                                                <span className="text-gray-600">Daily Rate</span>
+                                                <span className="font-medium">₱{dailyRate}</span>
+                                              </div>
                                             </div>
 
                                             <div className="flex justify-between text-sm border-b pb-3">

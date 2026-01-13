@@ -255,8 +255,23 @@ export default function RentedProduct() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6">
-            {rentals.map((rental) => (
+          <div className="space-y-12">
+            {/* Active Rentals Section */}
+            {rentals.filter(r => !['completed', 'cancelled'].includes(r.status?.toLowerCase())).length > 0 && (
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-1 h-8 bg-blue-600 rounded-full"></div>
+                  <h2 className="text-2xl font-semibold text-black">
+                    Active Rentals
+                  </h2>
+                  <span className="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">
+                    {rentals.filter(r => !['completed', 'cancelled'].includes(r.status?.toLowerCase())).length}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 gap-6">
+                  {rentals
+                    .filter(r => !['completed', 'cancelled'].includes(r.status?.toLowerCase()))
+                    .map((rental) => (
               <motion.div
                 key={rental.rental_id}
                 initial={{ opacity: 0, y: 20 }}
@@ -604,6 +619,519 @@ export default function RentedProduct() {
                 </div>
               </motion.div>
             ))}
+                </div>
+              </div>
+            )}
+
+            {/* Completed Rentals Section */}
+            {rentals.filter(r => r.status?.toLowerCase() === 'completed').length > 0 && (
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-1 h-8 bg-green-600 rounded-full"></div>
+                  <h2 className="text-2xl font-semibold text-black">
+                    Completed Rentals
+                  </h2>
+                  <span className="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">
+                    {rentals.filter(r => r.status?.toLowerCase() === 'completed').length}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 gap-6">
+                  {rentals
+                    .filter(r => r.status?.toLowerCase() === 'completed')
+                    .map((rental) => (
+              <motion.div
+                key={rental.rental_id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="border border-zinc-300 rounded-xl p-6 bg-white shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Product Image & Details */}
+                  <div className="lg:col-span-2">
+                    <div className="flex flex-col md:flex-row gap-4">
+                      {/* Product Image */}
+                      <div className="w-full md:w-48 h-48 rounded-lg overflow-hidden bg-gray-100 shrink-0">
+                        <img
+                          src={rental.image_path}
+                          alt={rental.product_name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      {/* Product Info */}
+                      <div className="flex-1 flex flex-col gap-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h2 className="text-2xl font-semibold text-black">
+                              {rental.product_name}
+                            </h2>
+                            <p className="text-zinc-600 text-sm mt-1">
+                              {rental.category_type}
+                            </p>
+                          </div>
+                          {getStatusBadge(rental.status)}
+                        </div>
+
+                        {/* Rental Period */}
+                        <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                          <div className="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                              <p className="text-zinc-600">Start Date</p>
+                              <p className="font-semibold text-black">
+                                {new Date(rental.rental_start).toLocaleDateString("en-US", {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-zinc-600">End Date</p>
+                              <p className="font-semibold text-black">
+                                {new Date(rental.rental_end).toLocaleDateString("en-US", {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Pricing */}
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-zinc-600 text-sm">
+                              Rate: <span className="text-sky-800 font-semibold">₱{rental.product_rate}</span>/day
+                            </p>
+                            <p className="text-black font-bold text-lg mt-1">
+                              Total: ₱{rental.total_cost.toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Owner Info */}
+                        <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+                          <img
+                            src={rental.business_profile_picture || "/pictures/sample-pfp-productCard.png"}
+                            alt={rental.business_name}
+                            className="w-12 h-12 rounded-full object-cover"
+                          />
+                          <div>
+                            <p className="font-semibold text-black">
+                              {rental.business_name}
+                            </p>
+                            <p className="text-zinc-600 text-sm">
+                              {rental.business_address}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Cancel Rental Section - Only for rentals not yet started and not cancelled */}
+                  {rental.status && ['To ship', 'Pending', 'Reserved'].includes(rental.status) && rental.status.toLowerCase() !== 'cancelled' && (
+                    <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-gray-200 pt-6 lg:pt-0 lg:pl-6">
+                      <div className="flex flex-col items-center justify-center h-full">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-3">
+                          <svg
+                            className="w-8 h-8 text-red-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </div>
+                        <p className="text-sm text-zinc-600 text-center mb-4">
+                          Haven't started yet? You can still cancel this rental.
+                        </p>
+                        <button
+                          onClick={() => handleCancelRental(rental.rental_id)}
+                          className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200"
+                        >
+                          Cancel Rental
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Cancelled Rental Message */}
+                  {rental.status && rental.status.toLowerCase() === 'cancelled' && (
+                    <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-gray-200 pt-6 lg:pt-0 lg:pl-6">
+                      <div className="flex flex-col items-center justify-center h-full text-center">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-3">
+                          <svg
+                            className="w-8 h-8 text-red-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </div>
+                        <p className="font-semibold text-black">
+                          {rental.payment_method === "E-Wallet" ? "Transaction Refunded" : "Booking Cancelled"}
+                        </p>
+                        <p className="text-sm text-zinc-600 mt-1">
+                          {rental.payment_method === "E-Wallet" ? "This rental was cancelled and payment is refunded." : "This rental was cancelled and cannot be reviewed."}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Out for Delivery Message */}
+                  {rental.status && rental.status === 'Out for Delivery' && (
+                    <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-gray-200 pt-6 lg:pt-0 lg:pl-6">
+                      <div className="flex flex-col items-center justify-center h-full text-center">
+                        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-3">
+                          <svg
+                            className="w-8 h-8 text-blue-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M13 10V3L4 14h7v7l9-11h-7z"
+                            />
+                          </svg>
+                        </div>
+                        <p className="font-semibold text-black">
+                          On Its Way!
+                        </p>
+                        <p className="text-sm text-zinc-600 mt-1">
+                          The product is on its way to you
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Delivered Message */}
+                  {rental.status && rental.status === 'Delivered' && (
+                    <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-gray-200 pt-6 lg:pt-0 lg:pl-6">
+                      <div className="flex flex-col items-center justify-center h-full text-center">
+                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                          <svg
+                            className="w-8 h-8 text-green-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        </div>
+                        <p className="font-semibold text-black">
+                          Product Delivered!
+                        </p>
+                        <p className="text-sm text-zinc-600 mt-1">
+                          Have a good rental day!
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Return Shipped Message */}
+                  {rental.status && rental.status === 'Return Shipped' && (
+                    <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-gray-200 pt-6 lg:pt-0 lg:pl-6">
+                      <div className="flex flex-col items-center justify-center h-full text-center">
+                        <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-3">
+                          <svg
+                            className="w-8 h-8 text-yellow-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M13 10V3L4 14h7v7l9-11h-7z"
+                            />
+                          </svg>
+                        </div>
+                        <p className="font-semibold text-black">
+                          Being Returned
+                        </p>
+                        <p className="text-sm text-zinc-600 mt-1">
+                          Product is being returned to the owner
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Rating Section - Only for Completed Rentals */}
+                  {rental.status && rental.status.toLowerCase() === "completed" && (
+                    <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-gray-200 pt-6 lg:pt-0 lg:pl-6">
+                      {submittedRatings[rental.rental_id] ? (
+                        <div className="flex flex-col items-center justify-center h-full text-center">
+                          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                            <svg
+                              className="w-8 h-8 text-green-600"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          </div>
+                          <p className="font-semibold text-black">
+                            Review Submitted!
+                          </p>
+                          <p className="text-sm text-zinc-600 mt-1">
+                            Thank you for your feedback
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-4">
+                          <h3 className="text-lg font-semibold text-black">
+                            Rate this Product
+                          </h3>
+
+                          {/* Star Rating */}
+                          <div className="flex flex-col gap-2">
+                            <label className="text-sm text-zinc-600">
+                              Your Rating
+                            </label>
+                            <div className="flex gap-2">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                  key={star}
+                                  onClick={() =>
+                                    handleStarClick(rental.rental_id, star)
+                                  }
+                                  className="focus:outline-none transition-transform hover:scale-110"
+                                >
+                                  <svg
+                                    className="w-8 h-8"
+                                    fill={
+                                      ratings[rental.rental_id] >= star
+                                        ? "#FCD34D"
+                                        : "#E5E7EB"
+                                    }
+                                    stroke={
+                                      ratings[rental.rental_id] >= star
+                                        ? "#F59E0B"
+                                        : "#D1D5DB"
+                                    }
+                                    strokeWidth="1"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                  </svg>
+                                </button>
+                              ))}
+                            </div>
+                            {ratings[rental.rental_id] && (
+                              <p className="text-sm text-zinc-600">
+                                {ratings[rental.rental_id]} out of 5 stars
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Review Text */}
+                          <div className="flex flex-col gap-2">
+                            <label className="text-sm text-zinc-600">
+                              Your Review (Optional)
+                            </label>
+                            <textarea
+                              value={reviews[rental.rental_id] || ""}
+                              onChange={(e) =>
+                                handleReviewChange(
+                                  rental.rental_id,
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Share your experience with this product..."
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red focus:border-transparent text-black resize-none"
+                              rows="4"
+                            />
+                          </div>
+
+                          {/* Submit Button */}
+                          <button
+                            onClick={() => handleSubmitRating(rental.rental_id)}
+                            className="w-full bg-red hover:bg-red-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200"
+                          >
+                            Submit Review
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* Cancelled Rentals Section */}
+            {rentals.filter(r => r.status?.toLowerCase() === 'cancelled').length > 0 && (
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-1 h-8 bg-red-600 rounded-full"></div>
+                  <h2 className="text-2xl font-semibold text-black">
+                    Cancelled Rentals
+                  </h2>
+                  <span className="bg-red-100 text-red-800 text-sm font-semibold px-3 py-1 rounded-full">
+                    {rentals.filter(r => r.status?.toLowerCase() === 'cancelled').length}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 gap-6">
+                  {rentals
+                    .filter(r => r.status?.toLowerCase() === 'cancelled')
+                    .map((rental) => (
+              <motion.div
+                key={rental.rental_id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="border border-zinc-300 rounded-xl p-6 bg-white shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Product Image & Details */}
+                  <div className="lg:col-span-2">
+                    <div className="flex flex-col md:flex-row gap-4">
+                      {/* Product Image */}
+                      <div className="w-full md:w-48 h-48 rounded-lg overflow-hidden bg-gray-100 shrink-0">
+                        <img
+                          src={rental.image_path}
+                          alt={rental.product_name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      {/* Product Info */}
+                      <div className="flex-1 flex flex-col gap-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h2 className="text-2xl font-semibold text-black">
+                              {rental.product_name}
+                            </h2>
+                            <p className="text-zinc-600 text-sm mt-1">
+                              {rental.category_type}
+                            </p>
+                          </div>
+                          {getStatusBadge(rental.status)}
+                        </div>
+
+                        {/* Rental Period */}
+                        <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                          <div className="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                              <p className="text-zinc-600">Start Date</p>
+                              <p className="font-semibold text-black">
+                                {new Date(rental.rental_start).toLocaleDateString("en-US", {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-zinc-600">End Date</p>
+                              <p className="font-semibold text-black">
+                                {new Date(rental.rental_end).toLocaleDateString("en-US", {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Pricing */}
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-zinc-600 text-sm">
+                              Rate: <span className="text-sky-800 font-semibold">₱{rental.product_rate}</span>/day
+                            </p>
+                            <p className="text-black font-bold text-lg mt-1">
+                              Total: ₱{rental.total_cost.toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Owner Info */}
+                        <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+                          <img
+                            src={rental.business_profile_picture || "/pictures/sample-pfp-productCard.png"}
+                            alt={rental.business_name}
+                            className="w-12 h-12 rounded-full object-cover"
+                          />
+                          <div>
+                            <p className="font-semibold text-black">
+                              {rental.business_name}
+                            </p>
+                            <p className="text-zinc-600 text-sm">
+                              {rental.business_address}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Cancelled Rental Message */}
+                  {rental.status && rental.status.toLowerCase() === 'cancelled' && (
+                    <div className="lg:col-span-1 border-t lg:border-t-0 lg:border-l border-gray-200 pt-6 lg:pt-0 lg:pl-6">
+                      <div className="flex flex-col items-center justify-center h-full text-center">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-3">
+                          <svg
+                            className="w-8 h-8 text-red-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </div>
+                        <p className="font-semibold text-black">
+                          {rental.payment_method === "E-Wallet" ? "Transaction Refunded" : "Booking Cancelled"}
+                        </p>
+                        <p className="text-sm text-zinc-600 mt-1">
+                          {rental.payment_method === "E-Wallet" ? "This rental was cancelled and payment is refunded." : "This rental was cancelled and cannot be reviewed."}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+                    ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
